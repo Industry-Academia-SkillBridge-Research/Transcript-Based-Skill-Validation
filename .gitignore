@@ -1,3 +1,7 @@
 # input files
 input/
 desktop.ini
+
+#env/venv
+.env
+.venv
