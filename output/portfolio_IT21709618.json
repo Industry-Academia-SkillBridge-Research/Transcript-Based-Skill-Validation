@@ -1,0 +1,231 @@
+{
+  "reg_no": "IT21709618",
+  "name": "Lauren Scott",
+  "skills": [
+    {
+      "name": "Information Retrieval & Web Analytics",
+      "score": 1.1,
+      "level": "Advanced",
+      "n_courses": 1
+    },
+    {
+      "name": "Machine Learning & Optimization",
+      "score": 1.1,
+      "level": "Advanced",
+      "n_courses": 1
+    },
+    {
+      "name": "Database Design & Administration",
+      "score": 1.05,
+      "level": "Advanced",
+      "n_courses": 1
+    },
+    {
+      "name": "Networking & Protocol Management",
+      "score": 1.05,
+      "level": "Advanced",
+      "n_courses": 1
+    },
+    {
+      "name": "Academic Communication Skills",
+      "score": 1.0,
+      "level": "Advanced",
+      "n_courses": 1
+    },
+    {
+      "name": "Data Engineering & BI Analytics",
+      "score": 0.9900000000000001,
+      "level": "Advanced",
+      "n_courses": 1
+    },
+    {
+      "name": "Information Systems & Database Design",
+      "score": 0.9450000000000001,
+      "level": "Advanced",
+      "n_courses": 1
+    },
+    {
+      "name": "Web Development & Internet Technologies",
+      "score": 0.9450000000000001,
+      "level": "Advanced",
+      "n_courses": 1
+    },
+    {
+      "name": "Operating Systems & System Administration",
+      "score": 0.9450000000000001,
+      "level": "Advanced",
+      "n_courses": 1
+    },
+    {
+      "name": "Mobile Application Design & Development",
+      "score": 0.9450000000000001,
+      "level": "Advanced",
+      "n_courses": 1
+    },
+    {
+      "name": "IT Project Management & Execution",
+      "score": 0.9450000000000001,
+      "level": "Advanced",
+      "n_courses": 1
+    },
+    {
+      "name": "Statistical Modeling & Data Analysis",
+      "score": 0.935,
+      "level": "Advanced",
+      "n_courses": 1
+    },
+    {
+      "name": "Advanced Database Design & Management",
+      "score": 0.935,
+      "level": "Advanced",
+      "n_courses": 1
+    },
+    {
+      "name": "Java & Object-Oriented Application Development",
+      "score": 0.8925,
+      "level": "Advanced",
+      "n_courses": 1
+    },
+    {
+      "name": "Software Development & Engineering Practices",
+      "score": 0.8400000000000001,
+      "level": "Proficient",
+      "n_courses": 1
+    },
+    {
+      "name": "Problem Solving & Algorithm Development",
+      "score": 0.8400000000000001,
+      "level": "Proficient",
+      "n_courses": 1
+    },
+    {
+      "name": "Full-Stack Web Application Development",
+      "score": 0.8250000000000001,
+      "level": "Proficient",
+      "n_courses": 1
+    },
+    {
+      "name": "Database Administration & Storage",
+      "score": 0.8250000000000001,
+      "level": "Proficient",
+      "n_courses": 1
+    },
+    {
+      "name": "Professionalism & Workplace Readiness",
+      "score": 0.8,
+      "level": "Proficient",
+      "n_courses": 1
+    },
+    {
+      "name": "Employability & Workplace Readiness",
+      "score": 0.8,
+      "level": "Proficient",
+      "n_courses": 2
+    },
+    {
+      "name": "Computer Systems & Networking",
+      "score": 0.7875000000000001,
+      "level": "Proficient",
+      "n_courses": 1
+    },
+    {
+      "name": "Software Development Processes",
+      "score": 0.7875000000000001,
+      "level": "Proficient",
+      "n_courses": 1
+    },
+    {
+      "name": "Information Security Analytics",
+      "score": 0.77,
+      "level": "Proficient",
+      "n_courses": 1
+    },
+    {
+      "name": "Programming Fundamentals & C Language",
+      "score": 0.7,
+      "level": "Proficient",
+      "n_courses": 1
+    },
+    {
+      "name": "Mathematics & Logical Thinking",
+      "score": 0.6825000000000001,
+      "level": "Developing",
+      "n_courses": 1
+    },
+    {
+      "name": "Object-Oriented Design & Programming",
+      "score": 0.6825000000000001,
+      "level": "Developing",
+      "n_courses": 1
+    },
+    {
+      "name": "Statistical Analysis & Data Interpretation",
+      "score": 0.6825000000000001,
+      "level": "Developing",
+      "n_courses": 1
+    }
+  ],
+  "recommended_roles": [
+    {
+      "role": "Data Scientist",
+      "readiness": 0.8428910280109009,
+      "label": "Moderately Ready",
+      "top_gaps": [
+        {
+          "skill": "Probability & Statistics for IT",
+          "student": 0.0,
+          "required": 0.9
+        },
+        {
+          "skill": "Relational Database Design & SQL",
+          "student": 0.0,
+          "required": 0.7
+        }
+      ]
+    },
+    {
+      "role": "Data Analyst",
+      "readiness": 0.7180085514734861,
+      "label": "Moderately Ready",
+      "top_gaps": [
+        {
+          "skill": "Probability & Statistics for IT",
+          "student": 0.0,
+          "required": 0.9
+        },
+        {
+          "skill": "Relational Database Design & SQL",
+          "student": 0.0,
+          "required": 0.8
+        },
+        {
+          "skill": "Information Systems & Data Modelling",
+          "student": 0.0,
+          "required": 0.7
+        }
+      ]
+    },
+    {
+      "role": "Business Intelligence Engineer",
+      "readiness": 0.6891436921545151,
+      "label": "Partially Ready",
+      "top_gaps": [
+        {
+          "skill": "Relational Database Design & SQL",
+          "student": 0.0,
+          "required": 0.9
+        },
+        {
+          "skill": "Database Systems & Storage",
+          "student": 0.0,
+          "required": 0.7
+        },
+        {
+          "skill": "Information Systems & Data Modelling",
+          "student": 0.0,
+          "required": 0.7
+        }
+      ]
+    }
+  ]
+}
