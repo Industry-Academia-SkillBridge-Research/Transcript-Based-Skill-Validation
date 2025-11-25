@@ -1,3 +1,4 @@
+@ -1,131 +0,0 @@
 from typing import Dict, List
 import numpy as np
 
@@ -129,3 +130,4 @@ if __name__ == "__main__":
     print("\n=== Skill Profile (Main Skills) ===")
     for skill, info in sorted(profile.items(), key=lambda x: x[1]["score"], reverse=True):
         print(f"{skill:45s}  Score: {info['score']:.2f}  (from {info['n_courses']} course(s))")
+        

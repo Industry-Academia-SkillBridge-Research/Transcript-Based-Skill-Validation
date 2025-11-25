@@ -55,3 +55,4 @@ if __name__ == "__main__":
     print(f"Loaded {len(mapping)} courses")
     # print one sample
     print("IT1010 →", mapping.get("IT1010"))
+    
