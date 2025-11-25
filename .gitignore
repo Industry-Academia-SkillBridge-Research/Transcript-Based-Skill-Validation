@@ -5,3 +5,4 @@ desktop.ini
 #env/venv
 .env
 .venv
+output/
