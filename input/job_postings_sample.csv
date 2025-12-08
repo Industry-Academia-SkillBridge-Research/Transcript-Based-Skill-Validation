@@ -1,0 +1,5 @@
+JobID,Title,Company,Location,Description,Source,PostedDate
+1,Junior Data Scientist,ABC Analytics,Colombo,"We are looking for a Junior Data Scientist with strong skills in Python, machine learning, statistics, SQL, data visualization, and cloud platforms.",LinkedIn,2024-11-20
+2,Software Engineer (.NET),TechSoft,Sri Lanka,"Responsibilities: design and develop software using C#, .NET, OOP, design patterns, REST APIs, and SQL Server. Experience with Agile and version control (Git) is required.",TopJobs,2024-11-18
+3,Data Analyst,InsightHub,Remote,"Analyze datasets using SQL, Power BI or Tableau, statistics and hypothesis testing. Experience with data warehousing and ETL is a plus.",LinkedIn,2024-11-15
+4,Machine Learning Engineer,CloudAI,Colombo,"Build ML models in Python, use deep learning frameworks, deploy models as APIs, work with big data tools and cloud platforms.",LinkedIn,2024-11-10

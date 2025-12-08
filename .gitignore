@@ -1,8 +1,8 @@
 # input files
-input/
+# input/
 desktop.ini
 
 #env/venv
 .env
 .venv
-output/
+# output/

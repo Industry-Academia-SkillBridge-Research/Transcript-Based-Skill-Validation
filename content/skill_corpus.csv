@@ -1,136 +1,136 @@
 Skill,SourceType,SourceName,Content
-Academic Listening & Note-taking,module_outline,AUTO_FROM_MAPPING,
-Academic Writing & Grammar,module_outline,AUTO_FROM_MAPPING,
-Agile Development & SCRUM,module_outline,AUTO_FROM_MAPPING,
-Agile Software Development & Scrum Practices,module_outline,AUTO_FROM_MAPPING,
-Algorithm Analysis & Asymptotic Notations,module_outline,AUTO_FROM_MAPPING,
-Algorithm Design Techniques,module_outline,AUTO_FROM_MAPPING,
-Android OS & Application Components,module_outline,AUTO_FROM_MAPPING,
-AngularJS & TypeScript MVC Development,module_outline,AUTO_FROM_MAPPING,
-Application Testing & Security,module_outline,AUTO_FROM_MAPPING,
-"Arrays, Structures & File Handling",module_outline,AUTO_FROM_MAPPING,
-BI Solution Implementation,module_outline,AUTO_FROM_MAPPING,
-Bayesian Analysis,module_outline,AUTO_FROM_MAPPING,
-Boolean Algebra & Logic,module_outline,AUTO_FROM_MAPPING,
-Boolean Retrieval & Inverted Indexes,module_outline,AUTO_FROM_MAPPING,
-C++ Programming Implementation,module_outline,AUTO_FROM_MAPPING,
-Calculus & Differentiation,module_outline,AUTO_FROM_MAPPING,
-"Classes, Objects & Properties",module_outline,AUTO_FROM_MAPPING,
-Client-side Development with JavaScript Frameworks,module_outline,AUTO_FROM_MAPPING,
-Cloud Database Setup,module_outline,AUTO_FROM_MAPPING,
-"Collections, Generics & Threads",module_outline,AUTO_FROM_MAPPING,
-Combinational & Sequential Logic Circuits,module_outline,AUTO_FROM_MAPPING,
-Control Structures & Loops,module_outline,AUTO_FROM_MAPPING,
-Convolutional Neural Networks,module_outline,AUTO_FROM_MAPPING,
-Crash Recovery Algorithms,module_outline,AUTO_FROM_MAPPING,
-DBMS Architecture Analysis,module_outline,AUTO_FROM_MAPPING,
-Data Handling & Media Integration,module_outline,AUTO_FROM_MAPPING,
-Data Modeling & ER Diagrams,module_outline,AUTO_FROM_MAPPING,
-Data Representation & Computer Architecture,module_outline,AUTO_FROM_MAPPING,
-Data Warehousing Architecture,module_outline,AUTO_FROM_MAPPING,
-Database Connectivity (ODBC/JDBC),module_outline,AUTO_FROM_MAPPING,
-Database Design & Conceptual Modeling,module_outline,AUTO_FROM_MAPPING,
-Database Security & Performance Optimization,module_outline,AUTO_FROM_MAPPING,
-Database Server Configuration,module_outline,AUTO_FROM_MAPPING,
-"Deep Sequence Models (RNN, LSTM)",module_outline,AUTO_FROM_MAPPING,
-Descriptive & Inferential Statistics,module_outline,AUTO_FROM_MAPPING,
-Design Patterns & Web-based Project,module_outline,AUTO_FROM_MAPPING,
-"Design Patterns (Creational, Structural, Behavioral)",module_outline,AUTO_FROM_MAPPING,
-Dimensional Data Modelling,module_outline,AUTO_FROM_MAPPING,
-Diversity & Inclusion Awareness,module_outline,AUTO_FROM_MAPPING,
-Documentation & Presentation Skills,module_outline,AUTO_FROM_MAPPING,
-ETL/ELT Processes,module_outline,AUTO_FROM_MAPPING,
-"Encapsulation, Abstraction & Interfaces",module_outline,AUTO_FROM_MAPPING,
-Enterprise Storage Solutions,module_outline,AUTO_FROM_MAPPING,
-Ethics & Professional Conduct,module_outline,AUTO_FROM_MAPPING,
-Exception Handling & Debugging,module_outline,AUTO_FROM_MAPPING,
-File System & I/O Management,module_outline,AUTO_FROM_MAPPING,
-Functional & Object-Oriented Analysis & Design,module_outline,AUTO_FROM_MAPPING,
-Functions & Recursion,module_outline,AUTO_FROM_MAPPING,
-Graph Theory & Matrices,module_outline,AUTO_FROM_MAPPING,
-HTML/CSS & UI Design,module_outline,AUTO_FROM_MAPPING,
-Hypothesis Testing,module_outline,AUTO_FROM_MAPPING,
-Hypothesis Testing & Chi-Squared Tests,module_outline,AUTO_FROM_MAPPING,
-IP Addressing & Network Design,module_outline,AUTO_FROM_MAPPING,
-IP Addressing & Subnetting,module_outline,AUTO_FROM_MAPPING,
-Indexing & Query Optimization,module_outline,AUTO_FROM_MAPPING,
-Industrial Tools & Technologies,module_outline,AUTO_FROM_MAPPING,
-Industry Expectations & Workplace Adaptation,module_outline,AUTO_FROM_MAPPING,
-Information Systems Analysis,module_outline,AUTO_FROM_MAPPING,
-Inheritance & Polymorphism,module_outline,AUTO_FROM_MAPPING,
-Integration & Applications,module_outline,AUTO_FROM_MAPPING,
-Intellectual Property & Entrepreneurship,module_outline,AUTO_FROM_MAPPING,
-Internet & Web Protocols,module_outline,AUTO_FROM_MAPPING,
-Intrusion Detection & Prevention,module_outline,AUTO_FROM_MAPPING,
-"Java Frameworks (JAX-WS, Servlets, JSP)",module_outline,AUTO_FROM_MAPPING,
-Java Programming Fundamentals,module_outline,AUTO_FROM_MAPPING,
-JavaScript/PHP Web Development,module_outline,AUTO_FROM_MAPPING,
-Job Role Awareness,module_outline,AUTO_FROM_MAPPING,
-Legal & Professional Responsibilities,module_outline,AUTO_FROM_MAPPING,
-Logical Database Design & Schema Refinement,module_outline,AUTO_FROM_MAPPING,
-Memory & Virtual Memory Management,module_outline,AUTO_FROM_MAPPING,
-Mobile App Development Fundamentals,module_outline,AUTO_FROM_MAPPING,
-Multilevel Access Control Design,module_outline,AUTO_FROM_MAPPING,
-Multiple Linear Regression,module_outline,AUTO_FROM_MAPPING,
-Network Device Configuration (Routers/Switches),module_outline,AUTO_FROM_MAPPING,
-Network Security & ACLs,module_outline,AUTO_FROM_MAPPING,
-Networking Fundamentals & ISO/OSI Layers,module_outline,AUTO_FROM_MAPPING,
-Neural Networks & Perceptrons,module_outline,AUTO_FROM_MAPPING,
-Number Systems & Computer Arithmetic,module_outline,AUTO_FROM_MAPPING,
-OLAP Cube Design,module_outline,AUTO_FROM_MAPPING,
-OS Concepts & Architecture,module_outline,AUTO_FROM_MAPPING,
-Object-Oriented Concepts & Recap,module_outline,AUTO_FROM_MAPPING,
-Object-Oriented Programming Fundamentals,module_outline,AUTO_FROM_MAPPING,
-Object-Relational Database Design,module_outline,AUTO_FROM_MAPPING,
-Operating Systems Basics,module_outline,AUTO_FROM_MAPPING,
-"Optimization Methods (Linear, Stochastic, Genetic)",module_outline,AUTO_FROM_MAPPING,
-"Paraphrasing, Summarizing & Referencing",module_outline,AUTO_FROM_MAPPING,
-Personal Development & Work Ethics,module_outline,AUTO_FROM_MAPPING,
-Pointers & Memory Management,module_outline,AUTO_FROM_MAPPING,
-Probability Distributions,module_outline,AUTO_FROM_MAPPING,
-Probability Distributions & Random Variables,module_outline,AUTO_FROM_MAPPING,
-Procedural Programming Concepts,module_outline,AUTO_FROM_MAPPING,
-Process & Thread Management,module_outline,AUTO_FROM_MAPPING,
-Project Planning & Requirement Gathering,module_outline,AUTO_FROM_MAPPING,
-RESTful Web Services,module_outline,AUTO_FROM_MAPPING,
-Reading Comprehension,module_outline,AUTO_FROM_MAPPING,
-Regression & Time Series Analysis,module_outline,AUTO_FROM_MAPPING,
-Reinforcement Learning & Q-Learning,module_outline,AUTO_FROM_MAPPING,
-Relevance Feedback & Query Expansion,module_outline,AUTO_FROM_MAPPING,
-Requirements Engineering & UML,module_outline,AUTO_FROM_MAPPING,
-Risk Management & Mitigation,module_outline,AUTO_FROM_MAPPING,
-Routing & TCP/UDP Protocols,module_outline,AUTO_FROM_MAPPING,
-SQL Database Management (DDL/DML),module_outline,AUTO_FROM_MAPPING,
-SQL Querying & Database Programming,module_outline,AUTO_FROM_MAPPING,
-Sampling & Probability Theory,module_outline,AUTO_FROM_MAPPING,
-Schema Refinement & Normalization,module_outline,AUTO_FROM_MAPPING,
-"Scoring, Term Weighting & Vector Space Model",module_outline,AUTO_FROM_MAPPING,
-Searching & Sorting Algorithms,module_outline,AUTO_FROM_MAPPING,
-Security Monitoring & Reporting,module_outline,AUTO_FROM_MAPPING,
-Security Threats Analysis,module_outline,AUTO_FROM_MAPPING,
-Social Media & Digital Content,module_outline,AUTO_FROM_MAPPING,
-Soft Skills & Professionalism,module_outline,AUTO_FROM_MAPPING,
-Software Design & Testing,module_outline,AUTO_FROM_MAPPING,
-Software Engineering Fundamentals,module_outline,AUTO_FROM_MAPPING,
-Software Life Cycle Modeling,module_outline,AUTO_FROM_MAPPING,
-Software Testing & Unit Testing,module_outline,AUTO_FROM_MAPPING,
-Software Testing & User Acceptance,module_outline,AUTO_FROM_MAPPING,
-Speaking & Presentations,module_outline,AUTO_FROM_MAPPING,
-"Stack, Queue & Linked List Implementation",module_outline,AUTO_FROM_MAPPING,
-Strategic IS & Decision Support,module_outline,AUTO_FROM_MAPPING,
-"Supportive Software Processes (Configuration, Version, Release Management)",module_outline,AUTO_FROM_MAPPING,
-System Security & Administration Scripting,module_outline,AUTO_FROM_MAPPING,
-Team Organization & Collaboration,module_outline,AUTO_FROM_MAPPING,
-Teamwork & Collaboration,module_outline,AUTO_FROM_MAPPING,
-Text Classification & Naïve Bayes,module_outline,AUTO_FROM_MAPPING,
-Time Series Analysis,module_outline,AUTO_FROM_MAPPING,
-Transactions & Concurrency Control,module_outline,AUTO_FROM_MAPPING,
-Tree & Graph Data Structures,module_outline,AUTO_FROM_MAPPING,
-UI/UX Design & Mobile Interface Concepts,module_outline,AUTO_FROM_MAPPING,
-UML Modeling & Behavioral Modeling,module_outline,AUTO_FROM_MAPPING,
-"VLAN, Spanning Tree & Trunking",module_outline,AUTO_FROM_MAPPING,
-Vulnerability Assessment,module_outline,AUTO_FROM_MAPPING,
-Web Analytics & SEO/SEM,module_outline,AUTO_FROM_MAPPING,
-Web-based Application Development using Java,module_outline,AUTO_FROM_MAPPING,
-XML & Semi-Structured Data,module_outline,AUTO_FROM_MAPPING,
-e-Commerce & Web Security,module_outline,AUTO_FROM_MAPPING,
+Academic Listening & Note-taking,module_outline,AUTO_FROM_MAPPING,"Listening strategies for lectures and academic talks, with emphasis on identifying key ideas, recording structured notes and extracting relevant information for later study."
+Academic Writing & Grammar,module_outline,AUTO_FROM_MAPPING,"Skills for structuring academic writing, using formal style, correct grammar and cohesion, and integrating citations and references."
+Agile Development & SCRUM,module_outline,AUTO_FROM_MAPPING,"Agile principles and Scrum practices including roles, ceremonies, backlog management, iterative delivery and how to collaborate in an Agile software team."
+Agile Software Development & Scrum Practices,module_outline,AUTO_FROM_MAPPING,"Agile Software Development & Scrum Practices refers to communication, teamwork, ethics and other professional behaviours required to work effectively in industry."
+Algorithm Analysis & Asymptotic Notations,module_outline,AUTO_FROM_MAPPING,"Algorithm Analysis & Asymptotic Notations focuses on efficient organisation of data and step-by-step procedures for solving computational problems, with attention to time and space complexity."
+Algorithm Design Techniques,module_outline,AUTO_FROM_MAPPING,"Algorithm Design Techniques focuses on efficient organisation of data and step-by-step procedures for solving computational problems, with attention to time and space complexity."
+Android OS & Application Components,module_outline,AUTO_FROM_MAPPING,"Android OS & Application Components is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+AngularJS & TypeScript MVC Development,module_outline,AUTO_FROM_MAPPING,"AngularJS & TypeScript MVC Development is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Application Testing & Security,module_outline,AUTO_FROM_MAPPING,"Application Testing & Security is concerned with protecting systems and data through access control, secure configuration and detection of suspicious activity."
+"Arrays, Structures & File Handling",module_outline,AUTO_FROM_MAPPING,"Arrays, Structures & File Handling is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+BI Solution Implementation,module_outline,AUTO_FROM_MAPPING,"BI Solution Implementation is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Bayesian Analysis,module_outline,AUTO_FROM_MAPPING,"Bayesian Analysis is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Boolean Algebra & Logic,module_outline,AUTO_FROM_MAPPING,"Boolean Algebra & Logic is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Boolean Retrieval & Inverted Indexes,module_outline,AUTO_FROM_MAPPING,"Boolean Retrieval & Inverted Indexes is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+C++ Programming Implementation,module_outline,AUTO_FROM_MAPPING,"C++ Programming Implementation is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Calculus & Differentiation,module_outline,AUTO_FROM_MAPPING,"Calculus & Differentiation is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+"Classes, Objects & Properties",module_outline,AUTO_FROM_MAPPING,"Classes, Objects & Properties is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Client-side Development with JavaScript Frameworks,module_outline,AUTO_FROM_MAPPING,"Client-side Development with JavaScript Frameworks is about building and delivering content and applications over the web, including front-end interfaces and server-side processing."
+Cloud Database Setup,module_outline,AUTO_FROM_MAPPING,"Cloud Database Setup covers designing relational schemas and using SQL to define, manipulate and query data while preserving integrity and performance."
+"Collections, Generics & Threads",module_outline,AUTO_FROM_MAPPING,"Collections, Generics & Threads relates to how an operating system manages processes, threads, memory, files and I/O devices to provide a safe and efficient execution environment."
+Combinational & Sequential Logic Circuits,module_outline,AUTO_FROM_MAPPING,"Combinational & Sequential Logic Circuits is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Control Structures & Loops,module_outline,AUTO_FROM_MAPPING,"Control Structures & Loops is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Convolutional Neural Networks,module_outline,AUTO_FROM_MAPPING,"Convolutional Neural Networks focuses on learning patterns from data using parameterised models, training procedures, evaluation metrics and regularization to generalize to unseen cases."
+Crash Recovery Algorithms,module_outline,AUTO_FROM_MAPPING,"Crash Recovery Algorithms focuses on efficient organisation of data and step-by-step procedures for solving computational problems, with attention to time and space complexity."
+DBMS Architecture Analysis,module_outline,AUTO_FROM_MAPPING,"DBMS Architecture Analysis is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Data Handling & Media Integration,module_outline,AUTO_FROM_MAPPING,"Data Handling & Media Integration is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Data Modeling & ER Diagrams,module_outline,AUTO_FROM_MAPPING,"Data Modeling & ER Diagrams is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Data Representation & Computer Architecture,module_outline,AUTO_FROM_MAPPING,"Data Representation & Computer Architecture is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Data Warehousing Architecture,module_outline,AUTO_FROM_MAPPING,"Data Warehousing Architecture is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Database Connectivity (ODBC/JDBC),module_outline,AUTO_FROM_MAPPING,"Database Connectivity (ODBC/JDBC) covers designing relational schemas and using SQL to define, manipulate and query data while preserving integrity and performance."
+Database Design & Conceptual Modeling,module_outline,AUTO_FROM_MAPPING,"Database Design & Conceptual Modeling covers designing relational schemas and using SQL to define, manipulate and query data while preserving integrity and performance."
+Database Security & Performance Optimization,module_outline,AUTO_FROM_MAPPING,"Database Security & Performance Optimization covers designing relational schemas and using SQL to define, manipulate and query data while preserving integrity and performance."
+Database Server Configuration,module_outline,AUTO_FROM_MAPPING,"Database Server Configuration covers designing relational schemas and using SQL to define, manipulate and query data while preserving integrity and performance."
+"Deep Sequence Models (RNN, LSTM)",module_outline,AUTO_FROM_MAPPING,"Deep Sequence Models (RNN, LSTM) focuses on learning patterns from data using parameterised models, training procedures, evaluation metrics and regularization to generalize to unseen cases."
+Descriptive & Inferential Statistics,module_outline,AUTO_FROM_MAPPING,"Descriptive & Inferential Statistics involves using statistical thinking to analyse data, quantify uncertainty and make evidence-based decisions, including choosing appropriate tests, interpreting p-values and confidence intervals."
+Design Patterns & Web-based Project,module_outline,AUTO_FROM_MAPPING,"Design Patterns & Web-based Project is about building and delivering content and applications over the web, including front-end interfaces and server-side processing."
+"Design Patterns (Creational, Structural, Behavioral)",module_outline,AUTO_FROM_MAPPING,"Design Patterns (Creational, Structural, Behavioral) is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Dimensional Data Modelling,module_outline,AUTO_FROM_MAPPING,"Dimensional Data Modelling is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Diversity & Inclusion Awareness,module_outline,AUTO_FROM_MAPPING,"Diversity & Inclusion Awareness is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Documentation & Presentation Skills,module_outline,AUTO_FROM_MAPPING,"Documentation & Presentation Skills is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+ETL/ELT Processes,module_outline,AUTO_FROM_MAPPING,"ETL/ELT Processes relates to how an operating system manages processes, threads, memory, files and I/O devices to provide a safe and efficient execution environment."
+"Encapsulation, Abstraction & Interfaces",module_outline,AUTO_FROM_MAPPING,"Encapsulation, Abstraction & Interfaces is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Enterprise Storage Solutions,module_outline,AUTO_FROM_MAPPING,"Enterprise Storage Solutions is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Ethics & Professional Conduct,module_outline,AUTO_FROM_MAPPING,"Ethics & Professional Conduct refers to communication, teamwork, ethics and other professional behaviours required to work effectively in industry."
+Exception Handling & Debugging,module_outline,AUTO_FROM_MAPPING,"Exception Handling & Debugging is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+File System & I/O Management,module_outline,AUTO_FROM_MAPPING,"File System & I/O Management is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Functional & Object-Oriented Analysis & Design,module_outline,AUTO_FROM_MAPPING,"Functional & Object-Oriented Analysis & Design is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Functions & Recursion,module_outline,AUTO_FROM_MAPPING,"Functions & Recursion is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Graph Theory & Matrices,module_outline,AUTO_FROM_MAPPING,"Graph Theory & Matrices is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+HTML/CSS & UI Design,module_outline,AUTO_FROM_MAPPING,"HTML/CSS & UI Design is about building and delivering content and applications over the web, including front-end interfaces and server-side processing."
+Hypothesis Testing,module_outline,AUTO_FROM_MAPPING,"Hypothesis Testing involves using statistical thinking to analyse data, quantify uncertainty and make evidence-based decisions, including choosing appropriate tests, interpreting p-values and confidence intervals."
+Hypothesis Testing & Chi-Squared Tests,module_outline,AUTO_FROM_MAPPING,"Hypothesis Testing & Chi-Squared Tests involves using statistical thinking to analyse data, quantify uncertainty and make evidence-based decisions, including choosing appropriate tests, interpreting p-values and confidence intervals."
+IP Addressing & Network Design,module_outline,AUTO_FROM_MAPPING,"IP Addressing & Network Design deals with how devices communicate over networks, including addressing, routing, switching, protocols and basic security controls."
+IP Addressing & Subnetting,module_outline,AUTO_FROM_MAPPING,"IP Addressing & Subnetting is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Indexing & Query Optimization,module_outline,AUTO_FROM_MAPPING,"Indexing & Query Optimization is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Industrial Tools & Technologies,module_outline,AUTO_FROM_MAPPING,"Industrial Tools & Technologies is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Industry Expectations & Workplace Adaptation,module_outline,AUTO_FROM_MAPPING,"Industry Expectations & Workplace Adaptation is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Information Systems Analysis,module_outline,AUTO_FROM_MAPPING,"Information Systems Analysis is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Inheritance & Polymorphism,module_outline,AUTO_FROM_MAPPING,"Inheritance & Polymorphism is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Integration & Applications,module_outline,AUTO_FROM_MAPPING,"Integration & Applications is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Intellectual Property & Entrepreneurship,module_outline,AUTO_FROM_MAPPING,"Intellectual Property & Entrepreneurship is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Internet & Web Protocols,module_outline,AUTO_FROM_MAPPING,"Internet & Web Protocols is about building and delivering content and applications over the web, including front-end interfaces and server-side processing."
+Intrusion Detection & Prevention,module_outline,AUTO_FROM_MAPPING,"Intrusion Detection & Prevention is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+"Java Frameworks (JAX-WS, Servlets, JSP)",module_outline,AUTO_FROM_MAPPING,"Java Frameworks (JAX-WS, Servlets, JSP) is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Java Programming Fundamentals,module_outline,AUTO_FROM_MAPPING,"Java Programming Fundamentals is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+JavaScript/PHP Web Development,module_outline,AUTO_FROM_MAPPING,"JavaScript/PHP Web Development is about building and delivering content and applications over the web, including front-end interfaces and server-side processing."
+Job Role Awareness,module_outline,AUTO_FROM_MAPPING,"Job Role Awareness is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Legal & Professional Responsibilities,module_outline,AUTO_FROM_MAPPING,"Legal & Professional Responsibilities refers to communication, teamwork, ethics and other professional behaviours required to work effectively in industry."
+Logical Database Design & Schema Refinement,module_outline,AUTO_FROM_MAPPING,"Logical Database Design & Schema Refinement covers designing relational schemas and using SQL to define, manipulate and query data while preserving integrity and performance."
+Memory & Virtual Memory Management,module_outline,AUTO_FROM_MAPPING,"Memory & Virtual Memory Management is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Mobile App Development Fundamentals,module_outline,AUTO_FROM_MAPPING,"Mobile App Development Fundamentals is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Multilevel Access Control Design,module_outline,AUTO_FROM_MAPPING,"Multilevel Access Control Design is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Multiple Linear Regression,module_outline,AUTO_FROM_MAPPING,"Multiple Linear Regression covers building and interpreting regression models, checking assumptions, diagnosing issues and using the models for prediction and explanation."
+Network Device Configuration (Routers/Switches),module_outline,AUTO_FROM_MAPPING,"Network Device Configuration (Routers/Switches) deals with how devices communicate over networks, including addressing, routing, switching, protocols and basic security controls."
+Network Security & ACLs,module_outline,AUTO_FROM_MAPPING,"Network Security & ACLs deals with how devices communicate over networks, including addressing, routing, switching, protocols and basic security controls."
+Networking Fundamentals & ISO/OSI Layers,module_outline,AUTO_FROM_MAPPING,"Networking Fundamentals & ISO/OSI Layers deals with how devices communicate over networks, including addressing, routing, switching, protocols and basic security controls."
+Neural Networks & Perceptrons,module_outline,AUTO_FROM_MAPPING,"Neural Networks & Perceptrons focuses on learning patterns from data using parameterised models, training procedures, evaluation metrics and regularization to generalize to unseen cases."
+Number Systems & Computer Arithmetic,module_outline,AUTO_FROM_MAPPING,"Number Systems & Computer Arithmetic is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+OLAP Cube Design,module_outline,AUTO_FROM_MAPPING,"OLAP Cube Design focuses on storing large volumes of data for analytics, designing dimensional models and supporting fast, ad-hoc queries for business decision-making."
+OS Concepts & Architecture,module_outline,AUTO_FROM_MAPPING,"OS Concepts & Architecture is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Object-Oriented Concepts & Recap,module_outline,AUTO_FROM_MAPPING,"Object-Oriented Concepts & Recap is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Object-Oriented Programming Fundamentals,module_outline,AUTO_FROM_MAPPING,"Core object-oriented concepts such as classes, objects, methods, encapsulation, inheritance and polymorphism. Focus on designing reusable components and modelling real-world problems in code."
+Object-Relational Database Design,module_outline,AUTO_FROM_MAPPING,"Object-Relational Database Design covers designing relational schemas and using SQL to define, manipulate and query data while preserving integrity and performance."
+Operating Systems Basics,module_outline,AUTO_FROM_MAPPING,"Operating Systems Basics relates to how an operating system manages processes, threads, memory, files and I/O devices to provide a safe and efficient execution environment."
+"Optimization Methods (Linear, Stochastic, Genetic)",module_outline,AUTO_FROM_MAPPING,"Optimization Methods (Linear, Stochastic, Genetic) is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+"Paraphrasing, Summarizing & Referencing",module_outline,AUTO_FROM_MAPPING,"Paraphrasing, Summarizing & Referencing is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Personal Development & Work Ethics,module_outline,AUTO_FROM_MAPPING,"Personal Development & Work Ethics is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Pointers & Memory Management,module_outline,AUTO_FROM_MAPPING,"Pointers & Memory Management is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Probability Distributions,module_outline,AUTO_FROM_MAPPING,"Probability Distributions involves using statistical thinking to analyse data, quantify uncertainty and make evidence-based decisions, including choosing appropriate tests, interpreting p-values and confidence intervals."
+Probability Distributions & Random Variables,module_outline,AUTO_FROM_MAPPING,"Probability Distributions & Random Variables involves using statistical thinking to analyse data, quantify uncertainty and make evidence-based decisions, including choosing appropriate tests, interpreting p-values and confidence intervals."
+Procedural Programming Concepts,module_outline,AUTO_FROM_MAPPING,"Procedural Programming Concepts is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Process & Thread Management,module_outline,AUTO_FROM_MAPPING,"Process & Thread Management relates to how an operating system manages processes, threads, memory, files and I/O devices to provide a safe and efficient execution environment."
+Project Planning & Requirement Gathering,module_outline,AUTO_FROM_MAPPING,"Project Planning & Requirement Gathering is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+RESTful Web Services,module_outline,AUTO_FROM_MAPPING,"RESTful Web Services is about building and delivering content and applications over the web, including front-end interfaces and server-side processing."
+Reading Comprehension,module_outline,AUTO_FROM_MAPPING,"Reading Comprehension is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Regression & Time Series Analysis,module_outline,AUTO_FROM_MAPPING,"Regression & Time Series Analysis covers building and interpreting regression models, checking assumptions, diagnosing issues and using the models for prediction and explanation."
+Reinforcement Learning & Q-Learning,module_outline,AUTO_FROM_MAPPING,"Reinforcement Learning & Q-Learning is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Relevance Feedback & Query Expansion,module_outline,AUTO_FROM_MAPPING,"Relevance Feedback & Query Expansion is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Requirements Engineering & UML,module_outline,AUTO_FROM_MAPPING,"Requirements Engineering & UML is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Risk Management & Mitigation,module_outline,AUTO_FROM_MAPPING,"Risk Management & Mitigation is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Routing & TCP/UDP Protocols,module_outline,AUTO_FROM_MAPPING,"Routing & TCP/UDP Protocols is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+SQL Database Management (DDL/DML),module_outline,AUTO_FROM_MAPPING,"SQL Database Management (DDL/DML) covers designing relational schemas and using SQL to define, manipulate and query data while preserving integrity and performance."
+SQL Querying & Database Programming,module_outline,AUTO_FROM_MAPPING,"SQL Querying & Database Programming covers designing relational schemas and using SQL to define, manipulate and query data while preserving integrity and performance."
+Sampling & Probability Theory,module_outline,AUTO_FROM_MAPPING,"Sampling & Probability Theory involves using statistical thinking to analyse data, quantify uncertainty and make evidence-based decisions, including choosing appropriate tests, interpreting p-values and confidence intervals."
+Schema Refinement & Normalization,module_outline,AUTO_FROM_MAPPING,"Schema Refinement & Normalization is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+"Scoring, Term Weighting & Vector Space Model",module_outline,AUTO_FROM_MAPPING,"Scoring, Term Weighting & Vector Space Model is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Searching & Sorting Algorithms,module_outline,AUTO_FROM_MAPPING,"Searching & Sorting Algorithms focuses on efficient organisation of data and step-by-step procedures for solving computational problems, with attention to time and space complexity."
+Security Monitoring & Reporting,module_outline,AUTO_FROM_MAPPING,"Security Monitoring & Reporting is concerned with protecting systems and data through access control, secure configuration and detection of suspicious activity."
+Security Threats Analysis,module_outline,AUTO_FROM_MAPPING,"Security Threats Analysis is concerned with protecting systems and data through access control, secure configuration and detection of suspicious activity."
+Social Media & Digital Content,module_outline,AUTO_FROM_MAPPING,"Social Media & Digital Content is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Soft Skills & Professionalism,module_outline,AUTO_FROM_MAPPING,"Soft Skills & Professionalism refers to communication, teamwork, ethics and other professional behaviours required to work effectively in industry."
+Software Design & Testing,module_outline,AUTO_FROM_MAPPING,"Software Design & Testing refers to communication, teamwork, ethics and other professional behaviours required to work effectively in industry."
+Software Engineering Fundamentals,module_outline,AUTO_FROM_MAPPING,"Software Engineering Fundamentals refers to communication, teamwork, ethics and other professional behaviours required to work effectively in industry."
+Software Life Cycle Modeling,module_outline,AUTO_FROM_MAPPING,"Software Life Cycle Modeling refers to communication, teamwork, ethics and other professional behaviours required to work effectively in industry."
+Software Testing & Unit Testing,module_outline,AUTO_FROM_MAPPING,"Software Testing & Unit Testing refers to communication, teamwork, ethics and other professional behaviours required to work effectively in industry."
+Software Testing & User Acceptance,module_outline,AUTO_FROM_MAPPING,"Software Testing & User Acceptance refers to communication, teamwork, ethics and other professional behaviours required to work effectively in industry."
+Speaking & Presentations,module_outline,AUTO_FROM_MAPPING,"Speaking & Presentations is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+"Stack, Queue & Linked List Implementation",module_outline,AUTO_FROM_MAPPING,"Stack, Queue & Linked List Implementation is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Strategic IS & Decision Support,module_outline,AUTO_FROM_MAPPING,"Strategic IS & Decision Support is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+"Supportive Software Processes (Configuration, Version, Release Management)",module_outline,AUTO_FROM_MAPPING,"Supportive Software Processes (Configuration, Version, Release Management) relates to how an operating system manages processes, threads, memory, files and I/O devices to provide a safe and efficient execution environment."
+System Security & Administration Scripting,module_outline,AUTO_FROM_MAPPING,"System Security & Administration Scripting is concerned with protecting systems and data through access control, secure configuration and detection of suspicious activity."
+Team Organization & Collaboration,module_outline,AUTO_FROM_MAPPING,"Team Organization & Collaboration refers to communication, teamwork, ethics and other professional behaviours required to work effectively in industry."
+Teamwork & Collaboration,module_outline,AUTO_FROM_MAPPING,"Teamwork & Collaboration refers to communication, teamwork, ethics and other professional behaviours required to work effectively in industry."
+Text Classification & Naïve Bayes,module_outline,AUTO_FROM_MAPPING,"Text Classification & Naïve Bayes is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Time Series Analysis,module_outline,AUTO_FROM_MAPPING,"Time Series Analysis is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Transactions & Concurrency Control,module_outline,AUTO_FROM_MAPPING,"Transactions & Concurrency Control is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Tree & Graph Data Structures,module_outline,AUTO_FROM_MAPPING,"Tree & Graph Data Structures focuses on efficient organisation of data and step-by-step procedures for solving computational problems, with attention to time and space complexity."
+UI/UX Design & Mobile Interface Concepts,module_outline,AUTO_FROM_MAPPING,"UI/UX Design & Mobile Interface Concepts is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+UML Modeling & Behavioral Modeling,module_outline,AUTO_FROM_MAPPING,"UML Modeling & Behavioral Modeling is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+"VLAN, Spanning Tree & Trunking",module_outline,AUTO_FROM_MAPPING,"VLAN, Spanning Tree & Trunking is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Vulnerability Assessment,module_outline,AUTO_FROM_MAPPING,"Vulnerability Assessment is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+Web Analytics & SEO/SEM,module_outline,AUTO_FROM_MAPPING,"Web Analytics & SEO/SEM is about building and delivering content and applications over the web, including front-end interfaces and server-side processing."
+Web-based Application Development using Java,module_outline,AUTO_FROM_MAPPING,"Web-based Application Development using Java is about building and delivering content and applications over the web, including front-end interfaces and server-side processing."
+XML & Semi-Structured Data,module_outline,AUTO_FROM_MAPPING,"XML & Semi-Structured Data is a core skill area in the IT / data science curriculum. It covers the key concepts, typical tools and practical problem-solving abilities needed to apply this knowledge in real projects."
+e-Commerce & Web Security,module_outline,AUTO_FROM_MAPPING,"e-Commerce & Web Security is about building and delivering content and applications over the web, including front-end interfaces and server-side processing."
