@@ -1,0 +1,47 @@
+[
+  {
+    "role_id": "data_analyst",
+    "role_name": "Data Analyst",
+    "skills": [
+      {"name": "SQL & Relational Databases", "weight": 1.0},
+      {"name": "Data Cleaning & Preprocessing", "weight": 0.9},
+      {"name": "Descriptive Statistics & EDA", "weight": 1.0},
+      {"name": "Data Visualization & Dashboards", "weight": 0.9},
+      {"name": "Data Warehousing & ETL", "weight": 0.8}
+    ]
+  },
+  {
+    "role_id": "data_scientist",
+    "role_name": "Data Scientist",
+    "skills": [
+      {"name": "Machine Learning Foundations", "weight": 1.0},
+      {"name": "Supervised Learning & Evaluation", "weight": 1.0},
+      {"name": "Statistical Modeling & Inference", "weight": 0.9},
+      {"name": "Feature Engineering", "weight": 0.9},
+      {"name": "Python for Data Science", "weight": 0.8},
+      {"name": "Big Data Processing & Cloud", "weight": 0.7}
+    ]
+  },
+  {
+    "role_id": "ml_engineer",
+    "role_name": "ML Engineer",
+    "skills": [
+      {"name": "Machine Learning Foundations", "weight": 1.0},
+      {"name": "Neural Networks & Deep Learning", "weight": 1.0},
+      {"name": "Model Deployment & APIs", "weight": 0.9},
+      {"name": "Big Data Processing & Cloud", "weight": 0.9},
+      {"name": "Software Engineering for ML", "weight": 0.8}
+    ]
+  },
+  {
+    "role_id": "software_engineer",
+    "role_name": "Software Engineer",
+    "skills": [
+      {"name": "Object-Oriented Programming Fundamentals", "weight": 1.0},
+      {"name": "Data Structures & Algorithms", "weight": 1.0},
+      {"name": "Software Engineering & Design Patterns", "weight": 0.9},
+      {"name": "Web Application Development", "weight": 0.9},
+      {"name": "Database Design & SQL", "weight": 0.8}
+    ]
+  }
+]
