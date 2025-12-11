@@ -6,3 +6,4 @@ desktop.ini
 .env
 .venv
 # output/
+src/__pycache__/

@@ -1,2 +1,273 @@
 RoleName,Skill,JobCount,RolePostingCount,Support,Importance,ImportanceNorm
-Data Analyst,Hypothesis Testing,1,1,1.0,0.6931471805599453,1.0
+AI Engineer,Advanced Database Design & Management,1,1,1.0,0.6931471805599453,1.0
+AI Engineer,Application Testing & Security,1,1,1.0,0.6931471805599453,1.0
+AI Engineer,BI Solution Implementation,1,1,1.0,0.6931471805599453,1.0
+AI Engineer,Enterprise Storage Solutions,1,1,1.0,0.6931471805599453,1.0
+AI Engineer,Integration & Applications,1,1,1.0,0.6931471805599453,1.0
+AI Engineer,OS Concepts & Architecture,1,1,1.0,0.6931471805599453,1.0
+AI Engineer,RESTful Web Services,1,1,1.0,0.6931471805599453,1.0
+AI Engineer,Software Design & Testing,1,1,1.0,0.6931471805599453,1.0
+AI Engineer,Software Development & Engineering Practices,1,1,1.0,0.6931471805599453,1.0
+AI Engineer,Software Development Processes,1,1,1.0,0.6931471805599453,1.0
+AI Engineer,Software Testing & Unit Testing,1,1,1.0,0.6931471805599453,1.0
+AI Engineer - New Grad,Cloud Database Setup,1,1,1.0,0.6931471805599453,1.0
+AI Engineer - New Grad,Integration & Applications,1,1,1.0,0.6931471805599453,1.0
+AI Research Engineer - Agentic AI & Intelligent Automation,Academic Communication Skills,1,1,1.0,0.6931471805599453,1.0
+AI Research Engineer - Agentic AI & Intelligent Automation,Data Engineering & BI Analytics,1,1,1.0,0.6931471805599453,1.0
+AI Research Engineer - Agentic AI & Intelligent Automation,Information Systems & Database Design,1,1,1.0,0.6931471805599453,1.0
+AI Research Engineer - Agentic AI & Intelligent Automation,Integration & Applications,1,1,1.0,0.6931471805599453,1.0
+AI Research Engineer - Agentic AI & Intelligent Automation,Software Design & Testing,1,1,1.0,0.6931471805599453,1.0
+AI Research Engineer - Agentic AI & Intelligent Automation,Software Testing & Unit Testing,1,1,1.0,0.6931471805599453,1.0
+AI Research Engineer Computer Vision & Analytics,Calculus & Differentiation,1,1,1.0,0.6931471805599453,1.0
+AI Research Engineer Computer Vision & Analytics,Data Engineering & BI Analytics,1,1,1.0,0.6931471805599453,1.0
+AI Research Engineer Computer Vision & Analytics,Integration & Applications,1,1,1.0,0.6931471805599453,1.0
+AI Research Engineer Computer Vision & Analytics,Machine Learning & Optimization,1,1,1.0,0.6931471805599453,1.0
+AI Research Engineer Computer Vision & Analytics,OS Concepts & Architecture,1,1,1.0,0.6931471805599453,1.0
+AI Research Engineer Computer Vision & Analytics,Probability Distributions,1,1,1.0,0.6931471805599453,1.0
+AI Research Engineer Computer Vision & Analytics,Problem Solving & Algorithm Development,1,1,1.0,0.6931471805599453,1.0
+AI Research Engineer Computer Vision & Analytics,Software Life Cycle Modeling,1,1,1.0,0.6931471805599453,1.0
+AI Research Engineer Computer Vision & Analytics,Software Testing & Unit Testing,1,1,1.0,0.6931471805599453,1.0
+AI/ML GCP Engineer,Algorithm Design Techniques,1,1,1.0,0.6931471805599453,1.0
+AI/ML GCP Engineer,Data Engineering & BI Analytics,1,1,1.0,0.6931471805599453,1.0
+AI/ML GCP Engineer,Software Development & Engineering Practices,1,1,1.0,0.6931471805599453,1.0
+Associate - Python Data Engineer - GDC,Ethics & Professional Conduct,1,1,1.0,0.6931471805599453,1.0
+Associate - Python Data Engineer - GDC,Personal Development & Work Ethics,1,1,1.0,0.6931471805599453,1.0
+Azure Data Engineer,Data Engineering & BI Analytics,1,1,1.0,0.6931471805599453,1.0
+Azure Data Engineer,ETL/ELT Processes,1,1,1.0,0.6931471805599453,1.0
+Azure Data Engineer,Information Security Analytics,1,1,1.0,0.6931471805599453,1.0
+Azure Data Engineer,Integration & Applications,1,1,1.0,0.6931471805599453,1.0
+Azure Data Engineer,Strategic IS & Decision Support,1,1,1.0,0.6931471805599453,1.0
+Data Analyst,Academic Communication Skills,1,24,0.041666666666666664,0.134119826036175,0.08333333333333333
+Data Analyst,Advanced Database Design & Management,1,24,0.041666666666666664,0.134119826036175,0.08333333333333333
+Data Analyst,Algorithm Design Techniques,1,24,0.041666666666666664,0.134119826036175,0.08333333333333333
+Data Analyst,Data Engineering & BI Analytics,12,24,0.5,1.6094379124341003,1.0
+Data Analyst,Data Handling & Media Integration,1,24,0.041666666666666664,0.134119826036175,0.08333333333333333
+Data Analyst,Database Security & Performance Optimization,1,24,0.041666666666666664,0.134119826036175,0.08333333333333333
+Data Analyst,Diversity & Inclusion Awareness,1,24,0.041666666666666664,0.134119826036175,0.08333333333333333
+Data Analyst,Documentation & Presentation Skills,1,24,0.041666666666666664,0.134119826036175,0.08333333333333333
+Data Analyst,Hypothesis Testing,2,24,0.08333333333333333,0.26823965207235,0.16666666666666666
+Data Analyst,Information Security Analytics,1,24,0.041666666666666664,0.134119826036175,0.08333333333333333
+Data Analyst,Information Systems & Database Design,2,24,0.08333333333333333,0.26823965207235,0.16666666666666666
+Data Analyst,Information Systems Analysis,5,24,0.20833333333333334,0.6705991301808751,0.4166666666666667
+Data Analyst,Integration & Applications,1,24,0.041666666666666664,0.134119826036175,0.08333333333333333
+Data Analyst,Legal & Professional Responsibilities,1,24,0.041666666666666664,0.134119826036175,0.08333333333333333
+Data Analyst,Machine Learning & Optimization,3,24,0.125,0.40235947810852507,0.25
+Data Analyst,Mobile Application Design & Development,1,24,0.041666666666666664,0.134119826036175,0.08333333333333333
+Data Analyst,Regression & Time Series Analysis,1,24,0.041666666666666664,0.134119826036175,0.08333333333333333
+Data Analyst,Security Monitoring & Reporting,1,24,0.041666666666666664,0.134119826036175,0.08333333333333333
+Data Analyst,Software Development & Engineering Practices,2,24,0.08333333333333333,0.26823965207235,0.16666666666666666
+Data Analyst,Software Development Processes,2,24,0.08333333333333333,0.26823965207235,0.16666666666666666
+Data Analyst,Software Engineering Fundamentals,1,24,0.041666666666666664,0.134119826036175,0.08333333333333333
+Data Analyst,Software Testing & Unit Testing,2,24,0.08333333333333333,0.26823965207235,0.16666666666666666
+Data Analyst,Statistical Analysis & Data Interpretation,1,24,0.041666666666666664,0.134119826036175,0.08333333333333333
+Data Analyst,Statistical Modeling & Data Analysis,5,24,0.20833333333333334,0.6705991301808751,0.4166666666666667
+Data Analyst,Strategic IS & Decision Support,9,24,0.375,1.2070784343255752,0.75
+Data Analyst,Team Organization & Collaboration,6,24,0.25,0.8047189562170501,0.5
+Data Analyst,Teamwork & Collaboration,1,24,0.041666666666666664,0.134119826036175,0.08333333333333333
+Data Analyst,Time Series Analysis,1,24,0.041666666666666664,0.134119826036175,0.08333333333333333
+Data Analytics Analyst [T500-20967],Information Security Analytics,1,1,1.0,0.6931471805599453,1.0
+Data Analytics Analyst [T500-20967],Information Systems Analysis,1,1,1.0,0.6931471805599453,1.0
+Data Engineer,Agile Development & SCRUM,1,9,0.1111111111111111,0.2558427881104495,0.14285714285714285
+Data Engineer,Agile Software Development & Scrum Practices,1,9,0.1111111111111111,0.2558427881104495,0.14285714285714285
+Data Engineer,BI Solution Implementation,3,9,0.3333333333333333,0.7675283643313486,0.4285714285714286
+Data Engineer,Computer Systems & Networking,1,9,0.1111111111111111,0.2558427881104495,0.14285714285714285
+Data Engineer,Data Engineering & BI Analytics,7,9,0.7777777777777778,1.7908995167731467,1.0
+Data Engineer,Data Representation & Computer Architecture,1,9,0.1111111111111111,0.2558427881104495,0.14285714285714285
+Data Engineer,Database Security & Performance Optimization,3,9,0.3333333333333333,0.7675283643313486,0.4285714285714286
+Data Engineer,Dimensional Data Modelling,2,9,0.2222222222222222,0.511685576220899,0.2857142857142857
+Data Engineer,Documentation & Presentation Skills,1,9,0.1111111111111111,0.2558427881104495,0.14285714285714285
+Data Engineer,ETL/ELT Processes,2,9,0.2222222222222222,0.511685576220899,0.2857142857142857
+Data Engineer,Enterprise Storage Solutions,1,9,0.1111111111111111,0.2558427881104495,0.14285714285714285
+Data Engineer,Indexing & Query Optimization,1,9,0.1111111111111111,0.2558427881104495,0.14285714285714285
+Data Engineer,Information Security Analytics,2,9,0.2222222222222222,0.511685576220899,0.2857142857142857
+Data Engineer,Information Systems & Database Design,3,9,0.3333333333333333,0.7675283643313486,0.4285714285714286
+Data Engineer,Integration & Applications,1,9,0.1111111111111111,0.2558427881104495,0.14285714285714285
+Data Engineer,Machine Learning & Optimization,1,9,0.1111111111111111,0.2558427881104495,0.14285714285714285
+Data Engineer,OS Concepts & Architecture,1,9,0.1111111111111111,0.2558427881104495,0.14285714285714285
+Data Engineer,Personal Development & Work Ethics,1,9,0.1111111111111111,0.2558427881104495,0.14285714285714285
+Data Engineer,SQL Querying & Database Programming,2,9,0.2222222222222222,0.511685576220899,0.2857142857142857
+Data Engineer,Security Monitoring & Reporting,2,9,0.2222222222222222,0.511685576220899,0.2857142857142857
+Data Engineer,Software Development & Engineering Practices,2,9,0.2222222222222222,0.511685576220899,0.2857142857142857
+Data Engineer,Software Development Processes,1,9,0.1111111111111111,0.2558427881104495,0.14285714285714285
+Data Engineer,Statistical Modeling & Data Analysis,1,9,0.1111111111111111,0.2558427881104495,0.14285714285714285
+Data Engineer & Solution Architect,Data Engineering & BI Analytics,1,1,1.0,0.6931471805599453,1.0
+Data Engineer & Solution Architect,Data Modeling & ER Diagrams,1,1,1.0,0.6931471805599453,1.0
+Data Engineer & Solution Architect,Enterprise Storage Solutions,1,1,1.0,0.6931471805599453,1.0
+Data Engineer & Solution Architect,Information Security Analytics,1,1,1.0,0.6931471805599453,1.0
+Data Engineer & Solution Architect,Information Systems & Database Design,1,1,1.0,0.6931471805599453,1.0
+Data Engineer & Solution Architect,Integration & Applications,1,1,1.0,0.6931471805599453,1.0
+Data Engineer & Solution Architect,Machine Learning & Optimization,1,1,1.0,0.6931471805599453,1.0
+Data Engineer & Solution Architect,Security Monitoring & Reporting,1,1,1.0,0.6931471805599453,1.0
+Data Engineer & Solution Architect,Strategic IS & Decision Support,1,1,1.0,0.6931471805599453,1.0
+Data Engineer (L5),Data Engineering & BI Analytics,1,1,1.0,0.6931471805599453,1.0
+Data Engineer (L5) - Ads,Data Engineering & BI Analytics,1,1,1.0,0.6931471805599453,1.0
+Data Engineer (L5) - Ads,Data Warehousing Architecture,1,1,1.0,0.6931471805599453,1.0
+Data Engineer (L5) - Ads,Information Systems Analysis,1,1,1.0,0.6931471805599453,1.0
+Data Engineer (L5) - Ads,Software Development & Engineering Practices,1,1,1.0,0.6931471805599453,1.0
+Data Engineer (L5) - Ads,Time Series Analysis,1,1,1.0,0.6931471805599453,1.0
+"Data Engineer (Python, SQL, Spark, ETL)",Data Engineering & BI Analytics,1,1,1.0,0.6931471805599453,1.0
+"Data Engineer (Python, SQL, Spark, ETL)",Information Security Analytics,1,1,1.0,0.6931471805599453,1.0
+"Data Engineer (Python, SQL, Spark, ETL)",Information Systems Analysis,1,1,1.0,0.6931471805599453,1.0
+"Data Engineer (Python, SQL, Spark, ETL)",Machine Learning & Optimization,1,1,1.0,0.6931471805599453,1.0
+Data Engineer III [T500-19720],Data Engineering & BI Analytics,1,1,1.0,0.6931471805599453,1.0
+Data Engineer III [T500-19720],Software Development & Engineering Practices,1,1,1.0,0.6931471805599453,1.0
+Data Engineer III [T500-19720],Software Development Processes,1,1,1.0,0.6931471805599453,1.0
+"Data Engineer, Analytics (University Grad)",Data Engineering & BI Analytics,1,1,1.0,0.6931471805599453,1.0
+"Data Engineer, Go-To-Market",C++ Programming Implementation,1,1,1.0,0.6931471805599453,1.0
+"Data Engineer, Go-To-Market",Integration & Applications,1,1,1.0,0.6931471805599453,1.0
+"Data Engineer, Go-To-Market",SQL Querying & Database Programming,1,1,1.0,0.6931471805599453,1.0
+"Data Engineer, Go-To-Market",Statistical Modeling & Data Analysis,1,1,1.0,0.6931471805599453,1.0
+DevOps Engineer,Application Testing & Security,3,8,0.375,0.8239592165010823,0.75
+DevOps Engineer,BI Solution Implementation,1,8,0.125,0.27465307216702745,0.25
+DevOps Engineer,Data Engineering & BI Analytics,1,8,0.125,0.27465307216702745,0.25
+DevOps Engineer,Integration & Applications,1,8,0.125,0.27465307216702745,0.25
+DevOps Engineer,Java & Object-Oriented Application Development,1,8,0.125,0.27465307216702745,0.25
+DevOps Engineer,Object-Oriented Design & Programming,1,8,0.125,0.27465307216702745,0.25
+DevOps Engineer,Social Media & Digital Content,1,8,0.125,0.27465307216702745,0.25
+DevOps Engineer,Software Design & Testing,2,8,0.25,0.5493061443340549,0.5
+DevOps Engineer,Software Development & Engineering Practices,3,8,0.375,0.8239592165010823,0.75
+DevOps Engineer,Software Development Processes,4,8,0.5,1.0986122886681098,1.0
+DevOps Engineer,Strategic IS & Decision Support,1,8,0.125,0.27465307216702745,0.25
+DevOps Engineer,System Security & Administration Scripting,1,8,0.125,0.27465307216702745,0.25
+DevOps Engineer,Team Organization & Collaboration,1,8,0.125,0.27465307216702745,0.25
+DevOps Engineer,Teamwork & Collaboration,1,8,0.125,0.27465307216702745,0.25
+DevOps Engineer,Vulnerability Assessment,1,8,0.125,0.27465307216702745,0.25
+Devops Engineer,Application Testing & Security,1,2,0.5,0.5493061443340549,0.5
+Devops Engineer,Software Design & Testing,1,2,0.5,0.5493061443340549,0.5
+Devops Engineer,Software Development Processes,2,2,1.0,1.0986122886681098,1.0
+Devops Engineer - 2,Application Testing & Security,1,1,1.0,0.6931471805599453,1.0
+Devops Engineer - 2,Integration & Applications,1,1,1.0,0.6931471805599453,1.0
+Devops Engineer - 2,Software Design & Testing,1,1,1.0,0.6931471805599453,1.0
+Devops Engineer - 2,Software Testing & Unit Testing,1,1,1.0,0.6931471805599453,1.0
+Full-Stack AI Application Engineer,Integration & Applications,1,1,1.0,0.6931471805599453,1.0
+Junior Data Engineer,Data Engineering & BI Analytics,1,1,1.0,0.6931471805599453,1.0
+Junior Data Engineer,Data Warehousing Architecture,1,1,1.0,0.6931471805599453,1.0
+Junior Data Engineer,Software Development & Engineering Practices,1,1,1.0,0.6931471805599453,1.0
+Lead DevOps Engineer,Agile Development & SCRUM,1,2,0.5,0.5493061443340549,1.0
+Lead DevOps Engineer,OS Concepts & Architecture,1,2,0.5,0.5493061443340549,1.0
+Lead DevOps Engineer,Object-Oriented Design & Programming,1,2,0.5,0.5493061443340549,1.0
+Lead DevOps Engineer,Software Design & Testing,1,2,0.5,0.5493061443340549,1.0
+Lead DevOps Engineer,Software Development & Engineering Practices,1,2,0.5,0.5493061443340549,1.0
+Lead DevOps Engineer,Software Development Processes,1,2,0.5,0.5493061443340549,1.0
+Lead DevOps Engineer,Software Testing & Unit Testing,1,2,0.5,0.5493061443340549,1.0
+Lead DevOps Engineer Site Reliability Engineering,BI Solution Implementation,1,1,1.0,0.6931471805599453,1.0
+Lead DevOps Engineer Site Reliability Engineering,Information Systems & Database Design,1,1,1.0,0.6931471805599453,1.0
+Lead DevOps Engineer Site Reliability Engineering,Integration & Applications,1,1,1.0,0.6931471805599453,1.0
+Lead DevOps Engineer Site Reliability Engineering,Software Design & Testing,1,1,1.0,0.6931471805599453,1.0
+Lead DevOps Engineer Site Reliability Engineering,Software Testing & Unit Testing,1,1,1.0,0.6931471805599453,1.0
+Lead Devops Engineer,Application Testing & Security,1,1,1.0,0.6931471805599453,1.0
+Lead Devops Engineer,BI Solution Implementation,1,1,1.0,0.6931471805599453,1.0
+Lead Devops Engineer,Computer Systems & Networking,1,1,1.0,0.6931471805599453,1.0
+Lead Devops Engineer,Software Design & Testing,1,1,1.0,0.6931471805599453,1.0
+Lead Devops Engineer,Software Development & Engineering Practices,1,1,1.0,0.6931471805599453,1.0
+Lead Devops Engineer,Software Development Processes,1,1,1.0,0.6931471805599453,1.0
+Lead Devops Engineer,Software Testing & Unit Testing,1,1,1.0,0.6931471805599453,1.0
+Lead Devops Engineer,Team Organization & Collaboration,1,1,1.0,0.6931471805599453,1.0
+Lead GCP DevOps Engineer,Application Testing & Security,1,1,1.0,0.6931471805599453,1.0
+ML Engineer,Advanced Database Design & Management,1,13,0.07692307692307693,0.2030044099704045,0.19999999999999998
+ML Engineer,Algorithm Design Techniques,1,13,0.07692307692307693,0.2030044099704045,0.19999999999999998
+ML Engineer,BI Solution Implementation,2,13,0.15384615384615385,0.406008819940809,0.39999999999999997
+ML Engineer,Data Engineering & BI Analytics,4,13,0.3076923076923077,0.812017639881618,0.7999999999999999
+ML Engineer,Data Representation & Computer Architecture,1,13,0.07692307692307693,0.2030044099704045,0.19999999999999998
+ML Engineer,Database Security & Performance Optimization,1,13,0.07692307692307693,0.2030044099704045,0.19999999999999998
+ML Engineer,Enterprise Storage Solutions,1,13,0.07692307692307693,0.2030044099704045,0.19999999999999998
+ML Engineer,IT Project Management & Execution,1,13,0.07692307692307693,0.2030044099704045,0.19999999999999998
+ML Engineer,Integration & Applications,1,13,0.07692307692307693,0.2030044099704045,0.19999999999999998
+ML Engineer,Machine Learning & Optimization,3,13,0.23076923076923078,0.6090132299112135,0.6
+ML Engineer,Mobile Application Design & Development,1,13,0.07692307692307693,0.2030044099704045,0.19999999999999998
+ML Engineer,OS Concepts & Architecture,1,13,0.07692307692307693,0.2030044099704045,0.19999999999999998
+ML Engineer,Problem Solving & Algorithm Development,2,13,0.15384615384615385,0.406008819940809,0.39999999999999997
+ML Engineer,Software Design & Testing,1,13,0.07692307692307693,0.2030044099704045,0.19999999999999998
+ML Engineer,Software Development & Engineering Practices,5,13,0.38461538461538464,1.0150220498520226,1.0
+ML Engineer,Software Development Processes,1,13,0.07692307692307693,0.2030044099704045,0.19999999999999998
+ML Engineer,Software Engineering Fundamentals,1,13,0.07692307692307693,0.2030044099704045,0.19999999999999998
+ML Engineer,Software Testing & Unit Testing,1,13,0.07692307692307693,0.2030044099704045,0.19999999999999998
+ML Engineer,Team Organization & Collaboration,1,13,0.07692307692307693,0.2030044099704045,0.19999999999999998
+ML Engineer,Time Series Analysis,1,13,0.07692307692307693,0.2030044099704045,0.19999999999999998
+Python Data Engineer,BI Solution Implementation,1,1,1.0,0.6931471805599453,1.0
+Python Data Engineer,Data Engineering & BI Analytics,1,1,1.0,0.6931471805599453,1.0
+Python Data Engineer,Data Warehousing Architecture,1,1,1.0,0.6931471805599453,1.0
+Python Data Engineer,ETL/ELT Processes,1,1,1.0,0.6931471805599453,1.0
+Python Data Engineer,Integration & Applications,1,1,1.0,0.6931471805599453,1.0
+Python Data Engineer,Machine Learning & Optimization,1,1,1.0,0.6931471805599453,1.0
+Python Data Engineer,RESTful Web Services,1,1,1.0,0.6931471805599453,1.0
+Python Data Engineer,Strategic IS & Decision Support,1,1,1.0,0.6931471805599453,1.0
+Senior Data Engineer,Data Engineering & BI Analytics,1,1,1.0,0.6931471805599453,1.0
+Senior Data Engineer,Database Security & Performance Optimization,1,1,1.0,0.6931471805599453,1.0
+Senior Data Engineer - Databricks,Agile Development & SCRUM,1,1,1.0,0.6931471805599453,1.0
+Senior Data Engineer - Snowflake,Data Engineering & BI Analytics,1,1,1.0,0.6931471805599453,1.0
+Senior Data Engineer - Snowflake,Software Development & Engineering Practices,1,1,1.0,0.6931471805599453,1.0
+Senior Data Engineer- Snowflake,Data Engineering & BI Analytics,1,1,1.0,0.6931471805599453,1.0
+Senior Data Engineer- Snowflake,Software Development & Engineering Practices,1,1,1.0,0.6931471805599453,1.0
+Senior Data Engineer/Architect,Data Engineering & BI Analytics,1,1,1.0,0.6931471805599453,1.0
+Senior Data Engineer/Architect,Data Modeling & ER Diagrams,1,1,1.0,0.6931471805599453,1.0
+Senior Data Engineer/Architect,Enterprise Storage Solutions,1,1,1.0,0.6931471805599453,1.0
+Senior Data Engineer/Architect,Information Security Analytics,1,1,1.0,0.6931471805599453,1.0
+Senior Data Engineer/Architect,Information Systems & Database Design,1,1,1.0,0.6931471805599453,1.0
+Senior Data Engineer/Architect,Integration & Applications,1,1,1.0,0.6931471805599453,1.0
+Senior Data Engineer/Architect,Machine Learning & Optimization,1,1,1.0,0.6931471805599453,1.0
+Senior Data Engineer/Architect,Security Monitoring & Reporting,1,1,1.0,0.6931471805599453,1.0
+Senior Data Engineer/Architect,Strategic IS & Decision Support,1,1,1.0,0.6931471805599453,1.0
+Senior DevOps Engineer,Application Testing & Security,1,5,0.2,0.358351893845611,0.25
+Senior DevOps Engineer,BI Solution Implementation,1,5,0.2,0.358351893845611,0.25
+Senior DevOps Engineer,Java & Object-Oriented Application Development,1,5,0.2,0.358351893845611,0.25
+Senior DevOps Engineer,Object-Oriented Design & Programming,1,5,0.2,0.358351893845611,0.25
+Senior DevOps Engineer,Software Design & Testing,2,5,0.4,0.716703787691222,0.5
+Senior DevOps Engineer,Software Development & Engineering Practices,4,5,0.8,1.433407575382444,1.0
+Senior DevOps Engineer,Software Development Processes,4,5,0.8,1.433407575382444,1.0
+Senior DevOps Engineer,Software Engineering Fundamentals,1,5,0.2,0.358351893845611,0.25
+Senior DevOps Engineer,Software Testing & Unit Testing,2,5,0.4,0.716703787691222,0.5
+Senior DevOps Engineer,Team Organization & Collaboration,1,5,0.2,0.358351893845611,0.25
+Senior DevOps Engineer,Vulnerability Assessment,1,5,0.2,0.358351893845611,0.25
+Senior DevOps Engineer (Azure) - IFS Ultimo,Computer Systems & Networking,1,1,1.0,0.6931471805599453,1.0
+Senior DevOps Engineer (Azure) - IFS Ultimo,Software Design & Testing,1,1,1.0,0.6931471805599453,1.0
+Senior DevOps Engineer (Azure) - IFS Ultimo,Software Development & Engineering Practices,1,1,1.0,0.6931471805599453,1.0
+Senior DevOps Engineer (Azure) - IFS Ultimo,Software Development Processes,1,1,1.0,0.6931471805599453,1.0
+Senior DevOps Engineer (Azure) - IFS Ultimo,Software Testing & Unit Testing,1,1,1.0,0.6931471805599453,1.0
+Senior DevOps Engineer (Azure) - IFS Ultimo,Strategic IS & Decision Support,1,1,1.0,0.6931471805599453,1.0
+Senior DevOps Engineer (Azure) - IFS Ultimo,Team Organization & Collaboration,1,1,1.0,0.6931471805599453,1.0
+Senior Devops Engineer,Application Testing & Security,1,1,1.0,0.6931471805599453,1.0
+Senior Devops Engineer,Integration & Applications,1,1,1.0,0.6931471805599453,1.0
+Senior Devops Engineer,Software Design & Testing,1,1,1.0,0.6931471805599453,1.0
+Senior Devops Engineer,Software Development & Engineering Practices,1,1,1.0,0.6931471805599453,1.0
+Senior Devops Engineer,Software Testing & Unit Testing,1,1,1.0,0.6931471805599453,1.0
+Software Engineer,Academic Communication Skills,1,39,0.02564102564102564,0.0945866526695881,0.05263157894736842
+Software Engineer,Agile Development & SCRUM,5,39,0.1282051282051282,0.4729332633479405,0.2631578947368421
+Software Engineer,Agile Software Development & Scrum Practices,3,39,0.07692307692307693,0.28375995800876436,0.15789473684210528
+Software Engineer,Algorithm Design Techniques,2,39,0.05128205128205128,0.1891733053391762,0.10526315789473684
+Software Engineer,Android OS & Application Components,1,39,0.02564102564102564,0.0945866526695881,0.05263157894736842
+Software Engineer,Application Testing & Security,5,39,0.1282051282051282,0.4729332633479405,0.2631578947368421
+Software Engineer,BI Solution Implementation,7,39,0.1794871794871795,0.6621065686871168,0.368421052631579
+Software Engineer,Computer Systems & Networking,2,39,0.05128205128205128,0.1891733053391762,0.10526315789473684
+Software Engineer,Data Engineering & BI Analytics,5,39,0.1282051282051282,0.4729332633479405,0.2631578947368421
+Software Engineer,Data Warehousing Architecture,1,39,0.02564102564102564,0.0945866526695881,0.05263157894736842
+Software Engineer,Documentation & Presentation Skills,1,39,0.02564102564102564,0.0945866526695881,0.05263157894736842
+Software Engineer,ETL/ELT Processes,1,39,0.02564102564102564,0.0945866526695881,0.05263157894736842
+Software Engineer,Enterprise Storage Solutions,2,39,0.05128205128205128,0.1891733053391762,0.10526315789473684
+Software Engineer,Full-Stack Web Application Development,3,39,0.07692307692307693,0.28375995800876436,0.15789473684210528
+Software Engineer,IT Project Management & Execution,1,39,0.02564102564102564,0.0945866526695881,0.05263157894736842
+Software Engineer,Information Security Analytics,1,39,0.02564102564102564,0.0945866526695881,0.05263157894736842
+Software Engineer,Information Systems & Database Design,4,39,0.10256410256410256,0.3783466106783524,0.21052631578947367
+Software Engineer,Integration & Applications,15,39,0.38461538461538464,1.4187997900438216,0.7894736842105263
+Software Engineer,Java & Object-Oriented Application Development,2,39,0.05128205128205128,0.1891733053391762,0.10526315789473684
+Software Engineer,Job Role Awareness,1,39,0.02564102564102564,0.0945866526695881,0.05263157894736842
+Software Engineer,Legal & Professional Responsibilities,1,39,0.02564102564102564,0.0945866526695881,0.05263157894736842
+Software Engineer,Machine Learning & Optimization,1,39,0.02564102564102564,0.0945866526695881,0.05263157894736842
+Software Engineer,Mobile App Development Fundamentals,1,39,0.02564102564102564,0.0945866526695881,0.05263157894736842
+Software Engineer,Mobile Application Design & Development,5,39,0.1282051282051282,0.4729332633479405,0.2631578947368421
+Software Engineer,OS Concepts & Architecture,8,39,0.20512820512820512,0.7566932213567048,0.42105263157894735
+Software Engineer,Object-Oriented Design & Programming,3,39,0.07692307692307693,0.28375995800876436,0.15789473684210528
+Software Engineer,Operating Systems & System Administration,1,39,0.02564102564102564,0.0945866526695881,0.05263157894736842
+Software Engineer,Problem Solving & Algorithm Development,3,39,0.07692307692307693,0.28375995800876436,0.15789473684210528
+Software Engineer,RESTful Web Services,3,39,0.07692307692307693,0.28375995800876436,0.15789473684210528
+Software Engineer,Soft Skills & Professionalism,1,39,0.02564102564102564,0.0945866526695881,0.05263157894736842
+Software Engineer,Software Design & Testing,19,39,0.48717948717948717,1.797146400722174,1.0
+Software Engineer,Software Development & Engineering Practices,15,39,0.38461538461538464,1.4187997900438216,0.7894736842105263
+Software Engineer,Software Development Processes,9,39,0.23076923076923078,0.851279874026293,0.4736842105263158
+Software Engineer,Software Engineering Fundamentals,4,39,0.10256410256410256,0.3783466106783524,0.21052631578947367
+Software Engineer,Software Life Cycle Modeling,1,39,0.02564102564102564,0.0945866526695881,0.05263157894736842
+Software Engineer,Software Testing & Unit Testing,19,39,0.48717948717948717,1.797146400722174,1.0
+Software Engineer,Strategic IS & Decision Support,1,39,0.02564102564102564,0.0945866526695881,0.05263157894736842
+Software Engineer,Team Organization & Collaboration,4,39,0.10256410256410256,0.3783466106783524,0.21052631578947367
+Software Engineer,Teamwork & Collaboration,6,39,0.15384615384615385,0.5675199160175287,0.31578947368421056
+Software Engineer,Web-based Application Development using Java,1,39,0.02564102564102564,0.0945866526695881,0.05263157894736842
