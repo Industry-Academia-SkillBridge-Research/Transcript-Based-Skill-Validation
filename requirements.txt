@@ -1,6 +1,10 @@
+numpy
 pandas
 scikit-learn
+fastapi
+uvicorn
+
 
 
 # To activate the virtual environment, use the following command:
-.\.venv\Scripts\Activate.ps1
+# .\.venv\Scripts\Activate.ps1
