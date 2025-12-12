@@ -1,147 +1,218 @@
-"""
-run_full_pipeline_for_student.py
-
-Simple orchestrator for the backend pipeline.
-
-Usage examples:
-
-  # Phase 1: transcript -> skills -> readiness -> quiz questions
-  python run_full_pipeline_for_student.py --student-id IT21001288 --phase pre_quiz
-
-  # Phase 2: after quiz responses are collected
-  python run_full_pipeline_for_student.py --student-id IT21001288 --phase post_quiz
-"""
-
 import argparse
 import os
+import sys
+import subprocess
 from pathlib import Path
 
-# All imports assume this file lives inside src/
-import transcript_loader
-import skill_aggregation_explainable
-import job_postings_ingestion
-import job_role_model_dynamic
-import quiz_planner
-import quiz_generation_rag
-import quiz_scoring
-import skill_profile_fusion
+import pandas as pd
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-OUTPUT_DIR = PROJECT_ROOT / "output"
+BASE_DIR = Path(__file__).resolve().parents[1]
 
 
-def run_pre_quiz_pipeline(student_id: str) -> None:
+def run_step(name: str, script_rel_path: str, extra_args=None):
     """
-    Run the pipeline up to quiz generation.
-    This stage does NOT require any quiz responses yet.
+    Helper to run another Python script using the *same* interpreter
+    that is currently running this file (sys.executable).
     """
+    script_path = BASE_DIR / script_rel_path
+    cmd = [sys.executable, str(script_path)]
+    if extra_args:
+        cmd.extend(extra_args)
 
-    print("=" * 80)
-    print("STEP 1: Transcript -> long format")
-    print("=" * 80)
-    transcript_loader.main()
-
-    print("=" * 80)
-    print("STEP 2: Long format -> skill profiles (explainable)")
-    print("=" * 80)
-    skill_aggregation_explainable.main()
-
-    print("=" * 80)
-    print("STEP 3: Job postings -> dynamic role skill templates")
-    print("=" * 80)
-    job_postings_ingestion.main()
-
-    print("=" * 80)
-    print("STEP 4: Compute role readiness (transcript driven)")
-    print("=" * 80)
-    job_role_model_dynamic.main()
-
-    print("=" * 80)
-    print("STEP 5: Build quiz plans from weak skills")
-    print("=" * 80)
-    quiz_planner.main()
-
-    print("=" * 80)
-    print("STEP 6: Generate quiz questions with RAG pipeline")
-    print("=" * 80)
-    quiz_generation_rag.main()
-
-    print("\nPre-quiz pipeline finished.")
-    print(f"Questions are in: {OUTPUT_DIR / 'quiz_questions_generated.csv'}")
-    print(f"You can now deliver these questions to student {student_id} and")
-    print("save their responses into output/quiz_responses.csv")
+    print(f"\n=== Running step: {name} ===")
+    print("Command:", " ".join(cmd))
+    subprocess.run(cmd, check=True)
+    print(f"=== Finished: {name} ===\n")
 
 
-def run_post_quiz_pipeline(student_id: str) -> None:
+def show_pre_quiz_summary(student_id: str):
     """
-    Run the pipeline from quiz responses to fused profile and updated readiness.
-    Expects that output/quiz_responses.csv already exists.
+    After pre_quiz pipeline: show skill profile, top roles, and planned quiz skills.
     """
+    skills_path = BASE_DIR / "output" / "skill_profiles_explainable.csv"
+    roles_path = BASE_DIR / "output" / "role_readiness_dynamic.csv"
+    quiz_plan_path = BASE_DIR / "output" / "quiz_plans.csv"
 
-    responses_path = OUTPUT_DIR / "quiz_responses.csv"
-    if not responses_path.exists():
-        print(f"Expected quiz responses at {responses_path}, but file not found.")
-        print("Please export the student's responses from the front end first.")
-        return
+    if skills_path.exists():
+        skills_df = pd.read_csv(skills_path)
+        stu_skills = skills_df[skills_df["StudentID"] == student_id].copy()
+        print(f"\n--- Skill profile (baseline) for {student_id} ---")
+        print(
+            stu_skills.sort_values("ScoreNormalized", ascending=False)
+            .head(10)[["Skill", "ScoreNormalized", "SkillLevel"]]
+        )
+    else:
+        print("\n[WARN] skill_profiles_explainable.csv not found")
 
-    print("=" * 80)
-    print("STEP 7: Score quiz responses and derive skill updates")
-    print("=" * 80)
-    quiz_scoring.main()
+    if roles_path.exists():
+        roles_df = pd.read_csv(roles_path)
+        stu_roles = roles_df[roles_df["StudentID"] == student_id].copy()
+        print(f"\n--- Top roles for {student_id} (pre-quiz) ---")
+        print(
+            stu_roles.sort_values("ReadinessScore", ascending=False)
+            .head(5)[
+                [
+                    "RoleName",
+                    "ReadinessScore",
+                    "Coverage",
+                    "NumSkills",
+                    "NumWeakOrMissing",
+                ]
+            ]
+        )
+    else:
+        print("\n[WARN] role_readiness_dynamic.csv not found")
 
-    print("=" * 80)
-    print("STEP 8: Fuse transcript skills with quiz-based proficiency")
-    print("=" * 80)
-    skill_profile_fusion.main()
+    if quiz_plan_path.exists():
+        qp_df = pd.read_csv(quiz_plan_path)
+        stu_qp = qp_df[qp_df["StudentID"] == student_id].copy()
+        print(f"\n--- Quiz plan for {student_id} (first few skills) ---")
+        print(
+            stu_qp.head(10)[
+                [
+                    "RoleName",
+                    "Skill",
+                    "StudentLevel",
+                    "TargetDifficulty",
+                    "NumQuestions",
+                ]
+            ]
+        )
+    else:
+        print("\n[WARN] quiz_plans.csv not found")
 
-    print("=" * 80)
-    print("STEP 9: Recompute role readiness using fused skill profiles")
-    print("=" * 80)
-    job_role_model_dynamic.main()
 
-    print("\nPost-quiz pipeline finished.")
-    print(f"Updated fused skills: {OUTPUT_DIR / 'skill_profiles_with_quiz.csv'}")
-    print(f"Updated readiness:    {OUTPUT_DIR / 'role_readiness_dynamic.csv'}")
-    print(f"Check the rows for StudentID = {student_id} in these files.")
+def show_post_quiz_summary(student_id: str):
+    """
+    After post_quiz pipeline: show quiz-based skill updates, fused profile,
+    and updated top roles.
+    """
+    quiz_updates_path = BASE_DIR / "output" / "skill_quiz_updates.csv"
+    fused_path = BASE_DIR / "output" / "skill_profiles_with_quiz.csv"
+    roles_path = BASE_DIR / "output" / "role_readiness_dynamic.csv"
+
+    if quiz_updates_path.exists():
+        q_df = pd.read_csv(quiz_updates_path)
+        stu_q = q_df[q_df["StudentID"] == student_id].copy()
+        print(f"\n--- Quiz-based skill updates for {student_id} ---")
+        if not stu_q.empty:
+            print(
+                stu_q.sort_values("FinalQuizScore", ascending=False)
+                .head(10)[
+                    [
+                        "Skill",
+                        "NumQuestions",
+                        "AvgEffectiveScore",
+                        "FinalQuizScore",
+                        "QuizProficiency",
+                    ]
+                ]
+            )
+        else:
+            print("No quiz updates for this student.")
+    else:
+        print("\n[WARN] skill_quiz_updates.csv not found")
+
+    if fused_path.exists():
+        fused_df = pd.read_csv(fused_path)
+        stu_fused = fused_df[fused_df["StudentID"] == student_id].copy()
+        print(f"\n--- Fused skill profile for {student_id} ---")
+        print(
+            stu_fused.sort_values("FinalScore", ascending=False)
+            .head(10)[["Skill", "BaselineScore", "FinalScore", "FinalSkillLevel"]]
+        )
+    else:
+        print("\n[WARN] skill_profiles_with_quiz.csv not found")
+
+    if roles_path.exists():
+        roles_df = pd.read_csv(roles_path)
+        stu_roles = roles_df[roles_df["StudentID"] == student_id].copy()
+        print(f"\n--- Updated top roles for {student_id} (post-quiz) ---")
+        print(
+            stu_roles.sort_values("ReadinessScore", ascending=False)
+            .head(5)[
+                [
+                    "RoleName",
+                    "ReadinessScore",
+                    "Coverage",
+                    "NumSkills",
+                    "NumWeakOrMissing",
+                ]
+            ]
+        )
+    else:
+        print("\n[WARN] role_readiness_dynamic.csv not found")
 
 
-def parse_args() -> argparse.Namespace:
+def main():
     parser = argparse.ArgumentParser(
-        description="Run end-to-end pipeline for transcript based skill validation."
+        description="Run the full skill-validation pipeline for a single student."
     )
     parser.add_argument(
-        "--student-id",
-        type=str,
-        required=True,
-        help="StudentID (for example IT21001288). Used mainly for reporting.",
+        "--student-id", required=True, help="StudentID / RegNo, e.g. IT21001288"
     )
     parser.add_argument(
         "--phase",
-        type=str,
-        choices=["pre_quiz", "post_quiz"],
         required=True,
-        help="Pipeline phase to run. "
-             "pre_quiz: up to question generation. "
-             "post_quiz: from responses to fused readiness.",
+        choices=["pre_quiz", "post_quiz"],
+        help="Which part of the pipeline to run.",
     )
-    return parser.parse_args()
+    args = parser.parse_args()
+    student_id = args.student_id
+    phase = args.phase
 
+    print(f"\n### Running pipeline for student: {student_id}, phase: {phase} ###")
 
-def main() -> None:
-    args = parse_args()
-    student_id = args.student_id.strip()
+    if phase == "pre_quiz":
+        # 1. Transcript → long format
+        run_step("Transcript loader", "src/transcript_loader.py")
 
-    print(f"Running pipeline for StudentID = {student_id}")
-    print(f"Phase = {args.phase}")
+        # 2. Course–skill mapping (sanity check; also useful for other scripts)
+        run_step("Course–skill mapping check", "src/course_skill_mapping.py")
 
-    # Make sure output directory exists
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
+        # 3. Aggregate skills (explainable profile)
+        run_step("Skill aggregation (explainable)", "src/skill_aggregation_explainable.py")
 
-    if args.phase == "pre_quiz":
-        run_pre_quiz_pipeline(student_id)
-    elif args.phase == "post_quiz":
-        run_post_quiz_pipeline(student_id)
+        # 4. Ingest job data (JSON → CSV → skill templates)
+        run_step("Convert Job_data.json to CSV", "src/convert_job_json_to_csv.py")
+        run_step("Job postings ingestion", "src/job_postings_ingestion.py")
+
+        # 5. Fuse baseline + (any existing) quiz signals
+        run_step("Skill profile fusion", "src/skill_profile_fusion.py")
+
+        # 6. Compute role readiness using dynamic templates
+        run_step("Role readiness (dynamic)", "src/job_role_model_dynamic.py")
+
+        # 7. Build quiz plans for weak/missing skills
+        run_step("Quiz planning", "src/quiz_planner.py")
+
+        # 8. Generate quiz questions using RAG over skill corpus
+        run_step("Quiz generation (RAG)", "src/quiz_generation_rag.py")
+
+        # Show summary for this student
+        show_pre_quiz_summary(student_id)
+
+    elif phase == "post_quiz":
+        # Here we assume:
+        #  - Student has answered quizzes
+        #  - Responses are stored in output/quiz_responses_*.csv (currently we use sample)
+        run_step("Quiz scoring", "src/quiz_scoring.py")
+
+        # Fuse transcript-based skills with quiz-based updates
+        run_step("Skill profile fusion", "src/skill_profile_fusion.py")
+
+        # Recompute role readiness after updated skills
+        run_step("Role readiness (dynamic)", "src/job_role_model_dynamic.py")
+
+        # Optionally generate a new round of quizzes (refinement cycle)
+        run_step("Quiz planning (post-quiz)", "src/quiz_planner.py")
+        run_step("Quiz generation (RAG, post-quiz)", "src/quiz_generation_rag.py")
+
+        # Show summary for this student
+        show_post_quiz_summary(student_id)
+
+    print("\n### Pipeline run completed. ###")
 
 
 if __name__ == "__main__":
