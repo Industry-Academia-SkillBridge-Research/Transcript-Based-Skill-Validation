@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Transcript-based Skill Validation – Demo UI</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 1.5rem;
+      background: #f5f5f7;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 0.75rem;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    h1 { margin-top: 0; }
+    label { font-weight: 600; }
+    input[type="text"] {
+      padding: 0.35rem 0.5rem;
+      border-radius: 0.4rem;
+      border: 1px solid #ccc;
+      width: 220px;
+    }
+    button {
+      padding: 0.4rem 0.9rem;
+      border-radius: 0.5rem;
+      border: none;
+      cursor: pointer;
+      margin-right: 0.5rem;
+    }
+    button.primary { background: #2563eb; color: white; }
+    button.secondary { background: #e5e7eb; }
+    pre {
+      background: #111827;
+      color: #e5e7eb;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      overflow-x: auto;
+      font-size: 0.85rem;
+    }
+    .question {
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .question:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Transcript-based Skill Validation – Demo UI</h1>
+
+  <div class="card">
+    <label for="studentId">Student ID</label><br />
+    <input id="studentId" type="text" value="IT21001288" />
+    <button class="primary" id="btnSkills">Load Skills</button>
+    <button class="secondary" id="btnRoles">Load Role Matches</button>
+    <button class="secondary" id="btnPrepareQuiz">Prepare Quiz</button>
+  </div>
+
+  <div class="card">
+    <h2>Skill profile</h2>
+    <pre id="skillsOutput">No data yet.</pre>
+  </div>
+
+  <div class="card">
+    <h2>Role matches</h2>
+    <pre id="rolesOutput">No data yet.</pre>
+  </div>
+
+  <div class="card">
+    <h2>Quiz</h2>
+    <div id="quizContainer">No quiz prepared yet.</div>
+    <button class="primary" id="btnSubmitQuiz">Submit Quiz</button>
+    <pre id="quizResultOutput">No results yet.</pre>
+  </div>
+
+  <script>
+    const API_BASE = "http://127.0.0.1:8000";
+
+    let currentQuestions = [];  // store last questions so we can submit
+
+    function getStudentId() {
+      return document.getElementById("studentId").value.trim();
+    }
+
+    // Helper for fetch
+    async function apiFetch(path, options = {}) {
+      const res = await fetch(API_BASE + path, {
+        headers: { "Content-Type": "application/json" },
+        ...options,
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error("HTTP " + res.status + ": " + text);
+      }
+      return res.json();
+    }
+
+    // Load skills
+    document.getElementById("btnSkills").onclick = async () => {
+      const id = getStudentId();
+      if (!id) return alert("Enter a student ID first.");
+      try {
+        const data = await apiFetch(`/students/${id}/skills`);
+        document.getElementById("skillsOutput").textContent =
+          JSON.stringify(data, null, 2);
+      } catch (e) {
+        document.getElementById("skillsOutput").textContent = e.message;
+      }
+    };
+
+    // Load roles
+    document.getElementById("btnRoles").onclick = async () => {
+      const id = getStudentId();
+      if (!id) return alert("Enter a student ID first.");
+      try {
+        const data = await apiFetch(`/students/${id}/roles`);
+        document.getElementById("rolesOutput").textContent =
+          JSON.stringify(data, null, 2);
+      } catch (e) {
+        document.getElementById("rolesOutput").textContent = e.message;
+      }
+    };
+
+    // Prepare quiz
+    document.getElementById("btnPrepareQuiz").onclick = async () => {
+      const id = getStudentId();
+      if (!id) return alert("Enter a student ID first.");
+      try {
+        const data = await apiFetch(`/students/${id}/prepare-quiz`, {
+          method: "POST",
+          body: JSON.stringify({}) // adjust later if your API expects filters
+        });
+
+        // Expecting something like { student_id, questions: [...] }
+        currentQuestions = data.questions || [];
+        const container = document.getElementById("quizContainer");
+
+        if (!currentQuestions.length) {
+          container.textContent = "No questions returned.";
+          return;
+        }
+
+        container.innerHTML = "";
+        currentQuestions.forEach((q, index) => {
+          const div = document.createElement("div");
+          div.className = "question";
+
+          const qId = q.question_id ?? q.QuestionID ?? index;
+
+          const optionsObj =
+            q.options ||
+            {
+              A: q.OptionA,
+              B: q.OptionB,
+              C: q.OptionC,
+              D: q.OptionD,
+            };
+
+          div.innerHTML = `
+            <div><strong>Q${index + 1}.</strong> ${q.question_text || q.QuestionText}</div>
+            <div>
+              ${["A","B","C","D"].map(letter => {
+                const text = optionsObj[letter];
+                if (!text) return "";
+                const inputId = `q${qId}_${letter}`;
+                return `
+                  <div>
+                    <label>
+                      <input type="radio" name="q_${qId}" value="${letter}" id="${inputId}" />
+                      <strong>${letter}</strong> – ${text}
+                    </label>
+                  </div>
+                `;
+              }).join("")}
+            </div>
+          `;
+          div.dataset.questionId = qId;
+          container.appendChild(div);
+        });
+
+      } catch (e) {
+        document.getElementById("quizContainer").textContent = e.message;
+      }
+    };
+
+    // Submit quiz
+    document.getElementById("btnSubmitQuiz").onclick = async () => {
+      const id = getStudentId();
+      if (!id) return alert("Enter a student ID first.");
+      if (!currentQuestions.length) return alert("Prepare a quiz first.");
+
+      const responses = [];
+      const now = Date.now();
+
+      document.querySelectorAll("#quizContainer .question").forEach(div => {
+        const qId = div.dataset.questionId;
+        const checked = div.querySelector("input[type=radio]:checked");
+        if (checked) {
+          responses.push({
+            question_id: Number(qId),
+            selected_option: checked.value,
+            response_time_seconds: 30   // dummy value for now
+          });
+        }
+      });
+
+      if (!responses.length) {
+        return alert("Please answer at least one question.");
+      }
+
+      try {
+        const payload = { responses };
+        const data = await apiFetch(`/students/${id}/submit-quiz`, {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+        document.getElementById("quizResultOutput").textContent =
+          JSON.stringify(data, null, 2);
+      } catch (e) {
+        document.getElementById("quizResultOutput").textContent = e.message;
+      }
+    };
+  </script>
+</body>
+</html>

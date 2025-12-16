@@ -6,9 +6,10 @@ from typing import List, Dict
 import pandas as pd
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
 
 
-BASE_DIR = Path(__file__).resolve().parents[1]
+BASE_DIR = Path(__file__).resolve().parents[2]  # project root (was parents[1] causing src/src path)
 
 app = FastAPI(
     title="Transcript-based Skill Validation API",
@@ -16,6 +17,13 @@ app = FastAPI(
     description="Backend API over the skill validation and job alignment pipeline.",
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],     # later you can restrict to your real frontend origin
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # ---------- Pydantic models ----------
 

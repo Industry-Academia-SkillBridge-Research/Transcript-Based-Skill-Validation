@@ -1,0 +1,358 @@
+INFO:     127.0.0.1:61218 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61218 - "GET /openapi.json HTTP/1.1" 200 OK
+Long-format rows: 35000
+    StudentID       RegNo          Name  ... YearGPA YearCredits GradePoint
+0  IT21709618  IT21709618  Lauren Scott  ...    2.86          31        2.3
+1  IT21709618  IT21709618  Lauren Scott  ...    2.86          31        2.7
+2  IT21709618  IT21709618  Lauren Scott  ...    2.86          31        2.0
+3  IT21709618  IT21709618  Lauren Scott  ...    2.86          31        2.3
+4  IT21709618  IT21709618  Lauren Scott  ...    2.86          31        2.0
+
+[5 rows x 18 columns]
+
+Transcript for IT21709618:
+    Year CourseCode  ... Grade GradePoint
+0      1     IT1010  ...    C+        2.3
+1      1     IT1020  ...    B-        2.7
+2      1     IT1030  ...     C        2.0
+3      1     IT1040  ...    C+        2.3
+4      1     IT1050  ...     C        2.0
+5      1     IT1060  ...    B-        2.7
+6      1     IT1080  ...     A        4.0
+7      1     IT1090  ...    A-        3.7
+8      1     IT1100  ...    A-        3.7
+9      2     IT2020  ...     B        3.0
+10     2     IT2030  ...    B+        3.3
+11     2     IT2040  ...     A        4.0
+12     2     IT2050  ...     A        4.0
+13     2     IT2060  ...    A-        3.7
+14     2     IT2070  ...     B        3.0
+15     2     IT2090  ...     B        3.0
+16     2     IT2110  ...     C        2.0
+17     2     IT2010  ...    A-        3.7
+18     2     IT2080  ...    A-        3.7
+19     2     IT2100  ...     B        3.0
+20     3     IT3011  ...    B+        3.3
+21     3     IT3021  ...    A-        3.7
+22     3     IT3030  ...    B-        2.7
+23     3     IT3031  ...    B+        3.3
+24     3     IT3050  ...     B        3.0
+25     3     IT3041  ...     A        4.0
+26     3     IT3051  ...    B-        2.7
+27     3     IT3061  ...     B        3.0
+28     3     IT3071  ...     A        4.0
+29     4     IT4021  ...    A-        3.7
+30     4     IT4031  ...    B-        2.7
+31     4     IT4070  ...    B+        3.3
+32     4     IT4011  ...    B-        2.7
+33     4     IT4041  ...    C+        2.3
+34     4     IT4010  ...     C        2.0
+
+[35 rows x 5 columns]
+Loaded 28 courses
+
+### Running pipeline for student: IT21001288, phase: pre_quiz ###
+
+=== Running step: Transcript loader ===
+Command: D:\OneDrive - Sri Lanka Institute of Information Technology\Research\Transcript-Based Skill Validation & Job Alignment\.venv\Scripts\python.exe D:\OneDrive - Sri Lanka Institute of Information Technology\Research\Transcript-Based Skill Validation & Job Alignment\src\transcript_loader.py
+=== Finished: Transcript loader ===
+
+
+=== Running step: Course–skill mapping check ===
+Command: D:\OneDrive - Sri Lanka Institute of Information Technology\Research\Transcript-Based Skill Validation & Job Alignment\.venv\Scripts\python.exe D:\OneDrive - Sri Lanka Institute of Information Technology\Research\Transcript-Based Skill Validation & Job Alignment\src\course_skill_mapping.py
+INFO:     127.0.0.1:58736 - "POST /students/IT21001288/prepare-quiz HTTP/1.1" 500 Internal Server Error
+Long-format rows: 35000
+    StudentID       RegNo          Name  ... YearGPA YearCredits GradePoint
+0  IT21709618  IT21709618  Lauren Scott  ...    2.86          31        2.3
+1  IT21709618  IT21709618  Lauren Scott  ...    2.86          31        2.7
+2  IT21709618  IT21709618  Lauren Scott  ...    2.86          31        2.0
+3  IT21709618  IT21709618  Lauren Scott  ...    2.86          31        2.3
+4  IT21709618  IT21709618  Lauren Scott  ...    2.86          31        2.0
+
+[5 rows x 18 columns]
+
+Transcript for IT21709618:
+    Year CourseCode  ... Grade GradePoint
+0      1     IT1010  ...    C+        2.3
+1      1     IT1020  ...    B-        2.7
+2      1     IT1030  ...     C        2.0
+3      1     IT1040  ...    C+        2.3
+4      1     IT1050  ...     C        2.0
+5      1     IT1060  ...    B-        2.7
+6      1     IT1080  ...     A        4.0
+7      1     IT1090  ...    A-        3.7
+8      1     IT1100  ...    A-        3.7
+9      2     IT2020  ...     B        3.0
+10     2     IT2030  ...    B+        3.3
+11     2     IT2040  ...     A        4.0
+12     2     IT2050  ...     A        4.0
+13     2     IT2060  ...    A-        3.7
+14     2     IT2070  ...     B        3.0
+15     2     IT2090  ...     B        3.0
+16     2     IT2110  ...     C        2.0
+17     2     IT2010  ...    A-        3.7
+18     2     IT2080  ...    A-        3.7
+19     2     IT2100  ...     B        3.0
+20     3     IT3011  ...    B+        3.3
+21     3     IT3021  ...    A-        3.7
+22     3     IT3030  ...    B-        2.7
+23     3     IT3031  ...    B+        3.3
+24     3     IT3050  ...     B        3.0
+25     3     IT3041  ...     A        4.0
+26     3     IT3051  ...    B-        2.7
+27     3     IT3061  ...     B        3.0
+28     3     IT3071  ...     A        4.0
+29     4     IT4021  ...    A-        3.7
+30     4     IT4031  ...    B-        2.7
+31     4     IT4070  ...    B+        3.3
+32     4     IT4011  ...    B-        2.7
+33     4     IT4041  ...    C+        2.3
+34     4     IT4010  ...     C        2.0
+
+[35 rows x 5 columns]
+Loaded 28 courses
+IT1010 â†’ {'title': 'Introduction to Programming', 'skills': ['Procedural Programming Concepts', 'Control Structures & Loops', 'Functions & Recursion', 'Pointers & Memory Management', 'Arrays, Structures & File Handling'], 'main_skill': 'Programming Fundamentals & C Language', 'skill_level': 'Beginner'}
+Long-format transcript rows: 35000
+Loaded 28 course mappings
+Per-course-per-skill rows: 140000
+Student-skill rows: 134865
+Explanation rows: 140000
+
+Skill scores for IT21709618:
+        StudentID  ... SkillLevel
+95985  IT21709618  ...   Beginner
+95986  IT21709618  ...   Beginner
+95987  IT21709618  ...   Beginner
+95988  IT21709618  ...   Beginner
+95989  IT21709618  ...   Beginner
+
+[5 rows x 6 columns]
+
+Explanation for one skill of IT21709618:
+                               Skill  ... ShareOfSkillContribution
+27  Academic Listening & Note-taking  ...                      1.0
+
+[1 rows x 9 columns]
+Wrote 175 rows to input/job_postings_sample.csv
+Columns: ['JobID', 'Title', 'Company', 'Location', 'Description', 'Source', 'PostedDate']
+Loaded 175 job postings
+Skill vocabulary size: 162
+Job-skill rows: 486
+Role-skill template rows: 272
+
+Sample role templates:
+      RoleName  ... ImportanceNorm
+0  AI Engineer  ...            1.0
+1  AI Engineer  ...            1.0
+2  AI Engineer  ...            1.0
+3  AI Engineer  ...            1.0
+4  AI Engineer  ...            1.0
+
+[5 rows x 7 columns]
+Loading baseline skill profiles from: output/skill_profiles_explainable.csv
+Baseline rows: 134865
+Loading quiz updates from: output/skill_quiz_updates.csv
+Quiz update rows: 1
+Fused rows: 134865
+Saved fused skill profiles to: output/skill_profiles_with_quiz.csv
+
+Fused skills for IT21001288:
+                                            Skill  ...  FinalSkillLevel
+66                             Job Role Awareness  ...       Developing
+56   Industry Expectations & Workplace Adaptation  ...       Developing
+110                 Soft Skills & Professionalism  ...       Developing
+43                  Ethics & Professional Conduct  ...       Developing
+55                Industrial Tools & Technologies  ...       Developing
+18                           Cloud Database Setup  ...         Beginner
+32                  Database Server Configuration  ...         Beginner
+71               Multilevel Access Control Design  ...         Beginner
+42                   Enterprise Storage Solutions  ...         Beginner
+24                     DBMS Architecture Analysis  ...         Beginner
+
+[10 rows x 8 columns]
+Loading fused (transcript + quiz) skill profiles from: output/skill_profiles_with_quiz.csv
+Loaded 134865 student-skill rows
+Loaded 272 role-skill template rows
+Role readiness summary rows: 36963
+Role readiness detailed rows: 271728
+
+Readiness for IT21001288:
+     StudentID  ...                                WeakOrMissingSkills
+5   IT21001288  ...  Ethics & Professional Conduct, Personal Develo...
+1   IT21001288  ...   Cloud Database Setup, Integration & Applications
+29  IT21001288  ...                          Agile Development & SCRUM
+25  IT21001288  ...                     Application Testing & Security
+19  IT21001288  ...  Application Testing & Security, Integration & ...
+
+[5 rows x 8 columns]
+
+Details for top role of IT21001288:
+                                 Skill  ...  IsWeakOrMissing
+31       Ethics & Professional Conduct  ...             True
+32  Personal Development & Work Ethics  ...             True
+
+[2 rows x 6 columns]
+Quiz plans saved to output/quiz_plans.csv
+Total quiz rows: 999
+
+Sample quiz plans:
+    StudentID      RoleName  ... TargetDifficulty NumQuestions
+0  IT21001288  Data Analyst  ...             Easy            3
+1  IT21002809  Data Analyst  ...             Easy            3
+2  IT21004505  Data Analyst  ...             Easy            3
+3  IT21004753  Data Analyst  ...           Medium            3
+4  IT21005263  Data Analyst  ...             Easy            3
+5  IT21006129  Data Analyst  ...             Easy            3
+6  IT21007298  Data Analyst  ...             Easy            3
+7  IT21008496  Data Analyst  ...             Easy            3
+8  IT21009261  Data Analyst  ...             Easy            3
+9  IT21010022  Data Analyst  ...             Easy            3
+
+[10 rows x 9 columns]
+Loading quiz plans from: output/quiz_plans.csv
+Quiz plan rows: 999
+Loading skill corpus from: content/skill_corpus.csv
+Skill corpus rows: 135
+Building TF-IDF index over skill corpus content...
+Generating questions for Student IT21001288, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21002809, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21004505, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21004753, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21005263, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21006129, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21007298, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21008496, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21009261, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21010022, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21011007, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21011057, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21012347, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21013965, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21014532, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21014776, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21015220, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21015693, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21017970, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21018131, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21018148, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21022952, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21023088, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21024320, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21024689, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21025361, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21027832, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21028954, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21031441, Role 'Data Analyst', Skill 'Hypothesis Testing'
+Generating questions for Student IT21031835, Role 'Data Analyst', Skill 'Hypothesis Testing'
+
+Saved 90 questions to output/quiz_questions_generated.csv
+
+Sample questions:
+    StudentID  ...                                        Explanation
+0  IT21001288  ...  This is a placeholder explanation. Replace thi...
+1  IT21001288  ...  This is a placeholder explanation. Replace thi...
+2  IT21001288  ...  This is a placeholder explanation. Replace thi...
+3  IT21002809  ...  This is a placeholder explanation. Replace thi...
+4  IT21002809  ...  This is a placeholder explanation. Replace thi...
+
+[5 rows x 11 columns]
+
+### Running pipeline for student: IT21001288, phase: pre_quiz ###
+
+=== Running step: Transcript loader ===
+Command: D:\OneDrive - Sri Lanka Institute of Information Technology\Research\Transcript-Based Skill Validation & Job Alignment\.venv\Scripts\python.exe D:\OneDrive - Sri Lanka Institute of Information Technology\Research\Transcript-Based Skill Validation & Job Alignment\src\transcript_loader.py
+=== Finished: Transcript loader ===
+
+
+=== Running step: Course–skill mapping check ===
+Command: D:\OneDrive - Sri Lanka Institute of Information Technology\Research\Transcript-Based Skill Validation & Job Alignment\.venv\Scripts\python.exe D:\OneDrive - Sri Lanka Institute of Information Technology\Research\Transcript-Based Skill Validation & Job Alignment\src\course_skill_mapping.py
+=== Finished: Course–skill mapping check ===
+
+
+=== Running step: Skill aggregation (explainable) ===
+Command: D:\OneDrive - Sri Lanka Institute of Information Technology\Research\Transcript-Based Skill Validation & Job Alignment\.venv\Scripts\python.exe D:\OneDrive - Sri Lanka Institute of Information Technology\Research\Transcript-Based Skill Validation & Job Alignment\src\skill_aggregation_explainable.py
+=== Finished: Skill aggregation (explainable) ===
+
+
+=== Running step: Convert Job_data.json to CSV ===
+Command: D:\OneDrive - Sri Lanka Institute of Information Technology\Research\Transcript-Based Skill Validation & Job Alignment\.venv\Scripts\python.exe D:\OneDrive - Sri Lanka Institute of Information Technology\Research\Transcript-Based Skill Validation & Job Alignment\src\convert_job_json_to_csv.py
+=== Finished: Convert Job_data.json to CSV ===
+
+
+=== Running step: Job postings ingestion ===
+Command: D:\OneDrive - Sri Lanka Institute of Information Technology\Research\Transcript-Based Skill Validation & Job Alignment\.venv\Scripts\python.exe D:\OneDrive - Sri Lanka Institute of Information Technology\Research\Transcript-Based Skill Validation & Job Alignment\src\job_postings_ingestion.py
+=== Finished: Job postings ingestion ===
+
+
+=== Running step: Skill profile fusion ===
+Command: D:\OneDrive - Sri Lanka Institute of Information Technology\Research\Transcript-Based Skill Validation & Job Alignment\.venv\Scripts\python.exe D:\OneDrive - Sri Lanka Institute of Information Technology\Research\Transcript-Based Skill Validation & Job Alignment\src\skill_profile_fusion.py
+=== Finished: Skill profile fusion ===
+
+
+=== Running step: Role readiness (dynamic) ===
+Command: D:\OneDrive - Sri Lanka Institute of Information Technology\Research\Transcript-Based Skill Validation & Job Alignment\.venv\Scripts\python.exe D:\OneDrive - Sri Lanka Institute of Information Technology\Research\Transcript-Based Skill Validation & Job Alignment\src\job_role_model_dynamic.py
+=== Finished: Role readiness (dynamic) ===
+
+
+=== Running step: Quiz planning ===
+Command: D:\OneDrive - Sri Lanka Institute of Information Technology\Research\Transcript-Based Skill Validation & Job Alignment\.venv\Scripts\python.exe D:\OneDrive - Sri Lanka Institute of Information Technology\Research\Transcript-Based Skill Validation & Job Alignment\src\quiz_planner.py
+=== Finished: Quiz planning ===
+
+
+=== Running step: Quiz generation (RAG) ===
+Command: D:\OneDrive - Sri Lanka Institute of Information Technology\Research\Transcript-Based Skill Validation & Job Alignment\.venv\Scripts\python.exe D:\OneDrive - Sri Lanka Institute of Information Technology\Research\Transcript-Based Skill Validation & Job Alignment\src\quiz_generation_rag.py
+=== Finished: Quiz generation (RAG) ===
+
+
+--- Skill profile (baseline) for IT21001288 ---
+                                            Skill  ScoreNormalized  SkillLevel
+66                             Job Role Awareness         0.304167  Developing
+56   Industry Expectations & Workplace Adaptation         0.304167  Developing
+110                 Soft Skills & Professionalism         0.304167  Developing
+43                  Ethics & Professional Conduct         0.304167  Developing
+55                Industrial Tools & Technologies         0.304167  Developing
+18                           Cloud Database Setup         0.200000    Beginner
+32                  Database Server Configuration         0.200000    Beginner
+71               Multilevel Access Control Design         0.200000    Beginner
+42                   Enterprise Storage Solutions         0.200000    Beginner
+24                     DBMS Architecture Analysis         0.200000    Beginner
+
+--- Top roles for IT21001288 (pre-quiz) ---
+                                  RoleName  ...  NumWeakOrMissing
+5   Associate - Python Data Engineer - GDC  ...                 2
+1                   AI Engineer - New Grad  ...                 2
+29       Senior Data Engineer - Databricks  ...                 1
+25                Lead GCP DevOps Engineer  ...                 1
+19                     Devops Engineer - 2  ...                 4
+
+[5 rows x 5 columns]
+
+--- Quiz plan for IT21001288 (first few skills) ---
+       RoleName               Skill StudentLevel TargetDifficulty  NumQuestions
+0  Data Analyst  Hypothesis Testing     Beginner             Easy             3
+
+### Pipeline run completed. ###
+INFO:     127.0.0.1:51403 - "POST /students/IT21001288/prepare-quiz HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:55063 - "OPTIONS /students/IT21001288/skills HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55063 - "GET /students/IT21001288/skills HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:55063 - "OPTIONS /students/IT21001288/roles HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55063 - "GET /students/IT21001288/roles HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55063 - "GET /students/IT21001288/roles HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55063 - "GET /students/IT21001288/skills HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57612 - "GET /students/IT21001288/skills HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57524 - "GET /students/IT21001288/skills HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62227 - "OPTIONS /students/IT21001288/skills HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62227 - "GET /students/IT21001288/skills HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62227 - "GET /students/IT21001288/skills HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64361 - "GET /students/IT21001288/skills HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64361 - "GET /students/IT21001288/skills HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64361 - "GET /students/IT21001288/skills HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64361 - "GET /students/IT21001288/skills HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64361 - "GET /students/IT21001288/skills HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64361 - "GET /students/IT21001288/skills HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64361 - "GET /students/IT21001288/skills HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64361 - "GET /students/IT21001288/skills HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64361 - "GET /students/IT21001288/skills HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64361 - "GET /students/IT21001288/skills HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64361 - "GET /students/IT21001288/skills HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58307 - "GET /students/IT21001288/skills HTTP/1.1" 404 Not Found
