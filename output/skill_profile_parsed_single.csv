@@ -1,0 +1,61 @@
+StudentID,Skill,EvidenceCount,TotalContribution,ScoreNormalized,SkillLevel
+IT21013928,Algorithm Analysis & Asymptotic Notations,1,0.5,0.4,Developing
+IT21013928,Algorithm Design Techniques,1,0.5,0.4,Developing
+IT21013928,Android OS & Application Components,1,0.75,0.6,Developing
+IT21013928,Application Testing & Security,1,0.75,0.6,Developing
+IT21013928,"Arrays, Structures & File Handling",1,0.8,0.64,Developing
+IT21013928,Boolean Algebra & Logic,1,0.8,0.64,Developing
+IT21013928,Calculus & Differentiation,1,0.8,0.64,Developing
+IT21013928,"Collections, Generics & Threads",1,1.0,0.8,Advanced
+IT21013928,Combinational & Sequential Logic Circuits,1,0.8,0.64,Developing
+IT21013928,Control Structures & Loops,1,0.8,0.64,Developing
+IT21013928,Data Handling & Media Integration,1,0.75,0.6,Developing
+IT21013928,Data Modeling & ER Diagrams,1,0.6000000000000001,0.4800000000000001,Developing
+IT21013928,Data Representation & Computer Architecture,1,0.8,0.64,Developing
+IT21013928,Descriptive & Inferential Statistics,1,0.5,0.4,Developing
+IT21013928,Design Patterns & Web-based Project,1,1.0,0.8,Advanced
+IT21013928,Diversity & Inclusion Awareness,1,0.5,0.4,Developing
+IT21013928,Ethics & Professional Conduct,2,1.25,1.0,Advanced
+IT21013928,Exception Handling & Debugging,1,1.0,0.8,Advanced
+IT21013928,Functions & Recursion,1,0.8,0.64,Developing
+IT21013928,Graph Theory & Matrices,1,0.8,0.64,Developing
+IT21013928,HTML/CSS & UI Design,1,0.6000000000000001,0.4800000000000001,Developing
+IT21013928,Hypothesis Testing & Chi-Squared Tests,1,0.5,0.4,Developing
+IT21013928,IP Addressing & Network Design,1,0.8,0.64,Developing
+IT21013928,IP Addressing & Subnetting,1,0.75,0.6,Developing
+IT21013928,Industrial Tools & Technologies,2,1.25,1.0,Advanced
+IT21013928,Industry Expectations & Workplace Adaptation,2,1.25,1.0,Advanced
+IT21013928,Information Systems Analysis,1,0.6000000000000001,0.4800000000000001,Developing
+IT21013928,Integration & Applications,1,0.8,0.64,Developing
+IT21013928,Intellectual Property & Entrepreneurship,1,0.5,0.4,Developing
+IT21013928,Internet & Web Protocols,1,0.6000000000000001,0.4800000000000001,Developing
+IT21013928,Java Programming Fundamentals,1,1.0,0.8,Advanced
+IT21013928,JavaScript/PHP Web Development,1,0.6000000000000001,0.4800000000000001,Developing
+IT21013928,Job Role Awareness,2,1.25,1.0,Advanced
+IT21013928,Legal & Professional Responsibilities,1,0.5,0.4,Developing
+IT21013928,Mobile App Development Fundamentals,1,0.75,0.6,Developing
+IT21013928,Network Device Configuration (Routers/Switches),1,0.75,0.6,Developing
+IT21013928,Network Security & ACLs,1,0.75,0.6,Developing
+IT21013928,Networking Fundamentals & ISO/OSI Layers,1,0.8,0.64,Developing
+IT21013928,Number Systems & Computer Arithmetic,1,0.8,0.64,Developing
+IT21013928,Object-Oriented Concepts & Recap,1,1.0,0.8,Advanced
+IT21013928,Operating Systems Basics,1,0.8,0.64,Developing
+IT21013928,Personal Development & Work Ethics,1,0.5,0.4,Developing
+IT21013928,Pointers & Memory Management,1,0.8,0.64,Developing
+IT21013928,Probability Distributions & Random Variables,1,0.5,0.4,Developing
+IT21013928,Procedural Programming Concepts,1,0.8,0.64,Developing
+IT21013928,Regression & Time Series Analysis,1,0.5,0.4,Developing
+IT21013928,Routing & TCP/UDP Protocols,1,0.75,0.6,Developing
+IT21013928,SQL Database Management (DDL/DML),1,0.6000000000000001,0.4800000000000001,Developing
+IT21013928,Sampling & Probability Theory,1,0.5,0.4,Developing
+IT21013928,Schema Refinement & Normalization,1,0.6000000000000001,0.4800000000000001,Developing
+IT21013928,Searching & Sorting Algorithms,1,0.5,0.4,Developing
+IT21013928,Social Media & Digital Content,1,0.6000000000000001,0.4800000000000001,Developing
+IT21013928,Soft Skills & Professionalism,2,1.25,1.0,Advanced
+IT21013928,"Stack, Queue & Linked List Implementation",1,0.5,0.4,Developing
+IT21013928,Strategic IS & Decision Support,1,0.6000000000000001,0.4800000000000001,Developing
+IT21013928,Teamwork & Collaboration,1,0.5,0.4,Developing
+IT21013928,Tree & Graph Data Structures,1,0.5,0.4,Developing
+IT21013928,UI/UX Design & Mobile Interface Concepts,1,0.75,0.6,Developing
+IT21013928,"VLAN, Spanning Tree & Trunking",1,0.75,0.6,Developing
+IT21013928,e-Commerce & Web Security,1,0.6000000000000001,0.4800000000000001,Developing

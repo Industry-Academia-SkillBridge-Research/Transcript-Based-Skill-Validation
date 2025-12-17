@@ -333,6 +333,12 @@ def main():
         return
 
     out_df = pd.DataFrame(all_questions)
+
+    # 👉 NEW: add a unique QuestionID column so the backend
+    # and frontend can refer to each question
+    if not out_df.empty:
+        out_df.insert(0, "QuestionID", range(1, len(out_df) + 1))
+
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     out_df.to_csv(output_path, index=False)
 
@@ -343,3 +349,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

@@ -3,6 +3,10 @@ pandas
 scikit-learn
 fastapi
 uvicorn
+pdfplumber
+pytesseract
+Pillow
+
 
 
 

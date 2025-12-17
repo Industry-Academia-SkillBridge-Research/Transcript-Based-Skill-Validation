@@ -1,13 +1,16 @@
+import os
 from pathlib import Path
 import sys
 import subprocess
 from typing import List, Dict
+import shutil
+from tempfile import NamedTemporaryFile
 
 import pandas as pd
-from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-
+from src import transcript_ingestion
 
 BASE_DIR = Path(__file__).resolve().parents[2]  # project root (was parents[1] causing src/src path)
 
@@ -181,12 +184,29 @@ def get_top_skills_for_student(student_id: str, top_k: int = 10) -> List[SkillSu
     if stu.empty:
         return []
 
-    # these columns come from skill_profile_fusion.py
-    # BaselineScore = ScoreNormalized
-    # FinalScore = fused score
-    for col in ["BaselineScore", "FinalScore", "FinalSkillLevel"]:
-        if col not in stu.columns:
-            return []
+    # ---- make columns robust to schema changes ----
+    # BaselineScore: if missing, use ScoreNormalized
+    if "BaselineScore" not in stu.columns:
+        if "ScoreNormalized" in stu.columns:
+            stu["BaselineScore"] = stu["ScoreNormalized"]
+        else:
+            stu["BaselineScore"] = 0.0
+
+    # FinalScore: if missing, fall back to ScoreNormalized
+    if "FinalScore" not in stu.columns:
+        if "ScoreNormalized" in stu.columns:
+            stu["FinalScore"] = stu["ScoreNormalized"]
+        else:
+            stu["FinalScore"] = 0.0
+
+    # FinalSkillLevel: if missing, fall back to SkillLevel
+    if "FinalSkillLevel" not in stu.columns:
+        if "SkillLevel" in stu.columns:
+            stu["FinalSkillLevel"] = stu["SkillLevel"]
+        else:
+            stu["FinalSkillLevel"] = "Unknown"
+
+    # -----------------------------------------------
 
     stu = stu.sort_values("FinalScore", ascending=False).head(top_k)
 
@@ -201,6 +221,7 @@ def get_top_skills_for_student(student_id: str, top_k: int = 10) -> List[SkillSu
             )
         )
     return results
+
 
 
 def get_top_roles_for_student(student_id: str, top_k: int = 5) -> List[RoleSummary]:
@@ -350,3 +371,154 @@ def get_roles(student_id: str):
             detail=f"No role readiness data found for student {student_id}.",
         )
     return roles
+
+@app.post("/students/{student_id}/upload-transcript")
+async def upload_transcript(
+    student_id: str,
+    regno: str = Form(...),
+    file: UploadFile = File(...)
+):
+    """
+    1) Save the uploaded transcript (pdf/image) to a temp file
+    2) Extract text + parse courses
+    3) Aggregate skills for this student (using your existing script)
+    4) Merge into global skill_profiles_with_quiz.csv
+    5) Recompute role readiness using job_role_model_dynamic.py
+    6) Return parsed courses + top skills + top roles
+    """
+
+    # 1) Save uploaded file to a temporary location
+    os.makedirs("uploads", exist_ok=True)
+    suffix = os.path.splitext(file.filename)[1] or ".pdf"
+    with NamedTemporaryFile(delete=False, dir="uploads", suffix=suffix) as tmp:
+        tmp_path = tmp.name
+        shutil.copyfileobj(file.file, tmp)
+
+    # 2) Extract text + parse courses using your transcript_ingestion module
+    try:
+        text = transcript_ingestion.extract_text_from_file(tmp_path)
+        parsed_df = transcript_ingestion.parse_transcript_text(text)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Transcript parsing failed: {e}")
+
+    if parsed_df.empty:
+        raise HTTPException(status_code=400, detail="Could not parse any course rows from transcript")
+
+    # Fill student metadata
+    parsed_df["StudentID"] = student_id
+    parsed_df["RegNo"] = regno
+
+    # Save in the location expected by skill_aggregation_from_parsed.py
+    os.makedirs("output", exist_ok=True)
+    parsed_csv_path = os.path.join("output", "transcript_parsed_single.csv")
+    parsed_df.to_csv(parsed_csv_path, index=False)
+
+    # 3) Run your existing skill aggregation for parsed transcript
+    skill_agg_script = os.path.join("src", "skill_aggregation_from_parsed.py")
+    result = subprocess.run(
+        [sys.executable, skill_agg_script],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Skill aggregation failed:\n{result.stderr}"
+        )
+
+    skill_single_path = os.path.join("output", "skill_profile_parsed_single.csv")
+    if not os.path.exists(skill_single_path):
+        raise HTTPException(status_code=500, detail="Skill profile file not found after aggregation.")
+
+    skill_single_df = pd.read_csv(skill_single_path)
+
+    # 4) Merge this student's skills into global skill_profiles_with_quiz.csv
+    fused_path = os.path.join("output", "skill_profiles_with_quiz.csv")
+    if not os.path.exists(fused_path):
+        raise HTTPException(
+            status_code=500,
+            detail="Global skill_profiles_with_quiz.csv not found. Run your offline pipeline first."
+        )
+
+    fused_df = pd.read_csv(fused_path)
+
+    # Build rows with same columns as fused_df
+    new_rows = []
+    for _, row in skill_single_df.iterrows():
+        rec = {}
+        for col in fused_df.columns:
+            if col in skill_single_df.columns:
+                rec[col] = row[col]
+            elif col == "FinalScore":
+                rec[col] = float(row.get("ScoreNormalized", 0.0))
+            elif col == "FinalSkillLevel":
+                rec[col] = row.get("SkillLevel", "Beginner")
+            elif col in [
+                "QuizQuestionCount",
+                "AvgQuestionScore",
+                "AvgEffectiveScore",
+                "QuizProficiency",
+                "QuizProficiencyFilled",
+            ]:
+                rec[col] = 0.0
+            else:
+                # Anything else gets a safe default
+                rec[col] = None
+        new_rows.append(rec)
+
+    new_rows_df = pd.DataFrame(new_rows)
+
+    # Drop old rows for this student (if any), then append new ones
+    fused_df = fused_df[fused_df["StudentID"] != student_id]
+    fused_df = pd.concat([fused_df, new_rows_df], ignore_index=True)
+    fused_df.to_csv(fused_path, index=False)
+
+    # 5) Recompute role readiness using your dynamic role model script
+    role_model_script = os.path.join("src", "job_role_model_dynamic.py")
+    result2 = subprocess.run(
+        [sys.executable, role_model_script],
+        capture_output=True,
+        text=True,
+    )
+    if result2.returncode != 0:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Role readiness computation failed:\n{result2.stderr}"
+        )
+
+    # 6) Prepare response: parsed courses, top skills, top roles
+    #   a) courses
+    courses_preview = parsed_df[["CourseCode", "CourseTitle", "Grade"]].fillna("").to_dict(
+        orient="records"
+    )
+
+    #   b) skills for this student from fused file
+    fused_df = pd.read_csv(fused_path)
+    student_skills = fused_df[fused_df["StudentID"] == student_id].copy()
+    student_skills = student_skills.sort_values(
+        by=student_skills.columns[-1], ascending=False
+    )  # last col usually FinalScore
+    skills_preview = student_skills[["Skill", "FinalScore", "FinalSkillLevel"]].head(15).to_dict(
+        orient="records"
+    )
+
+    #   c) roles from updated role_readiness_dynamic.csv
+    roles_path = os.path.join("output", "role_readiness_dynamic.csv")
+    roles_preview = []
+    if os.path.exists(roles_path):
+        roles_df = pd.read_csv(roles_path)
+        roles_df = roles_df[roles_df["StudentID"] == student_id].copy()
+        roles_df = roles_df.sort_values("ReadinessScore", ascending=False).head(10)
+        roles_preview = roles_df[
+            ["RoleName", "ReadinessScore", "Coverage", "WeakOrMissingSkills"]
+        ].to_dict(orient="records")
+
+    return {
+        "message": "Transcript processed and profiles updated",
+        "student_id": student_id,
+        "parsed_courses_count": int(len(parsed_df)),
+        "skills_count": int(len(student_skills)),
+        "courses": courses_preview,
+        "top_skills": skills_preview,
+        "top_roles": roles_preview,
+    }
