@@ -248,8 +248,11 @@
       }
 
       try {
-        const payload = { responses };
-        const data = await apiFetch(`/students/${encodeURIComponent(id)}/submit-quiz`, {
+        const payload = {
+          student_id: id,
+          answers: responses
+        };
+        const data = await apiFetch(`/students/${id}/submit-quiz`, {
           method: "POST",
           body: JSON.stringify(payload)
         });
@@ -258,6 +261,7 @@
       } catch (e) {
         document.getElementById("quizResultOutput").textContent = e.message;
       }
+
     };
 
     // Transcript upload handler
