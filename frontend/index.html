@@ -18,17 +18,17 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.06);
     }
     h1 { margin-top: 0; }
-    h2 { margin-top: 0; }
     label { font-weight: 600; }
-    input[type="text"] {
+    input[type="text"], input[type="file"] {
       padding: 0.35rem 0.5rem;
       border-radius: 0.4rem;
       border: 1px solid #ccc;
-      width: 220px;
+      margin-right: 0.5rem;
+      margin-top: 0.2rem;
     }
-    input[type="file"] {
-      margin-top: 0.5rem;
-      margin-bottom: 0.5rem;
+    input#studentId,
+    input#regNo {
+      width: 220px;
     }
     button {
       padding: 0.4rem 0.9rem;
@@ -36,19 +36,10 @@
       border: none;
       cursor: pointer;
       margin-right: 0.5rem;
-      margin-top: 0.5rem;
+      font-size: 0.9rem;
     }
     button.primary { background: #2563eb; color: white; }
     button.secondary { background: #e5e7eb; }
-    pre {
-      background: #111827;
-      color: #e5e7eb;
-      padding: 0.75rem;
-      border-radius: 0.5rem;
-      overflow-x: auto;
-      font-size: 0.85rem;
-      white-space: pre-wrap;
-    }
     .question {
       border-bottom: 1px solid #e5e7eb;
       padding-bottom: 0.75rem;
@@ -57,69 +48,104 @@
     .question:last-child {
       border-bottom: none;
     }
+    .tag {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      background: #e5e7eb;
+      margin-left: 0.35rem;
+    }
+    .tag.good { background: #bbf7d0; }
+    .tag.bad { background: #fecaca; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th, td {
+      padding: 0.35rem 0.4rem;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+    }
+    th {
+      background: #f3f4f6;
+      font-weight: 600;
+    }
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.85rem;
+      white-space: pre-wrap;
+    }
   </style>
 </head>
 <body>
   <h1>Transcript-based Skill Validation – Demo UI</h1>
 
-  <!-- Main student controls -->
+  <!-- Student identity -->
   <div class="card">
-    <label for="studentId">Student ID</label><br />
-    <input id="studentId" type="text" value="IT21001288" />
-    <button class="primary" id="btnSkills">Load Skills</button>
+    <div style="margin-bottom:0.5rem;">
+      <label for="studentId">Student ID</label><br />
+      <input id="studentId" type="text" value="IT21001288" />
+    </div>
+    <div style="margin-bottom:0.5rem;">
+      <label for="regNo">Reg No (optional)</label><br />
+      <input id="regNo" type="text" placeholder="IT21xxxxx" />
+    </div>
+    <button class="primary" id="btnSkills">Load Skills (from dataset)</button>
     <button class="secondary" id="btnRoles">Load Role Matches</button>
     <button class="secondary" id="btnPrepareQuiz">Prepare Quiz</button>
   </div>
 
-  <!-- Transcript upload -->
+  <!-- Upload & parse transcript -->
   <div class="card">
-    <h2>Upload Transcript (PDF / Image)</h2>
-    <form id="upload-form">
-      <div>
-        <label>Student ID:
-          <input type="text" id="upload-student-id" placeholder="IT21013928" required />
-        </label>
-      </div>
-      <div style="margin-top:0.5rem;">
-        <label>Reg No (optional, will default to Student ID):
-          <input type="text" id="upload-regno" />
-        </label>
-      </div>
-      <div>
-        <input type="file" id="upload-file" accept=".pdf,.png,.jpg,.jpeg" required />
-      </div>
-      <button type="submit" class="primary">Upload &amp; Process Transcript</button>
-    </form>
-    <pre id="upload-result">No upload yet.</pre>
+    <h2>Upload transcript & build skill profile (from PDF/image)</h2>
+    <p style="font-size:0.9rem;">
+      This calls <code>/students/{{student_id}}/upload-transcript</code> and runs the
+      transcript parsing + skill mapping pipeline on the uploaded file.
+    </p>
+    <div style="margin-bottom:0.5rem;">
+      <label for="transcriptFile">Transcript file (PDF / image)</label><br />
+      <input id="transcriptFile" type="file" accept=".pdf,image/*" />
+      <button class="primary" id="btnUploadTranscript">Upload &amp; Process Transcript</button>
+    </div>
+    <div id="uploadOutput" class="mono">No transcript uploaded yet.</div>
   </div>
 
+  <!-- Skills -->
   <div class="card">
-    <h2>Skill profile</h2>
-    <pre id="skillsOutput">No data yet.</pre>
+    <h2>Skill profile (from main dataset / fused pipeline)</h2>
+    <div id="skillsOutput">No data yet.</div>
   </div>
 
+  <!-- Roles -->
   <div class="card">
     <h2>Role matches</h2>
-    <pre id="rolesOutput">No data yet.</pre>
+    <div id="rolesOutput">No data yet.</div>
   </div>
 
+  <!-- Quiz -->
   <div class="card">
     <h2>Quiz</h2>
     <div id="quizContainer">No quiz prepared yet.</div>
     <button class="primary" id="btnSubmitQuiz">Submit Quiz</button>
-    <pre id="quizResultOutput">No results yet.</pre>
+    <h3>Quiz result</h3>
+    <div id="quizResultOutput">No results yet.</div>
   </div>
 
   <script>
     const API_BASE = "http://127.0.0.1:8000";
 
-    let currentQuestions = []; // store last questions so we can submit
+    let currentQuestions = [];  // store last questions so we can submit
 
     function getStudentId() {
       return document.getElementById("studentId").value.trim();
     }
+    function getRegNo() {
+      return document.getElementById("regNo").value.trim();
+    }
 
-    // Helper for JSON APIs (not for file upload)
+    // ---------------- helper: fetch wrapper ----------------
     async function apiFetch(path, options = {}) {
       const res = await fetch(API_BASE + path, {
         headers: { "Content-Type": "application/json" },
@@ -132,43 +158,209 @@
       return res.json();
     }
 
-    // Load skills
-    document.getElementById("btnSkills").onclick = async () => {
+    // ---------------- render helpers ----------------
+
+    function renderSkills(data) {
+      const container = document.getElementById("skillsOutput");
+      if (!data || !data.skills || !data.skills.length) {
+        container.textContent = "No skills found.";
+        return;
+      }
+      const rows = data.skills.map(s => {
+        const levelTag = `<span class="tag">${s.level}</span>`;
+        return `
+          <tr>
+            <td>${s.skill}</td>
+            <td>${s.score.toFixed(3)}</td>
+            <td>${s.evidence_count}</td>
+            <td>${levelTag}</td>
+          </tr>
+        `;
+      }).join("");
+      container.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Skill</th>
+              <th>Score</th>
+              <th>Evidence</th>
+              <th>Level</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+
+    function renderRoles(data) {
+      const container = document.getElementById("rolesOutput");
+      if (!data || !data.roles || !data.roles.length) {
+        container.textContent = "No role matches found.";
+        return;
+      }
+      const rows = data.roles.map(r => `
+        <tr>
+          <td>${r.role_name}</td>
+          <td>${r.readiness_score.toFixed(3)}</td>
+          <td>${(r.coverage * 100).toFixed(1)}%</td>
+          <td>${r.num_skills_present}/${r.num_skills}</td>
+          <td>${r.num_weak_or_missing}</td>
+        </tr>
+      `).join("");
+      container.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Role</th>
+              <th>Readiness</th>
+              <th>Coverage</th>
+              <th>Skills present</th>
+              <th>Weak/missing</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+
+    function renderQuizResult(result) {
+      const container = document.getElementById("quizResultOutput");
+      if (!result) {
+        container.textContent = "No results.";
+        return;
+      }
+
+      const acc = (result.overall_accuracy * 100).toFixed(1);
+      const perSkillLines = (result.per_skill || []).map(s => {
+        const tagClass = s.accuracy >= 0.7 ? "good"
+                         : s.accuracy <= 0.3 ? "bad"
+                         : "";
+        const pct = (s.accuracy * 100).toFixed(1);
+        return `
+          <li>
+            <strong>${s.skill}</strong>:
+            ${s.num_correct}/${s.num_questions} correct
+            <span class="tag ${tagClass}">${pct}%</span>
+          </li>
+        `;
+      }).join("");
+
+      const updatedRolesLines = (result.updated_roles || []).map(r => `
+        <li>
+          <strong>${r.role_name}</strong> –
+          readiness ${(r.readiness_score * 100).toFixed(1)}%,
+          weak/missing skills: ${r.num_weak_or_missing}
+        </li>
+      `).join("");
+
+      container.innerHTML = `
+        <p><strong>Answered:</strong> ${result.num_answered},
+           <strong>Correct:</strong> ${result.num_correct},
+           <strong>Overall accuracy:</strong> ${acc}%</p>
+
+        <p><strong>Per-skill performance:</strong></p>
+        <ul>${perSkillLines || "<li>No per-skill breakdown.</li>"}</ul>
+
+        <p><strong>Updated role matches (from quiz fusion):</strong></p>
+        <ul>${updatedRolesLines || "<li>No updated roles returned.</li>"}</ul>
+
+        <p style="font-size:0.8rem;color:#6b7280;">${result.note || ""}</p>
+      `;
+    }
+
+    // ---------------- API calls: skills / roles ----------------
+
+    async function loadSkills() {
       const id = getStudentId();
       if (!id) return alert("Enter a student ID first.");
       try {
-        const data = await apiFetch(`/students/${encodeURIComponent(id)}/skills`);
-        document.getElementById("skillsOutput").textContent =
-          JSON.stringify(data, null, 2);
+        const data = await apiFetch(`/students/${id}/skills`);
+        renderSkills(data);
       } catch (e) {
         document.getElementById("skillsOutput").textContent = e.message;
       }
-    };
+    }
+    document.getElementById("btnSkills").onclick = loadSkills;
 
-    // Load roles
-    document.getElementById("btnRoles").onclick = async () => {
+    async function loadRoles() {
       const id = getStudentId();
       if (!id) return alert("Enter a student ID first.");
       try {
-        const data = await apiFetch(`/students/${encodeURIComponent(id)}/roles`);
-        document.getElementById("rolesOutput").textContent =
-          JSON.stringify(data, null, 2);
+        const data = await apiFetch(`/students/${id}/roles`);
+        renderRoles(data);
       } catch (e) {
         document.getElementById("rolesOutput").textContent = e.message;
       }
+    }
+    document.getElementById("btnRoles").onclick = loadRoles;
+
+    // ---------------- API call: upload transcript ----------------
+
+    document.getElementById("btnUploadTranscript").onclick = async () => {
+      const id = getStudentId();
+      if (!id) return alert("Enter a student ID first.");
+
+      const fileInput = document.getElementById("transcriptFile");
+      if (!fileInput.files || fileInput.files.length === 0) {
+        return alert("Please choose a transcript file first.");
+      }
+
+      const regNo = getRegNo();
+      const file = fileInput.files[0];
+
+      const formData = new FormData();
+      formData.append("file", file);
+      if (regNo) {
+        formData.append("regno", regNo);
+      }
+
+      const output = document.getElementById("uploadOutput");
+      output.textContent = "Uploading and processing transcript...";
+
+      try {
+        // Note: do NOT set Content-Type header manually when using FormData
+        const res = await fetch(`${API_BASE}/students/${encodeURIComponent(id)}/upload-transcript`, {
+          method: "POST",
+          body: formData
+        });
+
+        const text = await res.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (_) {
+          // if not JSON, show raw text
+          output.textContent = text;
+          return;
+        }
+
+        output.textContent = JSON.stringify(data, null, 2);
+
+        // Optionally refresh skills and roles after upload (if backend writes into main CSVs)
+        try {
+          await loadSkills();
+          await loadRoles();
+        } catch (e) {
+          console.warn("Failed to refresh skills/roles after upload:", e);
+        }
+
+      } catch (e) {
+        output.textContent = e.message;
+      }
     };
+
+    // ---------------- API calls: quiz ----------------
 
     // Prepare quiz
     document.getElementById("btnPrepareQuiz").onclick = async () => {
       const id = getStudentId();
       if (!id) return alert("Enter a student ID first.");
       try {
-        const data = await apiFetch(`/students/${encodeURIComponent(id)}/prepare-quiz`, {
+        const data = await apiFetch(`/students/${id}/prepare-quiz`, {
           method: "POST",
-          body: JSON.stringify({}) // extend later if you add filter parameters
+          body: JSON.stringify({})
         });
 
-        // Expecting { student_id, questions: [...] }
         currentQuestions = data.questions || [];
         const container = document.getElementById("quizContainer");
 
@@ -182,37 +374,32 @@
           const div = document.createElement("div");
           div.className = "question";
 
-          const qId = q.question_id ?? q.QuestionID ?? index;
+          const qId = q.QuestionID ?? q.question_id ?? index;
 
-          const optionsObj =
-            q.options ||
-            {
-              A: q.OptionA,
-              B: q.OptionB,
-              C: q.OptionC,
-              D: q.OptionD,
-            };
-
-          const questionText = q.question_text || q.QuestionText || "";
-
-          let optionsHtml = "";
-          ["A", "B", "C", "D"].forEach(letter => {
-            const text = optionsObj[letter];
-            if (!text) return;
-            const inputId = `q${qId}_${letter}`;
-            optionsHtml += `
-              <div>
-                <label>
-                  <input type="radio" name="q_${qId}" value="${letter}" id="${inputId}" />
-                  <strong>${letter}</strong> – ${text}
-                </label>
-              </div>
-            `;
-          });
+          const optionsObj = {
+            A: q.OptionA,
+            B: q.OptionB,
+            C: q.OptionC,
+            D: q.OptionD,
+          };
 
           div.innerHTML = `
-            <div><strong>Q${index + 1}.</strong> ${questionText}</div>
-            <div>${optionsHtml}</div>
+            <div><strong>Q${index + 1}.</strong> ${q.QuestionText || q.question_text}</div>
+            <div>
+              ${["A","B","C","D"].map(letter => {
+                const text = optionsObj[letter];
+                if (!text) return "";
+                const inputId = `q${qId}_${letter}`;
+                return `
+                  <div>
+                    <label>
+                      <input type="radio" name="q_${qId}" value="${letter}" id="${inputId}" />
+                      <strong>${letter}</strong> – ${text}
+                    </label>
+                  </div>
+                `;
+              }).join("")}
+            </div>
           `;
           div.dataset.questionId = qId;
           container.appendChild(div);
@@ -230,7 +417,6 @@
       if (!currentQuestions.length) return alert("Prepare a quiz first.");
 
       const responses = [];
-
       document.querySelectorAll("#quizContainer .question").forEach(div => {
         const qId = div.dataset.questionId;
         const checked = div.querySelector("input[type=radio]:checked");
@@ -238,7 +424,7 @@
           responses.push({
             question_id: Number(qId),
             selected_option: checked.value,
-            response_time_seconds: 30 // simple fixed value for now
+            response_time_seconds: 30
           });
         }
       });
@@ -248,85 +434,26 @@
       }
 
       try {
-        const payload = {
-          student_id: id,
-          answers: responses
-        };
-        const data = await apiFetch(`/students/${id}/submit-quiz`, {
+        const payload = { responses };
+        const result = await apiFetch(`/students/${id}/submit-quiz`, {
           method: "POST",
           body: JSON.stringify(payload)
         });
-        document.getElementById("quizResultOutput").textContent =
-          JSON.stringify(data, null, 2);
+
+        renderQuizResult(result);
+
+        // refresh post-quiz state
+        try {
+          await loadSkills();
+          await loadRoles();
+        } catch (e) {
+          console.warn("Failed to refresh after quiz:", e);
+        }
+
       } catch (e) {
         document.getElementById("quizResultOutput").textContent = e.message;
       }
-
     };
-
-    // Transcript upload handler
-    const uploadForm = document.getElementById("upload-form");
-    const uploadResultEl = document.getElementById("upload-result");
-
-    if (uploadForm) {
-      uploadForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const studentInput = document.getElementById("upload-student-id");
-        const regnoInput = document.getElementById("upload-regno");
-        const fileInput = document.getElementById("upload-file");
-
-        const studentId = studentInput.value.trim();
-        let regno = regnoInput.value.trim();
-
-        if (!studentId) {
-          alert("Please enter a Student ID.");
-          return;
-        }
-        if (!fileInput.files.length) {
-          alert("Please choose a transcript file.");
-          return;
-        }
-        if (!regno) {
-          regno = studentId;
-        }
-
-        const formData = new FormData();
-        formData.append("regno", regno);
-        formData.append("file", fileInput.files[0]);
-
-        uploadResultEl.textContent = "Uploading and processing transcript...";
-
-        try {
-          const resp = await fetch(
-            `${API_BASE}/students/${encodeURIComponent(studentId)}/upload-transcript`,
-            {
-              method: "POST",
-              body: formData,
-            }
-          );
-
-          const data = await resp.json();
-
-          if (!resp.ok) {
-            uploadResultEl.textContent =
-              `Error: ${resp.status}\n` + JSON.stringify(data, null, 2);
-            return;
-          }
-
-          uploadResultEl.textContent = JSON.stringify(data, null, 2);
-
-          // Also sync the main student ID field so you can click Load Skills / Roles
-          const mainInput = document.getElementById("studentId");
-          if (mainInput) {
-            mainInput.value = studentId;
-          }
-
-        } catch (err) {
-          uploadResultEl.textContent = `Error calling API: ${err}`;
-        }
-      });
-    }
   </script>
 </body>
 </html>
