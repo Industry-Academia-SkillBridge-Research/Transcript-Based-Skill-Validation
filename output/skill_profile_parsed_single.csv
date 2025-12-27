@@ -1,61 +1,61 @@
 StudentID,Skill,EvidenceCount,TotalContribution,ScoreNormalized,SkillLevel
-IT21001288,Algorithm Analysis & Asymptotic Notations,1,0.5,0.4,Developing
-IT21001288,Algorithm Design Techniques,1,0.5,0.4,Developing
-IT21001288,Android OS & Application Components,1,0.75,0.6,Developing
-IT21001288,Application Testing & Security,1,0.75,0.6,Developing
-IT21001288,"Arrays, Structures & File Handling",1,0.8,0.64,Developing
-IT21001288,Boolean Algebra & Logic,1,0.8,0.64,Developing
-IT21001288,Calculus & Differentiation,1,0.8,0.64,Developing
-IT21001288,"Collections, Generics & Threads",1,1.0,0.8,Advanced
-IT21001288,Combinational & Sequential Logic Circuits,1,0.8,0.64,Developing
-IT21001288,Control Structures & Loops,1,0.8,0.64,Developing
-IT21001288,Data Handling & Media Integration,1,0.75,0.6,Developing
-IT21001288,Data Modeling & ER Diagrams,1,0.6000000000000001,0.4800000000000001,Developing
-IT21001288,Data Representation & Computer Architecture,1,0.8,0.64,Developing
-IT21001288,Descriptive & Inferential Statistics,1,0.5,0.4,Developing
-IT21001288,Design Patterns & Web-based Project,1,1.0,0.8,Advanced
-IT21001288,Diversity & Inclusion Awareness,1,0.5,0.4,Developing
-IT21001288,Ethics & Professional Conduct,2,1.25,1.0,Advanced
-IT21001288,Exception Handling & Debugging,1,1.0,0.8,Advanced
-IT21001288,Functions & Recursion,1,0.8,0.64,Developing
-IT21001288,Graph Theory & Matrices,1,0.8,0.64,Developing
-IT21001288,HTML/CSS & UI Design,1,0.6000000000000001,0.4800000000000001,Developing
-IT21001288,Hypothesis Testing & Chi-Squared Tests,1,0.5,0.4,Developing
-IT21001288,IP Addressing & Network Design,1,0.8,0.64,Developing
-IT21001288,IP Addressing & Subnetting,1,0.75,0.6,Developing
-IT21001288,Industrial Tools & Technologies,2,1.25,1.0,Advanced
-IT21001288,Industry Expectations & Workplace Adaptation,2,1.25,1.0,Advanced
-IT21001288,Information Systems Analysis,1,0.6000000000000001,0.4800000000000001,Developing
-IT21001288,Integration & Applications,1,0.8,0.64,Developing
-IT21001288,Intellectual Property & Entrepreneurship,1,0.5,0.4,Developing
-IT21001288,Internet & Web Protocols,1,0.6000000000000001,0.4800000000000001,Developing
-IT21001288,Java Programming Fundamentals,1,1.0,0.8,Advanced
-IT21001288,JavaScript/PHP Web Development,1,0.6000000000000001,0.4800000000000001,Developing
-IT21001288,Job Role Awareness,2,1.25,1.0,Advanced
-IT21001288,Legal & Professional Responsibilities,1,0.5,0.4,Developing
-IT21001288,Mobile App Development Fundamentals,1,0.75,0.6,Developing
-IT21001288,Network Device Configuration (Routers/Switches),1,0.75,0.6,Developing
-IT21001288,Network Security & ACLs,1,0.75,0.6,Developing
-IT21001288,Networking Fundamentals & ISO/OSI Layers,1,0.8,0.64,Developing
-IT21001288,Number Systems & Computer Arithmetic,1,0.8,0.64,Developing
-IT21001288,Object-Oriented Concepts & Recap,1,1.0,0.8,Advanced
-IT21001288,Operating Systems Basics,1,0.8,0.64,Developing
-IT21001288,Personal Development & Work Ethics,1,0.5,0.4,Developing
-IT21001288,Pointers & Memory Management,1,0.8,0.64,Developing
-IT21001288,Probability Distributions & Random Variables,1,0.5,0.4,Developing
-IT21001288,Procedural Programming Concepts,1,0.8,0.64,Developing
-IT21001288,Regression & Time Series Analysis,1,0.5,0.4,Developing
-IT21001288,Routing & TCP/UDP Protocols,1,0.75,0.6,Developing
-IT21001288,SQL Database Management (DDL/DML),1,0.6000000000000001,0.4800000000000001,Developing
-IT21001288,Sampling & Probability Theory,1,0.5,0.4,Developing
-IT21001288,Schema Refinement & Normalization,1,0.6000000000000001,0.4800000000000001,Developing
-IT21001288,Searching & Sorting Algorithms,1,0.5,0.4,Developing
-IT21001288,Social Media & Digital Content,1,0.6000000000000001,0.4800000000000001,Developing
-IT21001288,Soft Skills & Professionalism,2,1.25,1.0,Advanced
-IT21001288,"Stack, Queue & Linked List Implementation",1,0.5,0.4,Developing
-IT21001288,Strategic IS & Decision Support,1,0.6000000000000001,0.4800000000000001,Developing
-IT21001288,Teamwork & Collaboration,1,0.5,0.4,Developing
-IT21001288,Tree & Graph Data Structures,1,0.5,0.4,Developing
-IT21001288,UI/UX Design & Mobile Interface Concepts,1,0.75,0.6,Developing
-IT21001288,"VLAN, Spanning Tree & Trunking",1,0.75,0.6,Developing
-IT21001288,e-Commerce & Web Security,1,0.6000000000000001,0.4800000000000001,Developing
+UNKNOWN,Algorithm Analysis & Asymptotic Notations,1,0.5,0.37037037037037035,Developing
+UNKNOWN,Algorithm Design Techniques,1,0.5,0.37037037037037035,Developing
+UNKNOWN,Android OS & Application Components,1,0.75,0.5555555555555555,Developing
+UNKNOWN,Application Testing & Security,1,0.75,0.5555555555555555,Developing
+UNKNOWN,"Arrays, Structures & File Handling",1,0.8,0.5925925925925926,Developing
+UNKNOWN,Boolean Algebra & Logic,1,0.8,0.5925925925925926,Developing
+UNKNOWN,Calculus & Differentiation,1,0.8,0.5925925925925926,Developing
+UNKNOWN,"Collections, Generics & Threads",1,1.0,0.7407407407407407,Advanced
+UNKNOWN,Combinational & Sequential Logic Circuits,1,0.8,0.5925925925925926,Developing
+UNKNOWN,Control Structures & Loops,1,0.8,0.5925925925925926,Developing
+UNKNOWN,Data Handling & Media Integration,1,0.75,0.5555555555555555,Developing
+UNKNOWN,Data Modeling & ER Diagrams,1,0.6000000000000001,0.4444444444444445,Developing
+UNKNOWN,Data Representation & Computer Architecture,1,0.8,0.5925925925925926,Developing
+UNKNOWN,Descriptive & Inferential Statistics,1,0.5,0.37037037037037035,Developing
+UNKNOWN,Design Patterns & Web-based Project,1,1.0,0.7407407407407407,Advanced
+UNKNOWN,Diversity & Inclusion Awareness,1,0.5,0.37037037037037035,Developing
+UNKNOWN,Ethics & Professional Conduct,2,1.35,1.0,Advanced
+UNKNOWN,Exception Handling & Debugging,1,1.0,0.7407407407407407,Advanced
+UNKNOWN,Functions & Recursion,1,0.8,0.5925925925925926,Developing
+UNKNOWN,Graph Theory & Matrices,1,0.8,0.5925925925925926,Developing
+UNKNOWN,HTML/CSS & UI Design,1,0.6000000000000001,0.4444444444444445,Developing
+UNKNOWN,Hypothesis Testing & Chi-Squared Tests,1,0.5,0.37037037037037035,Developing
+UNKNOWN,IP Addressing & Network Design,1,0.8,0.5925925925925926,Developing
+UNKNOWN,IP Addressing & Subnetting,1,0.75,0.5555555555555555,Developing
+UNKNOWN,Industrial Tools & Technologies,2,1.35,1.0,Advanced
+UNKNOWN,Industry Expectations & Workplace Adaptation,2,1.35,1.0,Advanced
+UNKNOWN,Information Systems Analysis,1,0.6000000000000001,0.4444444444444445,Developing
+UNKNOWN,Integration & Applications,1,0.8,0.5925925925925926,Developing
+UNKNOWN,Intellectual Property & Entrepreneurship,1,0.5,0.37037037037037035,Developing
+UNKNOWN,Internet & Web Protocols,1,0.6000000000000001,0.4444444444444445,Developing
+UNKNOWN,Java Programming Fundamentals,1,1.0,0.7407407407407407,Advanced
+UNKNOWN,JavaScript/PHP Web Development,1,0.6000000000000001,0.4444444444444445,Developing
+UNKNOWN,Job Role Awareness,2,1.35,1.0,Advanced
+UNKNOWN,Legal & Professional Responsibilities,1,0.5,0.37037037037037035,Developing
+UNKNOWN,Mobile App Development Fundamentals,1,0.75,0.5555555555555555,Developing
+UNKNOWN,Network Device Configuration (Routers/Switches),1,0.75,0.5555555555555555,Developing
+UNKNOWN,Network Security & ACLs,1,0.75,0.5555555555555555,Developing
+UNKNOWN,Networking Fundamentals & ISO/OSI Layers,1,0.8,0.5925925925925926,Developing
+UNKNOWN,Number Systems & Computer Arithmetic,1,0.8,0.5925925925925926,Developing
+UNKNOWN,Object-Oriented Concepts & Recap,1,1.0,0.7407407407407407,Advanced
+UNKNOWN,Operating Systems Basics,1,0.8,0.5925925925925926,Developing
+UNKNOWN,Personal Development & Work Ethics,1,0.5,0.37037037037037035,Developing
+UNKNOWN,Pointers & Memory Management,1,0.8,0.5925925925925926,Developing
+UNKNOWN,Probability Distributions & Random Variables,1,0.5,0.37037037037037035,Developing
+UNKNOWN,Procedural Programming Concepts,1,0.8,0.5925925925925926,Developing
+UNKNOWN,Regression & Time Series Analysis,1,0.5,0.37037037037037035,Developing
+UNKNOWN,Routing & TCP/UDP Protocols,1,0.75,0.5555555555555555,Developing
+UNKNOWN,SQL Database Management (DDL/DML),1,0.6000000000000001,0.4444444444444445,Developing
+UNKNOWN,Sampling & Probability Theory,1,0.5,0.37037037037037035,Developing
+UNKNOWN,Schema Refinement & Normalization,1,0.6000000000000001,0.4444444444444445,Developing
+UNKNOWN,Searching & Sorting Algorithms,1,0.5,0.37037037037037035,Developing
+UNKNOWN,Social Media & Digital Content,1,0.6000000000000001,0.4444444444444445,Developing
+UNKNOWN,Soft Skills & Professionalism,2,1.35,1.0,Advanced
+UNKNOWN,"Stack, Queue & Linked List Implementation",1,0.5,0.37037037037037035,Developing
+UNKNOWN,Strategic IS & Decision Support,1,0.6000000000000001,0.4444444444444445,Developing
+UNKNOWN,Teamwork & Collaboration,1,0.5,0.37037037037037035,Developing
+UNKNOWN,Tree & Graph Data Structures,1,0.5,0.37037037037037035,Developing
+UNKNOWN,UI/UX Design & Mobile Interface Concepts,1,0.75,0.5555555555555555,Developing
+UNKNOWN,"VLAN, Spanning Tree & Trunking",1,0.75,0.5555555555555555,Developing
+UNKNOWN,e-Commerce & Web Security,1,0.6000000000000001,0.4444444444444445,Developing

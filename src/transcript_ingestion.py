@@ -125,6 +125,35 @@ def parse_transcript_text(
     print(f"Parsed {len(df)} course rows.")
     return df
 
+def parse_transcript_file(
+    file_path: str,
+    student_id: Optional[str] = None,
+    regno: Optional[str] = None,
+    tesseract_cmd: Optional[str] = None,
+) -> pd.DataFrame:
+    """
+    High-level helper used by both CLI and FastAPI.
+
+    1) Extract text from a PDF/image.
+    2) Parse courses/grades.
+    3) Attach StudentID / RegNo if provided.
+    """
+    text = extract_text_from_file(file_path, tesseract_cmd=tesseract_cmd)
+    df = parse_transcript_text(text)
+
+    # Ensure required columns exist
+    if "StudentID" not in df.columns:
+        df["StudentID"] = None
+    if "RegNo" not in df.columns:
+        df["RegNo"] = None
+
+    if student_id:
+        df["StudentID"] = df["StudentID"].fillna(student_id).replace("", student_id)
+    if regno:
+        df["RegNo"] = df["RegNo"].fillna(regno).replace("", regno)
+
+    return df
+
 
 # -----------------------------
 # CLI
@@ -173,4 +202,27 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--file", required=True, help="Path to transcript PDF/image")
+    parser.add_argument("--tesseract-cmd", help="Optional full path to tesseract.exe")
+    parser.add_argument("--out-csv", default="output/transcript_parsed_single.csv")
+    parser.add_argument("--student-id", help="Student ID (optional)")
+    parser.add_argument("--regno", help="Registration number (optional)")
+    args = parser.parse_args()
+
+    print(f"Reading transcript from: {args.file}")
+    df = parse_transcript_file(
+        file_path=args.file,
+        student_id=args.student_id,
+        regno=args.regno,
+        tesseract_cmd=args.tesseract_cmd,
+    )
+
+    print(f"Parsed {len(df)} course rows.")
+    os.makedirs(os.path.dirname(args.out_csv), exist_ok=True)
+    df.to_csv(args.out_csv, index=False)
+    print(f"Saved to: {args.out_csv}")
+    print(df.head())
+

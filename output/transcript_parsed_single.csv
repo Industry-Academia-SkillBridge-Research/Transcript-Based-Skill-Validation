@@ -1,27 +1,27 @@
 StudentID,RegNo,CourseCode,CourseTitle,Grade,Year
-IT21001288,IT21001288,IT2101,3928,,
-IT21001288,IT21001288,IT1010,Introduction to Programming 1 Apr-2021 4,A,1.0
-IT21001288,IT21001288,IT1020,Introduction to Computer Systems 1 Apr-2021 4,A,1.0
-IT21001288,IT21001288,IT1030,Mathematics for Computing 1 Apr-2021 4,A,1.0
-IT21001288,IT21001288,IT1040,Communication Skills 1 Apr-2021 3,A,1.0
-IT21001288,IT21001288,IT1050,Object Oriented Concepts 2 Oct-2021 2 A-,,1.0
-IT21001288,IT21001288,IT1060,Software Process Modelling 2 Oct-2021 3 B-,,1.0
-IT21001288,IT21001288,IT1080,English for Academic Purposes 2 Oct-2021 3 A-,,1.0
-IT21001288,IT21001288,IT1090,Information Systems & Data Modeling 2 Oct-2021 4,B,1.0
-IT21001288,IT21001288,IT1100,Internet & Web Technologies 2 Oct-2021 4,B,1.0
-IT21001288,IT21001288,IT2020,Software Engineering 1 Jun-2022 4 B+,,2.0
-IT21001288,IT21001288,IT2030,Object Oriented Programming 1 Jun-2022 4,A,2.0
-IT21001288,IT21001288,IT2040,Database Management Systems 1 Jun-2022 4 A-,,2.0
-IT21001288,IT21001288,IT2050,Computer Networks 1 Jun-2022 4,B,2.0
-IT21001288,IT21001288,IT2060,Operating Systems and System Administration 1 Jun-2022 4 C+,,2.0
-IT21001288,IT21001288,IT2070,Data Structures & Algorithms 2 Apr-2023 4,C,2.0
-IT21001288,IT21001288,IT2090,Professional Skills 2 Oct-2023 2,C,2.0
-IT21001288,IT21001288,IT2110,Probability & Statistics 2 Apr-2023 3,C,2.0
-IT21001288,IT21001288,IT2010,Mobile Application Development 2 Nov-2022 4,B,2.0
-IT21001288,IT21001288,IT2080,IT Project 2 Nov-2022 4 C+,,2.0
-IT21001288,IT21001288,IT2100,Employability Skills Development – Seminar 2 Nov-2022 1,B,2.0
-IT21001288,IT21001288,IT3050,Employability Skills Development – Seminar 1 Apr-2023 1,C,3.0
-IT21001288,IT21001288,IT4070,Preparation for the Professional World 1 May-2024 2,A,4.0
-IT21001288,IT21001288,IT4130,Image Understanding and Processing 1 May-2024 4,B,4.0
-IT21001288,IT21001288,IT4010,Research Project 2 Nov-2024 16,A,4.0
-IT21001288,IT21001288,IT4140,Industry Placement 2 Nov-2024 8,B,4.0
+UNKNOWN,,IT2101,3928,,
+UNKNOWN,,IT1010,Introduction to Programming 1 Apr-2021 4,A,1.0
+UNKNOWN,,IT1020,Introduction to Computer Systems 1 Apr-2021 4,A,1.0
+UNKNOWN,,IT1030,Mathematics for Computing 1 Apr-2021 4,A,1.0
+UNKNOWN,,IT1040,Communication Skills 1 Apr-2021 3,A,1.0
+UNKNOWN,,IT1050,Object Oriented Concepts 2 Oct-2021 2 A-,,1.0
+UNKNOWN,,IT1060,Software Process Modelling 2 Oct-2021 3 B-,,1.0
+UNKNOWN,,IT1080,English for Academic Purposes 2 Oct-2021 3 A-,,1.0
+UNKNOWN,,IT1090,Information Systems & Data Modeling 2 Oct-2021 4,B,1.0
+UNKNOWN,,IT1100,Internet & Web Technologies 2 Oct-2021 4,B,1.0
+UNKNOWN,,IT2020,Software Engineering 1 Jun-2022 4 B+,,2.0
+UNKNOWN,,IT2030,Object Oriented Programming 1 Jun-2022 4,A,2.0
+UNKNOWN,,IT2040,Database Management Systems 1 Jun-2022 4 A-,,2.0
+UNKNOWN,,IT2050,Computer Networks 1 Jun-2022 4,B,2.0
+UNKNOWN,,IT2060,Operating Systems and System Administration 1 Jun-2022 4 C+,,2.0
+UNKNOWN,,IT2070,Data Structures & Algorithms 2 Apr-2023 4,C,2.0
+UNKNOWN,,IT2090,Professional Skills 2 Oct-2023 2,C,2.0
+UNKNOWN,,IT2110,Probability & Statistics 2 Apr-2023 3,C,2.0
+UNKNOWN,,IT2010,Mobile Application Development 2 Nov-2022 4,B,2.0
+UNKNOWN,,IT2080,IT Project 2 Nov-2022 4 C+,,2.0
+UNKNOWN,,IT2100,Employability Skills Development – Seminar 2 Nov-2022 1,B,2.0
+UNKNOWN,,IT3050,Employability Skills Development – Seminar 1 Apr-2023 1,C,3.0
+UNKNOWN,,IT4070,Preparation for the Professional World 1 May-2024 2,A,4.0
+UNKNOWN,,IT4130,Image Understanding and Processing 1 May-2024 4,B,4.0
+UNKNOWN,,IT4010,Research Project 2 Nov-2024 16,A,4.0
+UNKNOWN,,IT4140,Industry Placement 2 Nov-2024 8,B,4.0

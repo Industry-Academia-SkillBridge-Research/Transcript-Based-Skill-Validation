@@ -1,9 +1,9 @@
 import os
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import pandas as pd
 
-from course_skill_mapping import load_course_skill_mapping
+from src.course_skill_mapping import load_course_skill_mapping
 
 # Letter grade → numeric points
 GRADE_TO_POINTS: Dict[str, float] = {
@@ -141,6 +141,104 @@ def aggregate_skills_from_parsed(
 
     return agg
 
+def build_skill_profile_from_parsed(
+    parsed_df: pd.DataFrame,
+    mapping_path: str = "input/course_skill_mapping.csv",
+) -> pd.DataFrame:
+    """
+    Take a parsed transcript (one student) and build a skill profile.
+
+    This is basically your current script logic, but parameterised.
+    Expected columns in parsed_df: StudentID, CourseCode, Grade, (optionally Year)
+    """
+    if parsed_df.empty:
+        return pd.DataFrame()
+
+    # Load course → skill mapping
+    mapping_df = pd.read_csv(mapping_path)
+
+    # Melt mapping_df so each (CourseCode, Skill) is a row
+    skill_cols = ["Skill1", "Skill2", "Skill3", "Skill4", "Skill5"]
+    mapping_long = []
+    for _, row in mapping_df.iterrows():
+        code = str(row["CourseCode"]).strip()
+        level = str(row.get("SkillLevel", "")).strip()
+        for col in skill_cols:
+            skill = row.get(col)
+            if isinstance(skill, str) and skill.strip():
+                mapping_long.append(
+                    {
+                        "CourseCode": code,
+                        "Skill": skill.strip(),
+                        "SkillLevelTemplate": level,
+                    }
+                )
+
+    mapping_long = pd.DataFrame(mapping_long)
+    if mapping_long.empty:
+        return pd.DataFrame()
+
+    # Join parsed transcript with mapping
+    parsed_df["CourseCode"] = parsed_df["CourseCode"].astype(str).str.strip()
+    merged = parsed_df.merge(mapping_long, on="CourseCode", how="left")
+    merged = merged.dropna(subset=["Skill"])
+
+    # Map grades to numeric weights (simplified, adjust if needed)
+    grade_to_weight = {
+        "A+": 1.0,
+        "A": 1.0,
+        "A-": 0.95,
+        "B+": 0.85,
+        "B": 0.8,
+        "B-": 0.75,
+        "C+": 0.65,
+        "C": 0.6,
+        "C-": 0.55,
+        "D+": 0.45,
+        "D": 0.4,
+        "E": 0.2,
+        "F": 0.0,
+        "": 0.0,
+        None: 0.0,
+    }
+
+    merged["Grade"] = merged["Grade"].fillna("").astype(str).str.strip()
+    merged["GradeWeight"] = merged["Grade"].map(grade_to_weight).fillna(0.0)
+
+    # For now, YearWeight = 1 (you can reuse your year weighting if you had it)
+    merged["YearWeight"] = 1.0
+    merged["Contribution"] = merged["GradeWeight"] * merged["YearWeight"]
+
+    # Aggregate by student + skill
+    student_id = parsed_df["StudentID"].iloc[0]
+    grouped = (
+        merged.groupby(["StudentID", "Skill"], as_index=False)
+        .agg(
+            EvidenceCount=("CourseCode", "nunique"),
+            TotalContribution=("Contribution", "sum"),
+        )
+    )
+
+    # Normalise contribution to [0,1] for ScoreNormalized
+    max_contrib = grouped["TotalContribution"].max()
+    if max_contrib > 0:
+        grouped["ScoreNormalized"] = grouped["TotalContribution"] / max_contrib
+    else:
+        grouped["ScoreNormalized"] = 0.0
+
+    # Simple level bucketing
+    def level_from_score(s: float) -> str:
+        if s >= 0.75:
+            return "Advanced"
+        if s >= 0.5:
+            return "Developing"
+        if s > 0:
+            return "Beginner"
+        return "None"
+
+    grouped["SkillLevel"] = grouped["ScoreNormalized"].apply(level_from_score)
+
+    return grouped
 
 def main():
     parsed_path = "output/transcript_parsed_single.csv"
@@ -148,29 +246,22 @@ def main():
     out_path = "output/skill_profile_parsed_single.csv"
 
     print(f"Loading parsed transcript from: {parsed_path}")
-    tdf = load_parsed_transcript(parsed_path)
-    print(f"Parsed transcript rows (after cleaning): {len(tdf)}")
+    parsed_df = pd.read_csv(parsed_path)
+    # Basic cleaning if needed
+    parsed_df = parsed_df.dropna(subset=["CourseCode"])
 
+    print(f"Parsed transcript rows (after cleaning): {len(parsed_df)}")
     print(f"Loading course-skill mapping from: {mapping_path}")
-    mapping_dict = load_course_skill_mapping(mapping_path)
-    mdf = mapping_to_dataframe(mapping_dict)
-    print(f"Mapping rows (course-skill): {len(mdf)}")
+    print(f"Mapping rows (course-skill): (see mapping file)")
 
-    skill_profile = aggregate_skills_from_parsed(tdf, mdf)
-    print(f"Skill rows: {len(skill_profile)}")
+    skill_df = build_skill_profile_from_parsed(parsed_df, mapping_path)
 
+    print(f"Skill rows: {len(skill_df)}")
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
-    skill_profile.to_csv(out_path, index=False)
+    skill_df.to_csv(out_path, index=False)
     print(f"Saved skill profile to: {out_path}")
-
-    # Quick sample
-    sid = skill_profile["StudentID"].iloc[0]
-    print(f"\nSample skills for {sid}:")
-    print(
-        skill_profile[skill_profile["StudentID"] == sid]
-        .sort_values("ScoreNormalized", ascending=False)
-        .head(10)
-    )
+    print("\nSample skills for", parsed_df['StudentID'].iloc[0], ":")
+    print(skill_df.head(10))
 
 
 if __name__ == "__main__":
