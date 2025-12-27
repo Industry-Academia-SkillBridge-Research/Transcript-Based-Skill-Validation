@@ -1,0 +1,61 @@
+StudentID,Skill,EvidenceCount,TotalContribution,ScoreNormalized,SkillLevel
+UNKNOWN,Algorithm Analysis & Asymptotic Notations,1,0.5,0.37037037037037035,Developing
+UNKNOWN,Algorithm Design Techniques,1,0.5,0.37037037037037035,Developing
+UNKNOWN,Android OS & Application Components,1,0.75,0.5555555555555555,Developing
+UNKNOWN,Application Testing & Security,1,0.75,0.5555555555555555,Developing
+UNKNOWN,"Arrays, Structures & File Handling",1,0.8,0.5925925925925926,Developing
+UNKNOWN,Boolean Algebra & Logic,1,0.8,0.5925925925925926,Developing
+UNKNOWN,Calculus & Differentiation,1,0.8,0.5925925925925926,Developing
+UNKNOWN,"Collections, Generics & Threads",1,1.0,0.7407407407407407,Advanced
+UNKNOWN,Combinational & Sequential Logic Circuits,1,0.8,0.5925925925925926,Developing
+UNKNOWN,Control Structures & Loops,1,0.8,0.5925925925925926,Developing
+UNKNOWN,Data Handling & Media Integration,1,0.75,0.5555555555555555,Developing
+UNKNOWN,Data Modeling & ER Diagrams,1,0.6000000000000001,0.4444444444444445,Developing
+UNKNOWN,Data Representation & Computer Architecture,1,0.8,0.5925925925925926,Developing
+UNKNOWN,Descriptive & Inferential Statistics,1,0.5,0.37037037037037035,Developing
+UNKNOWN,Design Patterns & Web-based Project,1,1.0,0.7407407407407407,Advanced
+UNKNOWN,Diversity & Inclusion Awareness,1,0.5,0.37037037037037035,Developing
+UNKNOWN,Ethics & Professional Conduct,2,1.35,1.0,Advanced
+UNKNOWN,Exception Handling & Debugging,1,1.0,0.7407407407407407,Advanced
+UNKNOWN,Functions & Recursion,1,0.8,0.5925925925925926,Developing
+UNKNOWN,Graph Theory & Matrices,1,0.8,0.5925925925925926,Developing
+UNKNOWN,HTML/CSS & UI Design,1,0.6000000000000001,0.4444444444444445,Developing
+UNKNOWN,Hypothesis Testing & Chi-Squared Tests,1,0.5,0.37037037037037035,Developing
+UNKNOWN,IP Addressing & Network Design,1,0.8,0.5925925925925926,Developing
+UNKNOWN,IP Addressing & Subnetting,1,0.75,0.5555555555555555,Developing
+UNKNOWN,Industrial Tools & Technologies,2,1.35,1.0,Advanced
+UNKNOWN,Industry Expectations & Workplace Adaptation,2,1.35,1.0,Advanced
+UNKNOWN,Information Systems Analysis,1,0.6000000000000001,0.4444444444444445,Developing
+UNKNOWN,Integration & Applications,1,0.8,0.5925925925925926,Developing
+UNKNOWN,Intellectual Property & Entrepreneurship,1,0.5,0.37037037037037035,Developing
+UNKNOWN,Internet & Web Protocols,1,0.6000000000000001,0.4444444444444445,Developing
+UNKNOWN,Java Programming Fundamentals,1,1.0,0.7407407407407407,Advanced
+UNKNOWN,JavaScript/PHP Web Development,1,0.6000000000000001,0.4444444444444445,Developing
+UNKNOWN,Job Role Awareness,2,1.35,1.0,Advanced
+UNKNOWN,Legal & Professional Responsibilities,1,0.5,0.37037037037037035,Developing
+UNKNOWN,Mobile App Development Fundamentals,1,0.75,0.5555555555555555,Developing
+UNKNOWN,Network Device Configuration (Routers/Switches),1,0.75,0.5555555555555555,Developing
+UNKNOWN,Network Security & ACLs,1,0.75,0.5555555555555555,Developing
+UNKNOWN,Networking Fundamentals & ISO/OSI Layers,1,0.8,0.5925925925925926,Developing
+UNKNOWN,Number Systems & Computer Arithmetic,1,0.8,0.5925925925925926,Developing
+UNKNOWN,Object-Oriented Concepts & Recap,1,1.0,0.7407407407407407,Advanced
+UNKNOWN,Operating Systems Basics,1,0.8,0.5925925925925926,Developing
+UNKNOWN,Personal Development & Work Ethics,1,0.5,0.37037037037037035,Developing
+UNKNOWN,Pointers & Memory Management,1,0.8,0.5925925925925926,Developing
+UNKNOWN,Probability Distributions & Random Variables,1,0.5,0.37037037037037035,Developing
+UNKNOWN,Procedural Programming Concepts,1,0.8,0.5925925925925926,Developing
+UNKNOWN,Regression & Time Series Analysis,1,0.5,0.37037037037037035,Developing
+UNKNOWN,Routing & TCP/UDP Protocols,1,0.75,0.5555555555555555,Developing
+UNKNOWN,SQL Database Management (DDL/DML),1,0.6000000000000001,0.4444444444444445,Developing
+UNKNOWN,Sampling & Probability Theory,1,0.5,0.37037037037037035,Developing
+UNKNOWN,Schema Refinement & Normalization,1,0.6000000000000001,0.4444444444444445,Developing
+UNKNOWN,Searching & Sorting Algorithms,1,0.5,0.37037037037037035,Developing
+UNKNOWN,Social Media & Digital Content,1,0.6000000000000001,0.4444444444444445,Developing
+UNKNOWN,Soft Skills & Professionalism,2,1.35,1.0,Advanced
+UNKNOWN,"Stack, Queue & Linked List Implementation",1,0.5,0.37037037037037035,Developing
+UNKNOWN,Strategic IS & Decision Support,1,0.6000000000000001,0.4444444444444445,Developing
+UNKNOWN,Teamwork & Collaboration,1,0.5,0.37037037037037035,Developing
+UNKNOWN,Tree & Graph Data Structures,1,0.5,0.37037037037037035,Developing
+UNKNOWN,UI/UX Design & Mobile Interface Concepts,1,0.75,0.5555555555555555,Developing
+UNKNOWN,"VLAN, Spanning Tree & Trunking",1,0.75,0.5555555555555555,Developing
+UNKNOWN,e-Commerce & Web Security,1,0.6000000000000001,0.4444444444444445,Developing

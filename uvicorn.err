@@ -1,0 +1,28 @@
+INFO:     Started server process [31704]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+Traceback (most recent call last):
+  File "D:\OneDrive - Sri Lanka Institute of Information Technology\Research\Transcript-Based Skill Validation & Job Alignment\src\course_skill_mapping.py", line 57, in <module>
+    print("IT1010 \u2192", mapping.get("IT1010"))
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rumes\anaconda3\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2192' in position 7: character maps to <undefined>
+Traceback (most recent call last):
+  File "D:\OneDrive - Sri Lanka Institute of Information Technology\Research\Transcript-Based Skill Validation & Job Alignment\src\run_full_pipeline_for_student.py", line 221, in <module>
+    main()
+    ~~~~^^
+  File "D:\OneDrive - Sri Lanka Institute of Information Technology\Research\Transcript-Based Skill Validation & Job Alignment\src\run_full_pipeline_for_student.py", line 174, in main
+    run_step("Course–skill mapping check", "course_skill_mapping.py")
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\OneDrive - Sri Lanka Institute of Information Technology\Research\Transcript-Based Skill Validation & Job Alignment\src\run_full_pipeline_for_student.py", line 27, in run_step
+    subprocess.run(cmd, check=True)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\rumes\anaconda3\Lib\subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['D:\\OneDrive - Sri Lanka Institute of Information Technology\\Research\\Transcript-Based Skill Validation & Job Alignment\\.venv\\Scripts\\python.exe', 'D:\\OneDrive - Sri Lanka Institute of Information Technology\\Research\\Transcript-Based Skill Validation & Job Alignment\\src\\course_skill_mapping.py']' returned non-zero exit status 1.
+D:\OneDrive - Sri Lanka Institute of Information Technology\Research\Transcript-Based Skill Validation & Job Alignment\src\job_postings_ingestion.py:155: FutureWarning: DataFrameGroupBy.apply operated on the grouping columns. This behavior is deprecated, and in a future version of pandas the grouping columns will be excluded from the operation. Either pass `include_groups=False` to exclude the groupings or explicitly select the grouping columns after groupby to silence this warning.
+  templates = templates.groupby("RoleName", group_keys=False).apply(normalize_group)

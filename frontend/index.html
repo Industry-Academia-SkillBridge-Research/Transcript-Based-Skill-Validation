@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Transcript-based Skill Validation – Demo UI</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 1.5rem;
+      background: #f5f5f7;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 0.75rem;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    h1 { margin-top: 0; }
+    h2 { margin-top: 0; }
+    label { font-weight: 600; font-size: 0.9rem; }
+    input[type="text"] {
+      padding: 0.35rem 0.5rem;
+      border-radius: 0.4rem;
+      border: 1px solid #ccc;
+      width: 220px;
+      margin-right: 0.5rem;
+    }
+    input[type="file"] {
+      margin-top: 0.35rem;
+      margin-bottom: 0.5rem;
+    }
+    button {
+      padding: 0.4rem 0.9rem;
+      border-radius: 0.5rem;
+      border: none;
+      cursor: pointer;
+      margin-right: 0.5rem;
+      font-size: 0.9rem;
+    }
+    button.primary { background: #2563eb; color: white; }
+    button.secondary { background: #e5e7eb; }
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .question {
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .question:last-child {
+      border-bottom: none;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      background: #e5e7eb;
+      margin-left: 0.35rem;
+    }
+    .tag.good { background: #bbf7d0; }
+    .tag.bad { background: #fecaca; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th, td {
+      padding: 0.35rem 0.4rem;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+    }
+    th {
+      background: #f3f4f6;
+      font-weight: 600;
+    }
+
+    .status {
+      font-size: 0.8rem;
+      color: #4b5563;
+      margin-top: 0.3rem;
+      white-space: pre-wrap;
+    }
+    .status.error {
+      color: #b91c1c;
+    }
+  </style>
+</head>
+<body>
+  <h1>Transcript-based Skill Validation – Demo UI</h1>
+
+  <!-- Top controls: student id + dataset-based view -->
+  <div class="card">
+    <div style="margin-bottom:0.5rem;">
+      <label for="studentId">Student ID</label><br />
+      <input id="studentId" type="text" value="IT21001288" />
+    </div>
+    <div style="margin-bottom:0.5rem;">
+      <label for="regNoMain">Reg No (optional)</label><br />
+      <input id="regNoMain" type="text" placeholder="IT21xxxx" />
+    </div>
+    <button class="primary" id="btnSkillsGlobal">Load Skills (from dataset)</button>
+    <button class="secondary" id="btnRoles">Load Role Matches</button>
+    <button class="secondary" id="btnPrepareQuiz">Prepare Quiz</button>
+    <div id="topStatus" class="status"></div>
+  </div>
+
+  <!-- Upload transcript and build local profile -->
+  <div class="card">
+    <h2>Upload transcript &amp; build skill profile (from PDF/image)</h2>
+    <p style="font-size:0.85rem;">
+      This calls <code>/students/{student_id}/upload-transcript</code> and runs the transcript parsing + skill mapping pipeline on the uploaded file.
+    </p>
+
+    <div style="margin-bottom:0.4rem;">
+      <label for="uploadStudentId">Student ID</label><br />
+      <input id="uploadStudentId" type="text" placeholder="IT21xxxxx" />
+    </div>
+
+    <div style="margin-bottom:0.4rem;">
+      <label for="uploadRegNo">Reg No (optional, will default to Student ID)</label><br />
+      <input id="uploadRegNo" type="text" placeholder="IT21xxxxx" />
+    </div>
+
+    <div style="margin-bottom:0.4rem;">
+      <label for="transcriptFile">Transcript file (PDF / image)</label><br />
+      <input id="transcriptFile" type="file" accept=".pdf,image/*" />
+    </div>
+
+    <button class="primary" id="btnUploadTranscript">Upload &amp; Process Transcript</button>
+    <div id="uploadTranscriptStatus" class="status">No transcript uploaded yet.</div>
+  </div>
+
+  <!-- Skill profiles -->
+  <div class="card">
+    <h2>Skill profile (from main dataset / fused pipeline)</h2>
+    <div id="skillsGlobalOutput">No data yet.</div>
+  </div>
+
+  <div class="card">
+    <h2>Skill profile (from uploaded transcript, this session only)</h2>
+    <div id="skillsLocalOutput">No transcript-based skills yet.</div>
+  </div>
+
+  <!-- Roles -->
+  <div class="card">
+    <h2>Role matches</h2>
+    <div id="rolesOutput">No data yet.</div>
+  </div>
+
+  <!-- Quiz -->
+  <div class="card">
+    <h2>Quiz</h2>
+    <div id="quizContainer">No quiz prepared yet.</div>
+    <button class="primary" id="btnSubmitQuiz">Submit Quiz</button>
+
+    <h3>Quiz result</h3>
+    <div id="quizResultOutput">No results yet.</div>
+  </div>
+
+  <script>
+    const API_BASE = "http://127.0.0.1:8000";
+
+    let currentQuestions = [];
+    let lastQuizSource = "dataset";   // just for explanation text
+
+    function getStudentId() {
+      return document.getElementById("studentId").value.trim();
+    }
+
+    function syncUploadIdsFromTop() {
+      const topId = getStudentId();
+      const topReg = document.getElementById("regNoMain").value.trim();
+      const upIdEl = document.getElementById("uploadStudentId");
+      const upRegEl = document.getElementById("uploadRegNo");
+
+      if (!upIdEl.value && topId) upIdEl.value = topId;
+      if (!upRegEl.value && (topReg || topId)) upRegEl.value = topReg || topId;
+    }
+
+    // -------- generic fetch wrapper --------
+    async function apiFetch(path, options = {}) {
+      const res = await fetch(API_BASE + path, {
+        headers: {
+          ...(options.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
+          ...options.headers,
+        },
+        ...options,
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error("HTTP " + res.status + ": " + text);
+      }
+      const ct = res.headers.get("Content-Type") || "";
+      if (ct.includes("application/json")) {
+        return res.json();
+      }
+      return res.text();
+    }
+
+    // -------- render helpers --------
+    function safeNumber(x) {
+      if (x === null || x === undefined || x === "") return null;
+      const n = Number(x);
+      return Number.isNaN(n) ? null : n;
+    }
+
+    function renderSkillsTable(skills, targetId) {
+      const container = document.getElementById(targetId);
+      if (!skills || !skills.length) {
+        container.textContent = "No skills found.";
+        return;
+      }
+
+      const rows = skills.map(s => {
+        // accept different field names from backend
+        const name = s.skill || s.Skill || s.SkillName || "";
+        const rawScore = s.score ?? s.final_score ?? s.baseline_score ?? s.ScoreNormalized;
+        const score = safeNumber(rawScore);
+        const scoreText = score !== null ? score.toFixed(3) : "–";
+
+        const evidence = s.evidence_count ?? s.EvidenceCount ?? s.evidence ?? "";
+        const level = s.level || s.skill_level || s.SkillLevel || "";
+
+        return `
+          <tr>
+            <td>${name}</td>
+            <td>${scoreText}</td>
+            <td>${evidence}</td>
+            <td>${level}</td>
+          </tr>
+        `;
+      }).join("");
+
+      container.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Skill</th>
+              <th>Score</th>
+              <th>Evidence</th>
+              <th>Level</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+
+    function renderGlobalSkills(data) {
+      if (!data) {
+        document.getElementById("skillsGlobalOutput").textContent = "No data.";
+        return;
+      }
+      renderSkillsTable(data.skills || [], "skillsGlobalOutput");
+    }
+
+    function renderLocalSkills(data) {
+      // expect shape: { student_id, num_courses, skills: [...] }
+      if (!data || !data.skills || !data.skills.length) {
+        document.getElementById("skillsLocalOutput").textContent =
+          "No transcript-based skills returned.";
+        return;
+      }
+      renderSkillsTable(data.skills, "skillsLocalOutput");
+    }
+
+    function renderRoles(data) {
+      const container = document.getElementById("rolesOutput");
+      if (!data || !data.roles || !data.roles.length) {
+        container.textContent = "No role matches found.";
+        return;
+      }
+      const rows = data.roles.map(r => {
+        const readiness = safeNumber(r.readiness_score);
+        const readinessText = readiness !== null ? readiness.toFixed(3) : "–";
+
+        const coverage = safeNumber(r.coverage);
+        const coverageText = coverage !== null ? (coverage * 100).toFixed(1) + "%" : "–";
+
+        const numSkills = r.num_skills ?? "";
+        const numPresent = r.num_skills_present ?? "";
+        const numWeak = r.num_weak_or_missing ?? "";
+
+        return `
+          <tr>
+            <td>${r.role_name}</td>
+            <td>${readinessText}</td>
+            <td>${coverageText}</td>
+            <td>${numPresent}/${numSkills}</td>
+            <td>${numWeak}</td>
+          </tr>
+        `;
+      }).join("");
+
+      container.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Role</th>
+              <th>Readiness</th>
+              <th>Coverage</th>
+              <th>Skills present</th>
+              <th>Weak/missing</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+
+    function renderQuizResult(result) {
+      const container = document.getElementById("quizResultOutput");
+      if (!result) {
+        container.textContent = "No results.";
+        return;
+      }
+
+      const answered = result.num_answered ?? 0;
+      const correct = result.num_correct ?? 0;
+      const accNum = safeNumber(result.overall_accuracy) ?? 0;
+      const accText = (accNum * 100).toFixed(1);
+
+      const perSkillLines = (result.per_skill || []).map(s => {
+        const acc = safeNumber(s.accuracy) ?? 0;
+        const pct = (acc * 100).toFixed(1);
+        const tagClass =
+          acc >= 0.7 ? "good" :
+          acc <= 0.3 ? "bad" : "";
+        return `
+          <li>
+            <strong>${s.skill}</strong>:
+            ${s.num_correct}/${s.num_questions} correct
+            <span class="tag ${tagClass}">${pct}%</span>
+          </li>
+        `;
+      }).join("");
+
+      const updatedRolesLines = (result.updated_roles || []).map(r => {
+        const rs = safeNumber(r.readiness_score) ?? 0;
+        return `
+          <li>
+            <strong>${r.role_name}</strong> –
+            readiness ${(rs * 100).toFixed(1)}%,
+            weak/missing skills: ${r.num_weak_or_missing}
+          </li>
+        `;
+      }).join("");
+
+      container.innerHTML = `
+        <p><strong>Answered:</strong> ${answered},
+           <strong>Correct:</strong> ${correct},
+           <strong>Overall accuracy:</strong> ${accText}%</p>
+
+        <p><strong>Per-skill performance:</strong></p>
+        <ul>${perSkillLines || "<li>No per-skill breakdown.</li>"}</ul>
+
+        <p><strong>Updated role matches (after quiz fusion):</strong></p>
+        <ul>${updatedRolesLines || "<li>No updated roles returned (pipeline may not persist quiz yet).</li>"}</ul>
+
+        <p style="font-size:0.8rem;color:#6b7280;">${result.note || ""}</p>
+      `;
+    }
+
+    // -------- button handlers --------
+
+    // dataset-based skills
+    async function loadGlobalSkills() {
+      const id = getStudentId();
+      if (!id) return alert("Enter a student ID first.");
+      try {
+        document.getElementById("skillsGlobalOutput").textContent = "Loading...";
+        const data = await apiFetch(`/students/${id}/skills`);
+        renderGlobalSkills(data);
+        document.getElementById("topStatus").textContent = "";
+      } catch (e) {
+        document.getElementById("skillsGlobalOutput").textContent = e.message;
+        document.getElementById("topStatus").textContent = e.message;
+        document.getElementById("topStatus").classList.add("error");
+      }
+    }
+
+    document.getElementById("btnSkillsGlobal").onclick = loadGlobalSkills;
+
+    // roles (using fused/dataset profile at this moment)
+    async function loadRoles() {
+      const id = getStudentId();
+      if (!id) return alert("Enter a student ID first.");
+      try {
+        document.getElementById("rolesOutput").textContent = "Loading...";
+        const data = await apiFetch(`/students/${id}/roles`);
+        renderRoles(data);
+      } catch (e) {
+        document.getElementById("rolesOutput").textContent = e.message;
+      }
+    }
+
+    document.getElementById("btnRoles").onclick = loadRoles;
+
+    // upload transcript → local skill profile
+    document.getElementById("btnUploadTranscript").onclick = async () => {
+      const statusEl = document.getElementById("uploadTranscriptStatus");
+      const studentId = document.getElementById("uploadStudentId").value.trim();
+      const regNo = document.getElementById("uploadRegNo").value.trim() || studentId;
+      const fileInput = document.getElementById("transcriptFile");
+
+      if (!studentId) {
+        alert("Enter a student ID for the upload.");
+        return;
+      }
+      if (!fileInput.files.length) {
+        alert("Choose a transcript file first.");
+        return;
+      }
+
+      const file = fileInput.files[0];
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("regno", regNo);
+
+      try {
+        statusEl.textContent = "Uploading and processing transcript...";
+        statusEl.classList.remove("error");
+
+        const data = await apiFetch(`/students/${encodeURIComponent(studentId)}/upload-transcript`, {
+          method: "POST",
+          body: formData,
+        });
+
+        statusEl.textContent =
+          `Parsed courses: ${data.num_courses ?? "?"}\n` +
+          `Skills returned: ${(data.skills || []).length}`;
+        renderLocalSkills(data);
+
+        // after local profile is built, you may want to run a quiz later
+      } catch (e) {
+        statusEl.textContent = e.message;
+        statusEl.classList.add("error");
+      }
+    };
+
+    // prepare quiz (still using existing backend logic)
+    document.getElementById("btnPrepareQuiz").onclick = async () => {
+      const id = getStudentId();
+      if (!id) return alert("Enter a student ID first.");
+
+      try {
+        const data = await apiFetch(`/students/${id}/prepare-quiz`, {
+          method: "POST",
+          body: JSON.stringify({}),
+        });
+
+        lastQuizSource = "dataset";  // for now, quiz is based on dataset pipeline
+        currentQuestions = data.questions || [];
+        const container = document.getElementById("quizContainer");
+
+        if (!currentQuestions.length) {
+          container.textContent = "No questions returned.";
+          return;
+        }
+
+        container.innerHTML = "";
+        currentQuestions.forEach((q, index) => {
+          const div = document.createElement("div");
+          div.className = "question";
+
+          const qId = q.QuestionID ?? q.question_id ?? index;
+          const optionsObj = {
+            A: q.OptionA,
+            B: q.OptionB,
+            C: q.OptionC,
+            D: q.OptionD,
+          };
+
+          div.innerHTML = `
+            <div><strong>Q${index + 1}.</strong> ${q.QuestionText || q.question_text}</div>
+            <div>
+              ${["A","B","C","D"].map(letter => {
+                const text = optionsObj[letter];
+                if (!text) return "";
+                const inputId = `q${qId}_${letter}`;
+                return `
+                  <div>
+                    <label>
+                      <input type="radio" name="q_${qId}" value="${letter}" id="${inputId}" />
+                      <strong>${letter}</strong> – ${text}
+                    </label>
+                  </div>
+                `;
+              }).join("")}
+            </div>
+          `;
+          div.dataset.questionId = qId;
+          container.appendChild(div);
+        });
+
+      } catch (e) {
+        document.getElementById("quizContainer").textContent = e.message;
+      }
+    };
+
+    // submit quiz
+    document.getElementById("btnSubmitQuiz").onclick = async () => {
+      const id = getStudentId();
+      if (!id) return alert("Enter a student ID first.");
+      if (!currentQuestions.length) return alert("Prepare a quiz first.");
+
+      const responses = [];
+      document.querySelectorAll("#quizContainer .question").forEach(div => {
+        const qId = div.dataset.questionId;
+        const checked = div.querySelector("input[type=radio]:checked");
+        if (checked) {
+          responses.push({
+            question_id: Number(qId),
+            selected_option: checked.value,
+            response_time_seconds: 30,
+          });
+        }
+      });
+
+      if (!responses.length) {
+        alert("Please answer at least one question.");
+        return;
+      }
+
+      try {
+        const payload = { responses };
+        const result = await apiFetch(`/students/${id}/submit-quiz`, {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+
+        renderQuizResult(result);
+
+        // refresh dataset-based view after quiz, if your backend later fuses quiz into skills
+        try {
+          await loadGlobalSkills();
+          await loadRoles();
+        } catch (e) {
+          console.warn("Refresh after quiz failed:", e);
+        }
+      } catch (e) {
+        document.getElementById("quizResultOutput").textContent = e.message;
+      }
+    };
+
+    // initial wiring
+    window.addEventListener("load", () => {
+      syncUploadIdsFromTop();
+      document.getElementById("studentId").addEventListener("change", syncUploadIdsFromTop);
+    });
+  </script>
+</body>
+</html>

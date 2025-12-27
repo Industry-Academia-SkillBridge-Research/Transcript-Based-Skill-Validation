@@ -7,7 +7,8 @@ from pathlib import Path
 import pandas as pd
 
 
-BASE_DIR = Path(__file__).resolve().parents[1]
+BASE_DIR = Path(__file__).resolve().parents[1]  # project root (was .parent causing missing output/ path)
+PIPELINE_SCRIPT = BASE_DIR / "run_full_pipeline_for_student.py"
 
 
 def run_step(name: str, script_rel_path: str, extra_args=None):
@@ -15,14 +16,18 @@ def run_step(name: str, script_rel_path: str, extra_args=None):
     Helper to run another Python script using the *same* interpreter
     that is currently running this file (sys.executable).
     """
-    script_path = BASE_DIR / script_rel_path
+    # scripts live under the 'src' folder; use project root BASE_DIR
+    script_path = BASE_DIR / "src" / script_rel_path
     cmd = [sys.executable, str(script_path)]
     if extra_args:
         cmd.extend(extra_args)
 
     print(f"\n=== Running step: {name} ===")
     print("Command:", " ".join(cmd))
-    subprocess.run(cmd, check=True)
+    # Ensure subprocess uses UTF-8 for stdout/stderr to avoid UnicodeEncodeError on Windows consoles
+    env = os.environ.copy()
+    env.setdefault("PYTHONIOENCODING", "utf-8")
+    subprocess.run(cmd, check=True, env=env)
     print(f"=== Finished: {name} ===\n")
 
 
@@ -166,29 +171,29 @@ def main():
 
     if phase == "pre_quiz":
         # 1. Transcript → long format
-        run_step("Transcript loader", "src/transcript_loader.py")
+        run_step("Transcript loader", "transcript_loader.py")
 
         # 2. Course–skill mapping (sanity check; also useful for other scripts)
-        run_step("Course–skill mapping check", "src/course_skill_mapping.py")
+        run_step("Course–skill mapping check", "course_skill_mapping.py")
 
         # 3. Aggregate skills (explainable profile)
-        run_step("Skill aggregation (explainable)", "src/skill_aggregation_explainable.py")
+        run_step("Skill aggregation (explainable)", "skill_aggregation_explainable.py")
 
         # 4. Ingest job data (JSON → CSV → skill templates)
-        run_step("Convert Job_data.json to CSV", "src/convert_job_json_to_csv.py")
-        run_step("Job postings ingestion", "src/job_postings_ingestion.py")
+        run_step("Convert Job_data.json to CSV", "convert_job_json_to_csv.py")
+        run_step("Job postings ingestion", "job_postings_ingestion.py")
 
         # 5. Fuse baseline + (any existing) quiz signals
-        run_step("Skill profile fusion", "src/skill_profile_fusion.py")
+        run_step("Skill profile fusion", "skill_profile_fusion.py")
 
         # 6. Compute role readiness using dynamic templates
-        run_step("Role readiness (dynamic)", "src/job_role_model_dynamic.py")
+        run_step("Role readiness (dynamic)", "job_role_model_dynamic.py")
 
         # 7. Build quiz plans for weak/missing skills
-        run_step("Quiz planning", "src/quiz_planner.py")
+        run_step("Quiz planning", "quiz_planner.py")
 
         # 8. Generate quiz questions using RAG over skill corpus
-        run_step("Quiz generation (RAG)", "src/quiz_generation_rag.py")
+        run_step("Quiz generation (RAG)", "quiz_generation_rag.py")
 
         # Show summary for this student
         show_pre_quiz_summary(student_id)
@@ -197,17 +202,17 @@ def main():
         # Here we assume:
         #  - Student has answered quizzes
         #  - Responses are stored in output/quiz_responses_*.csv (currently we use sample)
-        run_step("Quiz scoring", "src/quiz_scoring.py")
+        run_step("Quiz scoring", "quiz_scoring.py")
 
         # Fuse transcript-based skills with quiz-based updates
-        run_step("Skill profile fusion", "src/skill_profile_fusion.py")
+        run_step("Skill profile fusion", "skill_profile_fusion.py")
 
         # Recompute role readiness after updated skills
-        run_step("Role readiness (dynamic)", "src/job_role_model_dynamic.py")
+        run_step("Role readiness (dynamic)", "job_role_model_dynamic.py")
 
         # Optionally generate a new round of quizzes (refinement cycle)
-        run_step("Quiz planning (post-quiz)", "src/quiz_planner.py")
-        run_step("Quiz generation (RAG, post-quiz)", "src/quiz_generation_rag.py")
+        run_step("Quiz planning (post-quiz)", "quiz_planner.py")
+        run_step("Quiz generation (RAG, post-quiz)", "quiz_generation_rag.py")
 
         # Show summary for this student
         show_post_quiz_summary(student_id)
