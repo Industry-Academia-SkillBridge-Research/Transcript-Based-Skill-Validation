@@ -6,7 +6,7 @@ uvicorn
 pdfplumber
 pytesseract
 Pillow
-
+python-multipart
 
 
 
