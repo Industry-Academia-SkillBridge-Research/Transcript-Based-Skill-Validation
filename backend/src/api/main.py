@@ -1,41 +1,32 @@
-# src/api/main.py
-from fastapi import (
-    FastAPI,
-    HTTPException,
-    UploadFile,
-    File,
-    Form,
-)
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import List, Optional, Dict, Any
+# backend/src/api/main.py
 
 import os
-import io
-import pandas as pd
+from typing import Any, Dict, Optional
 
-# Import your existing helpers
-from src.course_skill_mapping import load_course_skill_mapping
-from src import transcript_ingestion  # uses extract_text_from_file, parse_transcript_text
-from src.transcript_ingestion import parse_transcript_file
+import pandas as pd
+import pdfplumber
+from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi.middleware.cors import CORSMiddleware
+
+from src.transcript_ingestion import parse_transcript_text
 from src.skill_aggregation_from_parsed import build_skill_profile_from_parsed
+
+from pydantic import BaseModel
+from typing import List, Optional
+
+
 
 app = FastAPI(
     title="Transcript-based Skill Validation API",
-    version="0.3.0",
-    description="Backend API for transcript → skills → quiz → role alignment.",
+    version="0.3.1",
 )
 
-# ---------------------------------------------------------------------
-# CORS (frontend at http://127.0.0.1:5500 or http://localhost:5500)
-# ---------------------------------------------------------------------
 origins = [
     "http://127.0.0.1:5500",
     "http://localhost:5500",
-    "http://127.0.0.1:5173",   # Vite default
+    "http://127.0.0.1:5173",
     "http://localhost:5173",
 ]
-
 
 app.add_middleware(
     CORSMiddleware,
@@ -44,843 +35,399 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-# ---------------------------------------------------------------------
-# Utility: core data loading
-# ---------------------------------------------------------------------
-def load_skill_profiles() -> pd.DataFrame:
-    """
-    Prefer fused skill profiles (transcript + quiz).
-    Fallback to explainable baseline if fused does not exist.
-    """
-    candidates = [
-        "output/skill_profiles_with_quiz.csv",
-        "output/skill_profiles_explainable.csv",
-    ]
-    for path in candidates:
-        if os.path.exists(path):
-            return pd.read_csv(path)
-    raise FileNotFoundError(
-        "No skill profile file found in output/. Run aggregation pipeline first."
-    )
+class PrepareQuizRequest(BaseModel):
+    selected_skills: List[str] = []
+    num_questions_per_skill: int = 3
+    difficulty: str = "mixed"   # optional: "easy" | "medium" | "hard" | "mixed"
 
 
 def load_role_readiness() -> pd.DataFrame:
     """
-    Static role readiness from the offline dynamic role model
-    (job_role_model_dynamic.py).
+    Loads the role readiness summary CSV (top roles with overall readiness score).
     """
-    path = "output/role_readiness_dynamic.csv"
+    path = os.path.join("output", "role_readiness_dynamic.csv")
     if not os.path.exists(path):
-        raise FileNotFoundError(
-            "Role readiness file not found. Run job_role_model_dynamic.py first."
-        )
+        raise FileNotFoundError("Role readiness CSV not found. Run job_role_model_dynamic.py first.")
     return pd.read_csv(path)
 
-BASELINE_SKILL_FILE = "output/skill_profiles_explainable.csv"
-FUSED_SKILL_FILE = "output/skill_profiles_with_quiz.csv"
-ROLE_TEMPLATE_FILE = "output/job_role_skill_templates_dynamic.csv"
 
-
-def load_baseline_skill_profiles() -> pd.DataFrame:
+def load_skill_explanations() -> pd.DataFrame:
     """
-    Load the grade-based skill profiles (without quiz fusion).
-    Used as the stable baseline when fusing quiz results.
+    Loads a CSV that contains explainability columns for skills.
+    Tries multiple candidate files.
     """
-    if not os.path.exists(BASELINE_SKILL_FILE):
-        raise FileNotFoundError(
-            f"Baseline skill profile file not found: {BASELINE_SKILL_FILE}. "
-            f"Run skill_aggregation_explainable.py first."
-        )
-    return pd.read_csv(BASELINE_SKILL_FILE)
+    candidates = [
+        "output/skill_explanations.csv",
+        "output/skill_profiles_explainable.csv",
+    ]
+    for p in candidates:
+        if os.path.exists(p):
+            return pd.read_csv(p)
+    raise FileNotFoundError("No explainability file found. Generate explainable skill output first.")
 
 
-
-def load_role_templates() -> pd.DataFrame:
+def load_role_readiness_details() -> pd.DataFrame:
     """
-    Role → skill template matrix derived from real job postings.
-    Used for *updated* role matches after quiz fusion.
+    Loads the role readiness details CSV (per-skill breakdown for each role).
     """
-    path = "output/job_role_skill_templates_dynamic.csv"
-    if not os.path.exists(path):
-        raise FileNotFoundError(
-            "Role-skill template file not found. Run job_postings_ingestion.py first."
-        )
-    df = pd.read_csv(path)
-    if "ImportanceNorm" not in df.columns:
-        df["ImportanceNorm"] = 1.0
-    return df
+    candidates = [
+        "output/role_readiness_details_dynamic.csv",
+        "output/role_readiness_details_explainable.csv",
+    ]
+    for p in candidates:
+        if os.path.exists(p):
+            return pd.read_csv(p)
+    raise FileNotFoundError("Role readiness details file not found. Run job_role_model_dynamic.py first.")
 
 
-def load_quiz_questions() -> pd.DataFrame:
-    path = "output/quiz_questions_generated.csv"
-    if not os.path.exists(path):
-        raise FileNotFoundError(
-            "Quiz questions file not found. Run quiz_generation_rag.py first."
-        )
-    df = pd.read_csv(path)
+@app.post("/students/{student_id}/upload-transcript")
+async def upload_transcript(student_id: str, file: UploadFile = File(...)):
+    try:
+        os.makedirs("output", exist_ok=True)
 
-    # Ensure QuestionID exists
-    if "QuestionID" not in df.columns:
-        df = df.reset_index().rename(columns={"index": "QuestionID"})
-    return df
+        contents = await file.read()
+        tmp_path = os.path.join("output", f"_tmp_{student_id}_{file.filename}")
+        with open(tmp_path, "wb") as f:
+            f.write(contents)
 
+        # PDF only (for now)
+        if not file.filename.lower().endswith(".pdf"):
+            raise HTTPException(status_code=400, detail="Only PDF supported for now.")
 
-# ---------------------------------------------------------------------
-# Utility: grade → numeric + transcript-based skill aggregation
-# ---------------------------------------------------------------------
-GRADE_TO_POINT = {
-    "A+": 4.0,
-    "A": 4.0,
-    "A-": 3.7,
-    "B+": 3.3,
-    "B": 3.0,
-    "B-": 2.7,
-    "C+": 2.3,
-    "C": 2.0,
-    "C-": 1.7,
-    "D+": 1.3,
-    "D": 1.0,
-    "E": 0.0,
-    "F": 0.0,
-}
+        text_parts = []
+        with pdfplumber.open(tmp_path) as pdf:
+            for page in pdf.pages:
+                text_parts.append(page.extract_text() or "")
+        text = "\n".join(text_parts)
 
-YEAR_WEIGHTS = {
-    1: 0.8,
-    2: 1.0,
-    3: 1.2,
-    4: 1.5,
-}
+        details, courses_df = parse_transcript_text(text)
 
-
-def grade_to_normalized(grade: str) -> float:
-    g = (grade or "").strip().upper()
-    if g not in GRADE_TO_POINT:
-        return 0.0
-    return GRADE_TO_POINT[g] / 4.0  # scale into [0,1]
-
-
-def aggregate_skills_from_parsed(df_parsed: pd.DataFrame) -> pd.DataFrame:
-    """
-    Given a parsed transcript (one student), join with course-skill mapping
-    and compute a transcript-based skill profile.
-
-    Returns columns:
-      StudentID, Skill, EvidenceCount, TotalContribution, ScoreNormalized, SkillLevel
-    """
-    if df_parsed.empty:
-        return pd.DataFrame()
-
-    mapping = load_course_skill_mapping("input/course_skill_mapping.csv")
-
-    records = []
-    for _, row in df_parsed.iterrows():
-        course_code = str(row.get("CourseCode", "")).strip()
-        grade = str(row.get("Grade", "")).strip()
-        if not course_code or course_code not in mapping or not grade:
-            continue
-
-        student_id = str(row.get("StudentID", "")).strip()
-        if not student_id:
-            continue
-
-        year_val = row.get("Year", None)
-        try:
-            year_int = int(year_val) if pd.notna(year_val) else None
-        except Exception:
-            year_int = None
-
-        year_weight = YEAR_WEIGHTS.get(year_int, 1.0)
-        grade_norm = grade_to_normalized(grade)
-
-        course_info = mapping[course_code]
-        skills = course_info.get("skills", [])
-
-        for sk in skills:
-            records.append(
-                {
-                    "StudentID": student_id,
-                    "Skill": sk,
-                    "GradeNorm": grade_norm,
-                    "Year": year_int,
-                    "YearWeight": year_weight,
-                    "Contribution": grade_norm * year_weight,
-                }
+        if courses_df.empty:
+            raise HTTPException(
+                status_code=422,
+                detail="No course lines detected. Transcript format may not match parser regex.",
             )
 
-    if not records:
-        return pd.DataFrame()
-
-    df = pd.DataFrame(records)
-
-    grouped = (
-        df.groupby(["StudentID", "Skill"], as_index=False)
-        .agg(
-            EvidenceCount=("Skill", "size"),
-            TotalContribution=("Contribution", "sum"),
-        )
-    )
-
-    def _normalize_group(g: pd.DataFrame) -> pd.DataFrame:
-        max_c = g["TotalContribution"].max()
-        if max_c <= 0:
-            g["ScoreNormalized"] = 0.0
-        else:
-            g["ScoreNormalized"] = g["TotalContribution"] / max_c
-        return g
-
-    grouped = grouped.groupby("StudentID", group_keys=False).apply(_normalize_group)
-
-    levels = []
-    for s in grouped["ScoreNormalized"]:
-        if s >= 0.66:
-            levels.append("Advanced")
-        elif s >= 0.33:
-            levels.append("Developing")
-        else:
-            levels.append("Beginner")
-    grouped["SkillLevel"] = levels
-
-    return grouped
-
-
-# ---------------------------------------------------------------------
-# Utility: helpers for updated role matches after quiz
-# ---------------------------------------------------------------------
-def compute_roles_for_student_from_skills(
-    student_skills: pd.DataFrame,
-    templates_df: pd.DataFrame,
-    score_col: str = "FusedScore",
-    weak_threshold: float = 0.4,
-    top_n: int = 10,
-) -> List[Dict[str, Any]]:
-    """
-    Compute role readiness for a single student given a skill profile
-    and role-skill templates.
-    """
-    if student_skills.empty or templates_df.empty:
-        return []
-
-    # ensure we only keep skill + score
-    s_df = student_skills[["Skill", score_col]].copy()
-    s_df = s_df.rename(columns={score_col: "Score"})
-    roles = []
-
-    for role_name in templates_df["RoleName"].unique():
-        role_skills = templates_df[templates_df["RoleName"] == role_name]
-        if role_skills.empty:
-            continue
-
-        total_importance = role_skills["ImportanceNorm"].sum()
-        if total_importance <= 0:
-            continue
-
-        attained_weighted = 0.0
-        num_skills = len(role_skills)
-        num_present = 0
-        weak_or_missing: List[str] = []
-
-        for _, r in role_skills.iterrows():
-            skill = r["Skill"]
-            importance = float(r["ImportanceNorm"])
-            row = s_df[s_df["Skill"] == skill]
-
-            if row.empty:
-                student_score = 0.0
-            else:
-                student_score = float(row.iloc[0]["Score"])
-                num_present += 1
-
-            attained_weighted += importance * student_score
-            if student_score < weak_threshold:
-                weak_or_missing.append(skill)
-
-        readiness = attained_weighted / total_importance
-        coverage = num_present / num_skills if num_skills else 0.0
-
-        roles.append(
-            {
-                "role_name": role_name,
-                "readiness_score": readiness,
-                "coverage": coverage,
-                "num_skills": num_skills,
-                "num_skills_present": num_present,
-                "num_weak_or_missing": len(weak_or_missing),
-                "weak_or_missing_skills": ", ".join(weak_or_missing[:15]),
-            }
+        skills_df = build_skill_profile_from_parsed(
+            student_id=student_id,
+            parsed_courses_df=courses_df,
+            mapping_path="input/course_skill_mapping.csv",
         )
 
-    roles_sorted = sorted(roles, key=lambda r: r["readiness_score"], reverse=True)
-    return roles_sorted[:top_n]
-
-
-# ---------------------------------------------------------------------
-# Pydantic models
-# ---------------------------------------------------------------------
-class QuizResponse(BaseModel):
-    question_id: int
-    selected_option: str
-    response_time_seconds: Optional[float] = None
-
-
-class QuizSubmission(BaseModel):
-    responses: List[QuizResponse]
-
-
-# ---------------------------------------------------------------------
-# Endpoints: main dataset / fused profile
-# ---------------------------------------------------------------------
-@app.get("/students/{student_id}/skills")
-def get_student_skills(student_id: str, top_n: int = 15) -> Dict[str, Any]:
-    """
-    Skill profile from the main dataset / fused pipeline
-    (historical transcripts + quiz fusion).
-    """
-    try:
-        df = load_skill_profiles()
-    except FileNotFoundError as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-    df = df[df["StudentID"] == student_id]
-    if df.empty:
-        raise HTTPException(
-            status_code=404, detail=f"No skill profile found for student {student_id}"
-        )
-
-    score_col = "FinalScore" if "FinalScore" in df.columns else "ScoreNormalized"
-    level_col = "FinalSkillLevel" if "FinalSkillLevel" in df.columns else "SkillLevel"
-
-    df = df.sort_values(score_col, ascending=False).head(top_n)
-
-    skills = []
-    for _, row in df.iterrows():
+        # Persist per-student skill profile so GET /skills works immediately
+        per_student_path = os.path.join("output", f"skill_profile_{student_id}.csv")
         try:
-            score_val = float(row[score_col])
-        except Exception:
-            score_val = 0.0
+            skills_df.to_csv(per_student_path, index=False)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to write {per_student_path}: {e}")
 
-        skills.append(
-            {
-                "skill": str(row["Skill"]),
-                "score": score_val,
-                "level": str(row[level_col]),
-                "evidence_count": int(row.get("EvidenceCount", 0)),
-            }
+        return {
+            "student_id": student_id,
+            "transcript_details": details,
+            "num_courses_detected": int(len(courses_df)),
+            "courses": courses_df.to_dict(orient="records"),
+            "num_skills_mapped": int(len(skills_df)),
+            "skills": skills_df.sort_values("ScoreNormalized", ascending=False).to_dict(orient="records"),
+            "saved_skill_profile": os.path.basename(per_student_path),
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing transcript: {e}")
+    finally:
+        # Keep temp by default. If you want auto-delete, uncomment this.
+        # if os.path.exists(tmp_path):
+        #     try:
+        #         os.remove(tmp_path)
+        #     except Exception:
+        #         pass
+        pass
+
+
+@app.get("/students/{student_id}/skills")
+def get_student_skills(student_id: str):
+    """
+    Returns the student's skill profile.
+    Priority:
+      0) output/skill_profile_{student_id}.csv (generated by upload-transcript)
+      1) output/skill_profiles_with_quiz.csv
+      2) output/skill_profiles_explainable.csv
+    """
+    per_student_path = os.path.join("output", f"skill_profile_{student_id}.csv")
+    path_primary = os.path.join("output", "skill_profiles_with_quiz.csv")
+    path_fallback = os.path.join("output", "skill_profiles_explainable.csv")
+
+    # 0) Per-student file from upload transcript
+    if os.path.exists(per_student_path):
+        df = pd.read_csv(per_student_path)
+        if "ScoreNormalized" in df.columns:
+            df = df.sort_values("ScoreNormalized", ascending=False)
+        return {
+            "student_id": student_id,
+            "source_file": os.path.basename(per_student_path),
+            "skills": df.to_dict(orient="records"),
+        }
+
+    # 1) Global files fallback
+    path = path_primary if os.path.exists(path_primary) else path_fallback
+    if not os.path.exists(path):
+        raise HTTPException(status_code=404, detail="Skill profile CSV not found in output/")
+
+    df = pd.read_csv(path)
+
+    col = "StudentID" if "StudentID" in df.columns else ("student_id" if "student_id" in df.columns else None)
+    if col is None:
+        raise HTTPException(status_code=500, detail=f"Student id column not found in {os.path.basename(path)}")
+
+    student_df = df[df[col].astype(str) == str(student_id)].copy()
+    if student_df.empty:
+        raise HTTPException(
+            status_code=404,
+            detail="Student not found in skill profile. Upload transcript first or generate the global CSV.",
         )
+
+    for score_col in ["FinalScore", "ScoreNormalized", "Score"]:
+        if score_col in student_df.columns:
+            student_df = student_df.sort_values(score_col, ascending=False)
+            break
 
     return {
         "student_id": student_id,
-        "count": len(skills),
-        "skills": skills,
+        "source_file": os.path.basename(path),
+        "skills": student_df.to_dict(orient="records"),
     }
 
 
 @app.get("/students/{student_id}/roles")
-def get_student_roles(student_id: str, top_n: int = 10) -> Dict[str, Any]:
+def get_student_roles(student_id: str):
     """
-    Baseline role matches from the offline dynamic role model.
-    These are based on the main dataset (fused skill profiles).
+    Returns role readiness results for a student from output CSV.
+    Note: This reads the global role readiness file generated by your pipeline.
     """
-    try:
-        df = load_role_readiness()
-    except FileNotFoundError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    path = os.path.join("output", "role_readiness_dynamic.csv")
+    if not os.path.exists(path):
+        raise HTTPException(status_code=404, detail="Role readiness CSV not found in output/")
 
-    df = df[df["StudentID"] == student_id]
-    if df.empty:
+    df = pd.read_csv(path)
+
+    col = "StudentID" if "StudentID" in df.columns else ("student_id" if "student_id" in df.columns else None)
+    if col is None:
+        raise HTTPException(status_code=500, detail="Student id column not found in role readiness CSV")
+
+    student_df = df[df[col].astype(str) == str(student_id)].copy()
+    if student_df.empty:
         raise HTTPException(
             status_code=404,
-            detail=f"No role readiness found for student {student_id}. "
-            f"Check that the offline pipeline has been run.",
+            detail="Student not found in role readiness. Run role model pipeline for this student.",
         )
 
-    df = df.sort_values("ReadinessScore", ascending=False).head(top_n)
-
-    roles = []
-    for _, row in df.iterrows():
-        roles.append(
-            {
-                "role_name": str(row["RoleName"]),
-                "readiness_score": float(row.get("ReadinessScore", 0.0)),
-                "coverage": float(row.get("Coverage", 0.0)),
-                "num_skills": int(row.get("NumSkills", 0)),
-                "num_skills_present": int(row.get("NumSkillsPresent", 0)),
-                "num_weak_or_missing": int(row.get("NumWeakOrMissing", 0)),
-                "weak_or_missing_skills": str(row.get("WeakOrMissingSkills", "")),
-            }
-        )
+    for readiness_col in ["ReadinessScore", "RoleReadiness", "Score", "MatchScore"]:
+        if readiness_col in student_df.columns:
+            student_df = student_df.sort_values(readiness_col, ascending=False)
+            break
 
     return {
         "student_id": student_id,
-        "count": len(roles),
-        "roles": roles,
+        "source_file": os.path.basename(path),
+        "roles": student_df.to_dict(orient="records"),
     }
 
 
-# ---------------------------------------------------------------------
-# Endpoint: upload transcript → transcript-based skill profile
-# ---------------------------------------------------------------------
-@app.post("/students/{student_id}/upload-transcript")
-async def upload_transcript_for_student(
-    student_id: str,
-    file: UploadFile = File(...),
-    regno: Optional[str] = Form(None),
-) -> Dict[str, Any]:
-    """
-    1) Save uploaded transcript (PDF/image).
-    2) Parse it into courses/grades.
-    3) Map courses → skills.
-    4) Save skill profile for this student and return it.
-
-    This does NOT touch the big dataset; it's a per-student profile:
-      output/skill_profile_parsed_{student_id}.csv
-    """
-    # 1) Save uploaded file
-    uploads_dir = "uploads"
-    os.makedirs(uploads_dir, exist_ok=True)
-
-    # Make a simple safe filename
-    original_name = os.path.basename(file.filename)
-    saved_path = os.path.join(uploads_dir, f"{student_id}_{original_name}")
-
-    with open(saved_path, "wb") as f:
-        content = await file.read()
-        f.write(content)
-
-    # 2) Parse transcript into a course-level DataFrame
+@app.get("/students/{student_id}/xai/skills")
+def xai_skills(student_id: str, top_n: int = 15) -> Dict[str, Any]:
     try:
-        parsed_df = parse_transcript_file(
-            file_path=saved_path,
-            student_id=student_id,
-            regno=regno or student_id,
-            tesseract_cmd=None,  # set path here if you need
+        df = load_skill_explanations()
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    # safer matching (handles numeric IDs in CSV)
+    if "StudentID" not in df.columns:
+        raise HTTPException(status_code=500, detail="StudentID column missing in skill explanations file.")
+
+    df_s = df[df["StudentID"].astype(str) == str(student_id)].copy()
+    if df_s.empty:
+        raise HTTPException(status_code=404, detail=f"No explainability found for student {student_id}")
+
+    score_col = "FinalScore" if "FinalScore" in df_s.columns else ("ScoreNormalized" if "ScoreNormalized" in df_s.columns else None)
+    if score_col:
+        df_s = df_s.sort_values(score_col, ascending=False).head(int(top_n))
+    else:
+        df_s = df_s.head(int(top_n))
+
+    evidence_cols = [c for c in ["Evidence", "EvidenceCourses", "CourseEvidence", "MatchedCourses"] if c in df_s.columns]
+
+    out = []
+    for _, r in df_s.iterrows():
+        evidence_text = ""
+        if evidence_cols:
+            evidence_text = str(r[evidence_cols[0]])
+
+        out.append(
+            {
+                "skill": str(r.get("Skill", "")),
+                "score": float(r[score_col]) if score_col and pd.notna(r[score_col]) else None,
+                "level": str(r["FinalSkillLevel"]) if "FinalSkillLevel" in df_s.columns else str(r.get("SkillLevel", "")),
+                "evidence": evidence_text,
+            }
         )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to parse transcript: {e}")
 
-    if parsed_df.empty:
-        raise HTTPException(status_code=400, detail="Parsed transcript is empty. Check the file format/content.")
+    return {"student_id": student_id, "count": len(out), "skills": out}
 
-    # 3) Build skill profile from parsed transcript
+
+@app.get("/students/{student_id}/xai/roles")
+def xai_roles(student_id: str, role: Optional[str] = None, top_n: int = 1) -> Dict[str, Any]:
     try:
-        skill_df = build_skill_profile_from_parsed(parsed_df, mapping_path="input/course_skill_mapping.csv")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to build skill profile: {e}")
+        df = load_role_readiness_details()
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-    if skill_df.empty:
+    if "StudentID" not in df.columns:
+        raise HTTPException(status_code=500, detail="StudentID column missing in role readiness details file.")
+
+    df_s = df[df["StudentID"].astype(str) == str(student_id)].copy()
+    if df_s.empty:
+        raise HTTPException(status_code=404, detail=f"No role details found for student {student_id}")
+
+    # If role not provided, pick the top role from summary if possible
+    if role is None:
+        try:
+            summary = load_role_readiness()
+            if "StudentID" in summary.columns:
+                s = summary[summary["StudentID"].astype(str) == str(student_id)].copy()
+                if not s.empty:
+                    readiness_col = "ReadinessScore" if "ReadinessScore" in s.columns else None
+                    if readiness_col:
+                        s = s.sort_values(readiness_col, ascending=False)
+                    if "RoleName" in s.columns:
+                        role = str(s.iloc[0]["RoleName"])
+        except Exception:
+            # fallback to first role in details
+            if "RoleName" in df_s.columns and not df_s.empty:
+                role = str(df_s.iloc[0]["RoleName"])
+
+    if role and "RoleName" in df_s.columns:
+        df_r = df_s[df_s["RoleName"].astype(str) == str(role)].copy()
+    else:
+        df_r = df_s.copy()
+
+    if df_r.empty:
+        raise HTTPException(status_code=404, detail=f"No detail rows for role '{role}' and student {student_id}")
+
+    required_col = "RequiredImportance" if "RequiredImportance" in df_r.columns else None
+    student_score_col = "StudentScore" if "StudentScore" in df_r.columns else None
+    weak_col = "IsWeakOrMissing" if "IsWeakOrMissing" in df_r.columns else None
+
+    rows = []
+    for _, r in df_r.iterrows():
+        rows.append(
+            {
+                "skill": str(r.get("Skill", "")),
+                "required_importance": float(r[required_col]) if required_col and pd.notna(r.get(required_col)) else None,
+                "student_score": float(r[student_score_col]) if student_score_col and pd.notna(r.get(student_score_col)) else None,
+                "student_level": str(r.get("StudentLevel", "")),
+                "attained_fraction": float(r["AttainedFraction"]) if "AttainedFraction" in df_r.columns and pd.notna(r.get("AttainedFraction")) else None,
+                "is_weak_or_missing": bool(r[weak_col]) if weak_col and pd.notna(r.get(weak_col)) else None,
+            }
+        )
+
+    weak_count = sum(1 for x in rows if x.get("is_weak_or_missing"))
+
+    # Optional: show only top_n required skills (by required_importance) if top_n is provided
+    if top_n is not None and int(top_n) > 0:
+        rows_sorted = sorted(
+            rows,
+            key=lambda x: (x["required_importance"] if x["required_importance"] is not None else -1.0),
+            reverse=True,
+        )
+        rows = rows_sorted[: int(top_n)] if role is None else rows  # keep full list when explaining a chosen role
+
+    return {
+        "student_id": student_id,
+        "role_name": role,
+        "num_required_skills": len(rows),
+        "num_weak_or_missing": weak_count,
+        "required_skills": rows,
+    }
+
+@app.post("/students/{student_id}/prepare-quiz")
+def prepare_quiz(student_id: str, payload: PrepareQuizRequest):
+    # 1) validate selection count
+    selected = [s.strip() for s in payload.selected_skills if s and s.strip()]
+    if not selected:
+        raise HTTPException(status_code=400, detail="Please select at least 1 skill.")
+    if len(selected) > 5:
+        raise HTTPException(status_code=400, detail="You can select a maximum of 5 skills.")
+
+    # 2) validate selected skills are in student's inferred skills
+    per_student_path = os.path.join("output", f"skill_profile_{student_id}.csv")
+    if not os.path.exists(per_student_path):
+        raise HTTPException(status_code=404, detail="Upload transcript first (skill profile not found).")
+
+    skills_df = pd.read_csv(per_student_path)
+    if "Skill" not in skills_df.columns:
+        raise HTTPException(status_code=500, detail="Skill profile missing 'Skill' column.")
+
+    available = set(skills_df["Skill"].astype(str))
+    invalid = [s for s in selected if s not in available]
+    if invalid:
         raise HTTPException(
             status_code=400,
-            detail="No skills could be derived from this transcript (no matching course codes in mapping).",
+            detail=f"Invalid skills selected: {invalid}. Must be from inferred skills list.",
         )
 
-    # 4) Save per-student skill profile
-    out_path = f"output/skill_profile_parsed_{student_id}.csv"
-    os.makedirs(os.path.dirname(out_path), exist_ok=True)
-    skill_df.to_csv(out_path, index=False)
-
-    # 5) Return skills in the same shape as /students/{id}/skills
-    skills_payload = []
-    for _, row in skill_df.sort_values("ScoreNormalized", ascending=False).iterrows():
-        skills_payload.append(
-            {
-                "skill": row["Skill"],
-                "score": float(row["ScoreNormalized"]),
-                "level": str(row["SkillLevel"]),
-                "evidence_count": int(row.get("EvidenceCount", 0)),
-            }
-        )
-
-    return {
-        "student_id": student_id,
-        "from": "uploaded_transcript",
-        "count": len(skills_payload),
-        "skills": skills_payload,
-        "parsed_courses": len(parsed_df),
-        "saved_profile_path": out_path,
-    }
-
-
-
-# ---------------------------------------------------------------------
-# Endpoint: prepare quiz (questions still come from question bank)
-# ---------------------------------------------------------------------
-@app.post("/students/{student_id}/prepare-quiz")
-def prepare_quiz(student_id: str, max_questions: int = 5) -> Dict[str, Any]:
-    """
-    Return a small quiz for the student by sampling questions from
-    output/quiz_questions_generated.csv.
-
-    At the moment we filter by StudentID if that column exists;
-    otherwise we just sample globally.
-    """
-    try:
-        df = load_quiz_questions()
-    except FileNotFoundError as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-    if "StudentID" in df.columns:
-        df = df[df["StudentID"] == student_id]
-
-    if df.empty:
+    # 3) load generated questions (you already generate this in your pipeline)
+    qpath = os.path.join("output", "quiz_questions_generated.csv")
+    if not os.path.exists(qpath):
         raise HTTPException(
             status_code=404,
-            detail=(
-                f"No questions found for student {student_id}. "
-                "Run quiz_generation_rag.py or relax filtering."
-            ),
+            detail="quiz_questions_generated.csv not found. Run quiz_generation_rag.py or build a question bank.",
         )
 
-    if len(df) > max_questions:
-        df = df.sample(n=max_questions, random_state=42)
+    qdf = pd.read_csv(qpath)
 
-    questions = []
-    for _, row in df.iterrows():
-        qid = int(row["QuestionID"])
-        options = {
-            "A": str(row.get("OptionA", "")),
-            "B": str(row.get("OptionB", "")),
-            "C": str(row.get("OptionC", "")),
-            "D": str(row.get("OptionD", "")),
-        }
-        questions.append(
-            {
-                "question_id": qid,
-                "question_text": str(row.get("QuestionText", "")),
-                "skill": str(row.get("Skill", "")),
-                "difficulty": str(row.get("Difficulty", "Unknown")),
-                "role_name": str(row.get("RoleName", "")),
-                "options": options,
-            }
+    # find the skill column used in your question file
+    skill_col = None
+    for c in ["Skill", "TargetSkill", "skill"]:
+        if c in qdf.columns:
+            skill_col = c
+            break
+    if skill_col is None:
+        raise HTTPException(status_code=500, detail="Quiz question file has no Skill/TargetSkill column.")
+
+    # optional difficulty filtering if your file has it
+    diff_col = None
+    for c in ["TargetDifficulty", "Difficulty", "difficulty"]:
+        if c in qdf.columns:
+            diff_col = c
+            break
+
+    quiz_questions = []
+    per_skill = int(payload.num_questions_per_skill)
+
+    for skill in selected:
+        subset = qdf[qdf[skill_col].astype(str) == skill].copy()
+
+        if diff_col and payload.difficulty.lower() != "mixed":
+            subset = subset[subset[diff_col].astype(str).str.lower() == payload.difficulty.lower()]
+
+        if subset.empty:
+            continue
+
+        # sample questions
+        subset = subset.sample(n=min(per_skill, len(subset)), random_state=42)
+
+        quiz_questions.extend(subset.to_dict(orient="records"))
+
+    if not quiz_questions:
+        raise HTTPException(
+            status_code=404,
+            detail="No questions found for selected skills. Try mixed difficulty or generate more questions.",
         )
 
     return {
         "student_id": student_id,
-        "num_questions": len(questions),
-        "questions": questions,
+        "selected_skills": selected,
+        "num_questions": len(quiz_questions),
+        "questions": quiz_questions,
     }
-
-
-# ---------------------------------------------------------------------
-# Endpoint: submit quiz → score → updated roles (in-memory)
-# ---------------------------------------------------------------------
-@app.post("/students/{student_id}/submit-quiz")
-def submit_quiz(student_id: str, submission: QuizSubmission) -> Dict[str, Any]:
-    """
-    1) Score quiz answers in memory.
-    2) Fuse quiz results into the student's skill profile
-       (creating/updating output/skill_profiles_with_quiz.csv).
-    3) Recompute role matches for this student from the fused skills.
-    """
-    if not submission.responses:
-        raise HTTPException(status_code=400, detail="No responses submitted.")
-
-    try:
-        questions_df = load_quiz_questions()
-    except FileNotFoundError as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-    # Step 1: pure scoring
-    try:
-        score_info = _score_quiz_in_memory(student_id, submission, questions_df)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error scoring quiz: {e}")
-
-    # Default outputs in case later steps fail
-    updated_skills: List[Dict[str, Any]] = []
-    updated_roles: List[Dict[str, Any]] = []
-    note_parts = ["Quiz scored successfully."]
-
-    # Step 2: fuse into skill profile
-    try:
-        fused_student = _fuse_skills_with_quiz(student_id, score_info["per_skill"])
-        if not fused_student.empty:
-            score_col = "FinalScore" if "FinalScore" in fused_student.columns else "ScoreNormalized"
-            level_col = "FinalSkillLevel" if "FinalSkillLevel" in fused_student.columns else "SkillLevel"
-
-            # return top 15 updated skills
-            for _, row in fused_student.sort_values(score_col, ascending=False).head(15).iterrows():
-                updated_skills.append(
-                    {
-                        "skill": str(row["Skill"]),
-                        "score": float(row[score_col]),
-                        "level": str(level_col in row and row[level_col] or row.get("SkillLevel", "")),
-                    }
-                )
-            note_parts.append("Skill profile fused with quiz results.")
-        else:
-            note_parts.append("Student not found in baseline skill file; fusion skipped.")
-    except FileNotFoundError as e:
-        note_parts.append(f"Fusion skipped: {e}")
-    except Exception as e:
-        note_parts.append(f"Fusion error: {e}")
-
-    # Step 3: recompute roles
-    try:
-        updated_roles = _recompute_roles_for_student(student_id, max_roles=5)
-        if updated_roles:
-            note_parts.append("Role matches recomputed from fused skills.")
-        else:
-            note_parts.append("No updated roles available (missing templates or skills).")
-    except Exception as e:
-        note_parts.append(f"Role recomputation error: {e}")
-
-    return {
-        "student_id": student_id,
-        "num_answered": score_info["num_answered"],
-        "num_correct": score_info["num_correct"],
-        "overall_accuracy": score_info["overall_accuracy"],
-        "per_skill": score_info["per_skill"],
-        "detailed": score_info["detailed"],
-        "updated_skills": updated_skills,
-        "updated_roles": updated_roles,
-        "note": " ".join(note_parts),
-    }
-
-
-def _score_quiz_in_memory(
-    student_id: str,
-    submission: QuizSubmission,
-    questions_df: pd.DataFrame,
-) -> Dict[str, Any]:
-    """
-    Pure scoring: compare selected vs correct answer using quiz_questions_generated.csv.
-    Returns per-question and per-skill stats (no CSV writes).
-    """
-    if questions_df.empty:
-        raise ValueError("Question bank is empty.")
-
-    # Ensure QuestionID is an index
-    if "QuestionID" not in questions_df.columns:
-        questions_df = questions_df.reset_index().rename(columns={"index": "QuestionID"})
-    questions_df = questions_df.set_index("QuestionID")
-
-    detailed_results = []
-    correct_count = 0
-
-    # per-skill aggregation
-    skill_stats: Dict[str, Dict[str, float]] = {}
-    difficulty_weight = {"Easy": 0.3, "Medium": 0.6, "Hard": 1.0}
-
-    for r in submission.responses:
-        qid = r.question_id
-        if qid not in questions_df.index:
-            # ignore unknown or stale question ids
-            continue
-
-        row = questions_df.loc[qid]
-        correct = str(row.get("CorrectOption", "")).strip().upper()
-        selected = r.selected_option.strip().upper()
-        skill = str(row.get("Skill", "Unknown"))
-        difficulty = str(row.get("Difficulty", "Unknown"))
-        role_name = str(row.get("RoleName", ""))
-
-        is_correct = selected == correct
-        if is_correct:
-            correct_count += 1
-
-        detailed_results.append(
-            {
-                "question_id": qid,
-                "skill": skill,
-                "selected_option": selected,
-                "correct_option": correct,
-                "is_correct": is_correct,
-                "difficulty": difficulty,
-                "role_name": role_name,
-                "response_time_seconds": r.response_time_seconds,
-            }
-        )
-
-        # aggregate per skill
-        if skill not in skill_stats:
-            skill_stats[skill] = {
-                "num": 0,
-                "correct": 0,
-                "sum_diff": 0.0,
-                "sum_time": 0.0,
-            }
-        skill_stats[skill]["num"] += 1
-        if is_correct:
-            skill_stats[skill]["correct"] += 1
-
-        diff_num = difficulty_weight.get(difficulty, 0.5)
-        skill_stats[skill]["sum_diff"] += diff_num
-        if r.response_time_seconds is not None:
-            skill_stats[skill]["sum_time"] += float(r.response_time_seconds)
-
-    total_answered = sum(s["num"] for s in skill_stats.values())
-    overall_accuracy = correct_count / total_answered if total_answered > 0 else 0.0
-
-    per_skill = []
-    for skill, stats in skill_stats.items():
-        n = stats["num"]
-        acc = stats["correct"] / n if n else 0.0
-        avg_diff = stats["sum_diff"] / n if n else 0.0
-        avg_time = stats["sum_time"] / n if n else None
-        per_skill.append(
-            {
-                "skill": skill,
-                "num_questions": n,
-                "num_correct": stats["correct"],
-                "accuracy": acc,
-                "avg_difficulty_numeric": avg_diff,
-                "avg_response_time": avg_time,
-            }
-        )
-
-    return {
-        "student_id": student_id,
-        "num_answered": total_answered,
-        "num_correct": correct_count,
-        "overall_accuracy": overall_accuracy,
-        "per_skill": per_skill,
-        "detailed": detailed_results,
-    }
-
-def _score_to_level(score: float) -> str:
-    """
-    Map final numeric score [0,1] into a human-readable skill level.
-    Tune thresholds as you like for your thesis.
-    """
-    if score >= 0.75:
-        return "Advanced"
-    elif score >= 0.5:
-        return "Developing"
-    else:
-        return "Beginner"
-
-
-def _fuse_skills_with_quiz(
-    student_id: str,
-    per_skill_stats: List[Dict[str, Any]],
-    baseline_weight: float = 0.7,
-    quiz_weight: float = 0.3,
-) -> pd.DataFrame:
-    """
-    Take baseline skill profile + quiz accuracies and produce
-    output/skill_profiles_with_quiz.csv, returning this student's rows.
-    """
-    # 1) Load baseline skill profiles (transcript-based)
-    baseline = load_baseline_skill_profiles()
-
-    # sanity check
-    if "ScoreNormalized" not in baseline.columns:
-        raise RuntimeError("Baseline skill file must have 'ScoreNormalized' column.")
-
-    # 2) Copy to fused, so we keep all other students untouched
-    fused = baseline.copy()
-
-    # Index quiz stats by skill for faster lookup
-    quiz_by_skill = {row["skill"]: row for row in per_skill_stats}
-
-    # 3) For this student, adjust skills that appeared in the quiz
-    mask_student = fused["StudentID"] == student_id
-    student_rows = fused[mask_student].copy()
-    if student_rows.empty:
-        # If student is not in baseline (e.g., only from parsed transcript), you can
-        # extend this to append new rows. For now, we just skip fusion.
-        return student_rows
-
-    # ensure FinalScore column exists
-    if "FinalScore" not in fused.columns:
-        fused["FinalScore"] = fused["ScoreNormalized"]
-
-    for idx, row in student_rows.iterrows():
-        skill_name = row["Skill"]
-        if skill_name not in quiz_by_skill:
-            # no quiz evidence for this skill, keep baseline
-            continue
-
-        baseline_score = float(row["ScoreNormalized"])
-        quiz_accuracy = float(quiz_by_skill[skill_name]["accuracy"])
-
-        final_score = (
-            baseline_weight * baseline_score + quiz_weight * quiz_accuracy
-        )
-
-        fused.loc[idx, "FinalScore"] = final_score
-
-    # 4) Fill any NaNs and assign FinalSkillLevel
-    fused["FinalScore"] = fused["FinalScore"].fillna(fused["ScoreNormalized"])
-    fused["FinalSkillLevel"] = fused["FinalScore"].apply(_score_to_level)
-
-    # 5) Persist for other endpoints (/students/{id}/skills, etc.)
-    fused.to_csv(FUSED_SKILL_FILE, index=False)
-
-    # return this student's fused rows
-    fused_student = fused[fused["StudentID"] == student_id].copy()
-    return fused_student
-
-def _score_to_level(score: float) -> str:
-    """
-    Map final numeric score [0,1] into a human-readable skill level.
-    Tune thresholds as you like for your thesis.
-    """
-    if score >= 0.75:
-        return "Advanced"
-    elif score >= 0.5:
-        return "Developing"
-    else:
-        return "Beginner"
-
-
-def _fuse_skills_with_quiz(
-    student_id: str,
-    per_skill_stats: List[Dict[str, Any]],
-    baseline_weight: float = 0.7,
-    quiz_weight: float = 0.3,
-) -> pd.DataFrame:
-    """
-    Take baseline skill profile + quiz accuracies and produce
-    output/skill_profiles_with_quiz.csv, returning this student's rows.
-    """
-    # 1) Load baseline skill profiles (transcript-based)
-    baseline = load_baseline_skill_profiles()
-
-    # sanity check
-    if "ScoreNormalized" not in baseline.columns:
-        raise RuntimeError("Baseline skill file must have 'ScoreNormalized' column.")
-
-    # 2) Copy to fused, so we keep all other students untouched
-    fused = baseline.copy()
-
-    # Index quiz stats by skill for faster lookup
-    quiz_by_skill = {row["skill"]: row for row in per_skill_stats}
-
-    # 3) For this student, adjust skills that appeared in the quiz
-    mask_student = fused["StudentID"] == student_id
-    student_rows = fused[mask_student].copy()
-    if student_rows.empty:
-        # If student is not in baseline (e.g., only from parsed transcript), you can
-        # extend this to append new rows. For now, we just skip fusion.
-        return student_rows
-
-    # ensure FinalScore column exists
-    if "FinalScore" not in fused.columns:
-        fused["FinalScore"] = fused["ScoreNormalized"]
-
-    for idx, row in student_rows.iterrows():
-        skill_name = row["Skill"]
-        if skill_name not in quiz_by_skill:
-            # no quiz evidence for this skill, keep baseline
-            continue
-
-        baseline_score = float(row["ScoreNormalized"])
-        quiz_accuracy = float(quiz_by_skill[skill_name]["accuracy"])
-
-        final_score = (
-            baseline_weight * baseline_score + quiz_weight * quiz_accuracy
-        )
-
-        fused.loc[idx, "FinalScore"] = final_score
-
-    # 4) Fill any NaNs and assign FinalSkillLevel
-    fused["FinalScore"] = fused["FinalScore"].fillna(fused["ScoreNormalized"])
-    fused["FinalSkillLevel"] = fused["FinalScore"].apply(_score_to_level)
-
-    # 5) Persist for other endpoints (/students/{id}/skills, etc.)
-    fused.to_csv(FUSED_SKILL_FILE, index=False)
-
-    # return this student's fused rows
-    fused_student = fused[fused["StudentID"] == student_id].copy()
-    return fused_student
