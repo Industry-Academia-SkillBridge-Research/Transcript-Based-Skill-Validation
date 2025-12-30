@@ -1,0 +1,96 @@
+StudentID,Skill,EvidenceCount,ScoreNormalized,SkillLevel
+IT21013928,Academic Listening & Note-taking,1,1.0,Advanced
+IT21013928,Academic Writing & Grammar,1,1.0,Advanced
+IT21013928,Agile Development & SCRUM,1,0.75,Advanced
+IT21013928,Agile Software Development & Scrum Practices,1,0.5,Developing
+IT21013928,Algorithm Analysis & Asymptotic Notations,1,0.5,Developing
+IT21013928,Algorithm Design Techniques,1,0.5,Developing
+IT21013928,Android OS & Application Components,1,0.75,Advanced
+IT21013928,Application Testing & Security,1,0.75,Advanced
+IT21013928,"Arrays, Structures & File Handling",1,1.0,Advanced
+IT21013928,Boolean Algebra & Logic,1,1.0,Advanced
+IT21013928,C++ Programming Implementation,1,1.0,Advanced
+IT21013928,Calculus & Differentiation,1,1.0,Advanced
+IT21013928,"Classes, Objects & Properties",1,1.0,Advanced
+IT21013928,"Collections, Generics & Threads",1,1.0,Advanced
+IT21013928,Combinational & Sequential Logic Circuits,1,1.0,Advanced
+IT21013928,Control Structures & Loops,1,1.0,Advanced
+IT21013928,Data Handling & Media Integration,1,0.75,Advanced
+IT21013928,Data Modeling & ER Diagrams,1,0.75,Advanced
+IT21013928,Data Representation & Computer Architecture,1,1.0,Advanced
+IT21013928,Database Connectivity (ODBC/JDBC),1,1.0,Advanced
+IT21013928,Database Design & Conceptual Modeling,1,1.0,Advanced
+IT21013928,Database Security & Performance Optimization,1,1.0,Advanced
+IT21013928,Descriptive & Inferential Statistics,1,0.5,Developing
+IT21013928,Design Patterns & Web-based Project,1,1.0,Advanced
+IT21013928,"Design Patterns (Creational, Structural, Behavioral)",1,0.75,Advanced
+IT21013928,Diversity & Inclusion Awareness,1,0.5,Developing
+IT21013928,Documentation & Presentation Skills,1,0.5,Developing
+IT21013928,"Encapsulation, Abstraction & Interfaces",1,1.0,Advanced
+IT21013928,Ethics & Professional Conduct,2,0.625,Developing
+IT21013928,Exception Handling & Debugging,1,1.0,Advanced
+IT21013928,File System & I/O Management,1,0.5,Developing
+IT21013928,Functional & Object-Oriented Analysis & Design,1,0.75,Advanced
+IT21013928,Functions & Recursion,1,1.0,Advanced
+IT21013928,Graph Theory & Matrices,1,1.0,Advanced
+IT21013928,HTML/CSS & UI Design,1,0.75,Advanced
+IT21013928,Hypothesis Testing & Chi-Squared Tests,1,0.5,Developing
+IT21013928,IP Addressing & Network Design,1,1.0,Advanced
+IT21013928,IP Addressing & Subnetting,1,0.75,Advanced
+IT21013928,Industrial Tools & Technologies,2,0.625,Developing
+IT21013928,Industry Expectations & Workplace Adaptation,2,0.625,Developing
+IT21013928,Information Systems Analysis,1,0.75,Advanced
+IT21013928,Inheritance & Polymorphism,1,1.0,Advanced
+IT21013928,Integration & Applications,1,1.0,Advanced
+IT21013928,Intellectual Property & Entrepreneurship,1,0.5,Developing
+IT21013928,Internet & Web Protocols,1,0.75,Advanced
+IT21013928,Java Programming Fundamentals,1,1.0,Advanced
+IT21013928,JavaScript/PHP Web Development,1,0.75,Advanced
+IT21013928,Job Role Awareness,2,0.625,Developing
+IT21013928,Legal & Professional Responsibilities,1,0.5,Developing
+IT21013928,Logical Database Design & Schema Refinement,1,1.0,Advanced
+IT21013928,Memory & Virtual Memory Management,1,0.5,Developing
+IT21013928,Mobile App Development Fundamentals,1,0.75,Advanced
+IT21013928,Network Device Configuration (Routers/Switches),1,0.75,Advanced
+IT21013928,Network Security & ACLs,1,0.75,Advanced
+IT21013928,Networking Fundamentals & ISO/OSI Layers,1,1.0,Advanced
+IT21013928,Number Systems & Computer Arithmetic,1,1.0,Advanced
+IT21013928,OS Concepts & Architecture,1,0.5,Developing
+IT21013928,Object-Oriented Concepts & Recap,1,1.0,Advanced
+IT21013928,Object-Oriented Programming Fundamentals,1,1.0,Advanced
+IT21013928,Operating Systems Basics,1,1.0,Advanced
+IT21013928,"Paraphrasing, Summarizing & Referencing",1,1.0,Advanced
+IT21013928,Personal Development & Work Ethics,1,0.5,Developing
+IT21013928,Pointers & Memory Management,1,1.0,Advanced
+IT21013928,Probability Distributions & Random Variables,1,0.5,Developing
+IT21013928,Procedural Programming Concepts,1,1.0,Advanced
+IT21013928,Process & Thread Management,1,0.5,Developing
+IT21013928,Project Planning & Requirement Gathering,1,0.5,Developing
+IT21013928,Reading Comprehension,1,1.0,Advanced
+IT21013928,Regression & Time Series Analysis,1,0.5,Developing
+IT21013928,Requirements Engineering & UML,1,0.75,Advanced
+IT21013928,Routing & TCP/UDP Protocols,1,0.75,Advanced
+IT21013928,SQL Database Management (DDL/DML),1,0.75,Advanced
+IT21013928,SQL Querying & Database Programming,1,1.0,Advanced
+IT21013928,Sampling & Probability Theory,1,0.5,Developing
+IT21013928,Schema Refinement & Normalization,1,0.75,Advanced
+IT21013928,Searching & Sorting Algorithms,1,0.5,Developing
+IT21013928,Social Media & Digital Content,1,0.75,Advanced
+IT21013928,Soft Skills & Professionalism,2,0.625,Developing
+IT21013928,Software Design & Testing,1,0.75,Advanced
+IT21013928,Software Engineering Fundamentals,1,0.75,Advanced
+IT21013928,Software Life Cycle Modeling,1,0.75,Advanced
+IT21013928,Software Testing & Unit Testing,1,0.75,Advanced
+IT21013928,Software Testing & User Acceptance,1,0.5,Developing
+IT21013928,Speaking & Presentations,1,1.0,Advanced
+IT21013928,"Stack, Queue & Linked List Implementation",1,0.5,Developing
+IT21013928,Strategic IS & Decision Support,1,0.75,Advanced
+IT21013928,"Supportive Software Processes (Configuration, Version, Release Management)",1,0.75,Advanced
+IT21013928,System Security & Administration Scripting,1,0.5,Developing
+IT21013928,Team Organization & Collaboration,1,0.5,Developing
+IT21013928,Teamwork & Collaboration,1,0.5,Developing
+IT21013928,Tree & Graph Data Structures,1,0.5,Developing
+IT21013928,UI/UX Design & Mobile Interface Concepts,1,0.75,Advanced
+IT21013928,UML Modeling & Behavioral Modeling,1,0.75,Advanced
+IT21013928,"VLAN, Spanning Tree & Trunking",1,0.75,Advanced
+IT21013928,e-Commerce & Web Security,1,0.75,Advanced
