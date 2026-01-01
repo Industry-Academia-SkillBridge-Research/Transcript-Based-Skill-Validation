@@ -58,12 +58,21 @@ export function prepareQuiz(studentId, payload = {}) {
   });
 }
 
-export function submitQuiz(studentId, responses) {
+export function submitQuiz(studentId, responses, quizId = null) {
+  const payload = { responses };
+  if (quizId) {
+    payload.quiz_id = quizId;
+  }
   return apiFetch(`/students/${encodeURIComponent(studentId)}/submit-quiz`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ responses }),
+    body: JSON.stringify(payload),
   });
+}
+
+// Get quiz by quiz_id
+export function getQuiz(quizId) {
+  return apiFetch(`/quizzes/${encodeURIComponent(quizId)}`);
 }
 
 export function uploadTranscript(studentId, file, regNo = "") {

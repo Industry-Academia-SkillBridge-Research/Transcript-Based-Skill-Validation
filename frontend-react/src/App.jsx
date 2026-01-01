@@ -279,7 +279,10 @@ export default function App() {
       };
 
       const q = await prepareQuiz(studentId.trim(), payload);
-      setQuiz(q);
+      // Store quiz_id for later submission
+      // Note: Questions will be shuffled on the QuizPage component (frontend)
+      setCurrentQuizId(q.quiz_id);
+      setQuiz({ ...q, quiz_id: q.quiz_id });
       setQuizResult(null);
     });
   };
@@ -310,7 +313,12 @@ export default function App() {
     }
 
     await safeRun(async () => {
-      const result = await submitQuiz(studentId.trim(), responses);
+      // Include quiz_id if available
+      const result = await submitQuiz(
+        studentId.trim(),
+        responses,
+        currentQuizId || quiz?.quiz_id || null
+      );
       setQuizResult(result);
 
       setSkillsResp(await getSkills(studentId.trim()));
@@ -408,6 +416,7 @@ export default function App() {
           <QuizPage
             studentId={studentId}
             selectedSkills={selectedQuizSkills}
+            quizId={currentQuizId || quiz?.quiz_id}
             onBack={() => {
               setShowQuizPage(false);
               setShowSkillsPage(true);

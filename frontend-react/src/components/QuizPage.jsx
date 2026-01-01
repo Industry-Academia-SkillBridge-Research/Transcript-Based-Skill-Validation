@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { prepareQuiz, submitQuiz } from "../api";
+import { shuffleArray, shuffleQuestionOptions } from "../utils/shuffle";
 
-function QuizPage({ studentId, selectedSkills, onBack, onQuizCompleted }) {
+function QuizPage({ studentId, selectedSkills, quizId, onBack, onQuizCompleted }) {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const [quizResult, setQuizResult] = useState(null);
@@ -11,6 +12,40 @@ function QuizPage({ studentId, selectedSkills, onBack, onQuizCompleted }) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [showReview, setShowReview] = useState(false);
   const [reviewIndex, setReviewIndex] = useState(0);
+  
+  // Store option mappings for each question (shuffled letter -> original letter)
+  const [optionMappings, setOptionMappings] = useState({});
+  
+  // Shuffled questions and processed questions with shuffled options
+  const processedQuestions = useMemo(() => {
+    if (!questions.length) return [];
+    
+    // 1. Shuffle question order
+    const shuffledQuestions = shuffleArray(questions);
+    
+    // 2. Shuffle options for each question and store mappings
+    const mappings = {};
+    const processed = shuffledQuestions.map((q) => {
+      const qId = q.QuestionID ?? q.question_id;
+      const { shuffledOptions, optionMapping } = shuffleQuestionOptions(q);
+      mappings[qId] = optionMapping;
+      
+      // Create new question object with shuffled options
+      const shuffledQuestion = { ...q };
+      shuffledOptions.forEach((opt, index) => {
+        const shuffledLetter = String.fromCharCode(65 + index); // A, B, C, D
+        shuffledQuestion[`Option${shuffledLetter}`] = opt.text;
+      });
+      
+      // Store original option letters for later mapping back
+      shuffledQuestion._originalOptionMapping = optionMapping;
+      
+      return shuffledQuestion;
+    });
+    
+    setOptionMappings(mappings);
+    return processed;
+  }, [questions]);
 
   const handleGenerateQuiz = async () => {
     if (!selectedSkills || selectedSkills.length === 0) {
@@ -33,6 +68,7 @@ function QuizPage({ studentId, selectedSkills, onBack, onQuizCompleted }) {
       };
 
       const data = await prepareQuiz(studentId, payload);
+      // Questions will be shuffled by useMemo when setQuestions is called
       setQuestions(data.questions || []);
       setQuizGenerated(true);
     } catch (err) {
@@ -62,17 +98,23 @@ function QuizPage({ studentId, selectedSkills, onBack, onQuizCompleted }) {
   };
 
   const handleSubmitQuiz = async () => {
-    if (questions.length === 0) {
+    if (processedQuestions.length === 0) {
       setError("No quiz questions available.");
       return;
     }
 
-    const responses = questions.map((q) => {
+    // Map shuffled answers back to original option letters
+    const responses = processedQuestions.map((q) => {
       const qId = q.QuestionID ?? q.question_id;
-      const selected = answers[qId];
+      const selectedShuffled = answers[qId]; // This is the shuffled letter (A/B/C/D)
+      
+      // Map back to original letter using option mapping
+      const mapping = optionMappings[qId] || {};
+      const originalOption = mapping[selectedShuffled] || selectedShuffled;
+      
       return {
         question_id: Number(qId),
-        selected_option: selected || "",
+        selected_option: originalOption || "", // Send original A/B/C/D to backend
         response_time_seconds: 30,
       };
     });
@@ -86,11 +128,12 @@ function QuizPage({ studentId, selectedSkills, onBack, onQuizCompleted }) {
       setLoading(true);
       setError(null);
 
-      const data = await submitQuiz(studentId, responses);
+      // Include quiz_id if available
+      const data = await submitQuiz(studentId, responses, quizId || null);
       setQuizResult(data);
 
       if (onQuizCompleted) {
-        // Pass quiz result and questions to navigate to result page
+        // Pass original questions (not shuffled) for result page
         onQuizCompleted(data, questions);
       }
     } catch (err) {
@@ -100,16 +143,16 @@ function QuizPage({ studentId, selectedSkills, onBack, onQuizCompleted }) {
     }
   };
 
-  // Get current question
-  const currentQuestion = questions[currentQuestionIndex];
+  // Get current question (from shuffled/processed questions)
+  const currentQuestion = processedQuestions[currentQuestionIndex];
   const currentReviewQuestion = showReview && quizResult ? questions[reviewIndex] : null;
 
   // Calculate progress
-  const progress = questions.length > 0 ? ((currentQuestionIndex + 1) / questions.length) * 100 : 0;
+  const progress = processedQuestions.length > 0 ? ((currentQuestionIndex + 1) / processedQuestions.length) * 100 : 0;
   const answeredCount = Object.keys(answers).length;
 
   // Check if all questions are answered
-  const allAnswered = questions.length > 0 && Object.keys(answers).length === questions.length;
+  const allAnswered = processedQuestions.length > 0 && Object.keys(answers).length === processedQuestions.length;
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 min-h-screen pb-12">
@@ -126,7 +169,7 @@ function QuizPage({ studentId, selectedSkills, onBack, onQuizCompleted }) {
         </button>
         {quizGenerated && !showReview && (
           <div className="text-sm text-slate-600">
-            Question {currentQuestionIndex + 1} of {questions.length}
+            Question {currentQuestionIndex + 1} of {processedQuestions.length}
           </div>
         )}
       </div>
@@ -187,7 +230,7 @@ function QuizPage({ studentId, selectedSkills, onBack, onQuizCompleted }) {
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-slate-700">Progress</span>
             <span className="text-sm font-medium text-slate-700">
-              {answeredCount} / {questions.length} answered
+              {answeredCount} / {processedQuestions.length} answered
             </span>
           </div>
           <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
@@ -200,7 +243,7 @@ function QuizPage({ studentId, selectedSkills, onBack, onQuizCompleted }) {
       )}
 
       {/* Single Question Display */}
-      {quizGenerated && !showReview && currentQuestion && (
+      {quizGenerated && !showReview && currentQuestion && processedQuestions.length > 0 && (
         <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-8">
           <div className="mb-6">
             <div className="flex items-center gap-3 mb-4">
@@ -284,14 +327,14 @@ function QuizPage({ studentId, selectedSkills, onBack, onQuizCompleted }) {
             </button>
 
             <div className="flex gap-2">
-              {questions.map((_, idx) => {
-                const qId = questions[idx].QuestionID ?? questions[idx].question_id;
+              {processedQuestions.map((q, idx) => {
+                const qId = q.QuestionID ?? q.question_id;
                 const isAnswered = answers[qId];
                 const isCurrent = idx === currentQuestionIndex;
                 
                 return (
                   <button
-                    key={idx}
+                    key={qId}
                     onClick={() => setCurrentQuestionIndex(idx)}
                     className={`w-10 h-10 rounded-lg font-semibold transition-all ${
                       isCurrent
@@ -307,7 +350,7 @@ function QuizPage({ studentId, selectedSkills, onBack, onQuizCompleted }) {
               })}
             </div>
 
-            {currentQuestionIndex === questions.length - 1 ? (
+            {currentQuestionIndex === processedQuestions.length - 1 ? (
               <button
                 onClick={handleSubmitQuiz}
                 disabled={loading || !allAnswered}

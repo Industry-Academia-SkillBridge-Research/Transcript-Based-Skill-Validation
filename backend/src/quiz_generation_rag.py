@@ -32,6 +32,13 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+# Import new RAG retrieval module
+try:
+    from src.rag_retrieval import retrieve_skill_context, build_query
+    RAG_RETRIEVAL_AVAILABLE = True
+except ImportError:
+    RAG_RETRIEVAL_AVAILABLE = False
+
 
 # -----------------------------
 # Loading utilities
@@ -264,8 +271,9 @@ def call_llm_generate_mcqs(prompt: str, num_questions: int) -> List[Dict]:
 def generate_mcqs_for_plan_row(
     plan_row: pd.Series,
     corpus_df: pd.DataFrame,
-    vectorizer: TfidfVectorizer,
-    tfidf_matrix,
+    vectorizer: Optional[TfidfVectorizer] = None,
+    tfidf_matrix = None,
+    retrieval_method: str = "tfidf",
 ) -> List[Dict]:
     """
     Build a RAG prompt for one quiz plan row and call the LLM generator.
@@ -277,14 +285,31 @@ def generate_mcqs_for_plan_row(
     num_questions = int(plan_row["NumQuestions"])
     student_level = plan_row["StudentLevel"]
 
-    # Retrieve knowledge context for the skill
-    context = retrieve_context_for_skill(
-        skill=skill,
-        corpus_df=corpus_df,
-        vectorizer=vectorizer,
-        tfidf_matrix=tfidf_matrix,
-        max_paragraphs=5,
-    )
+    # Retrieve knowledge context for the skill using new RAG retrieval
+    if RAG_RETRIEVAL_AVAILABLE:
+        retrieval_result = retrieve_skill_context(
+            skill=skill,
+            corpus_df=corpus_df,
+            method=retrieval_method,
+            top_k=5
+        )
+        context = retrieval_result["retrieved_text"]
+        retrieved_chunk_ids = retrieval_result["retrieved_chunk_ids"]
+        retrieval_query = retrieval_result.get("query", skill)
+    else:
+        # Fallback to old method
+        if vectorizer is None or tfidf_matrix is None:
+            # Build TF-IDF index if not provided
+            vectorizer, tfidf_matrix = build_tfidf_index(corpus_df)
+        context = retrieve_context_for_skill(
+            skill=skill,
+            corpus_df=corpus_df,
+            vectorizer=vectorizer,
+            tfidf_matrix=tfidf_matrix,
+            max_chunks=5,
+        )
+        retrieved_chunk_ids = []
+        retrieval_query = skill
 
     if not context:
         context = f"No specific context found for skill: {skill}. Use general knowledge."
@@ -337,6 +362,9 @@ Respond in a structured JSON-like list, for example:
             "Difficulty": difficulty,
         }
         record.update(q)
+        # Store retrieval metadata
+        record["retrieved_chunk_ids"] = ",".join(retrieved_chunk_ids) if retrieved_chunk_ids else ""
+        record["retrieval_query"] = retrieval_query
         enriched_questions.append(record)
 
     return enriched_questions
@@ -359,14 +387,22 @@ def main():
     corpus_df = load_skill_corpus(skill_corpus_path)
     print(f"Skill corpus rows: {len(corpus_df)}")
 
-    print("Building TF-IDF index over skill corpus content...")
-    vectorizer, tfidf_matrix = build_tfidf_index(corpus_df)
+    # Choose retrieval method (tfidf or embeddings)
+    retrieval_method = os.getenv("RAG_RETRIEVAL_METHOD", "tfidf").lower()
+    print(f"Using retrieval method: {retrieval_method}")
+
+    # Build TF-IDF index only if needed (for fallback)
+    vectorizer, tfidf_matrix = None, None
+    if not RAG_RETRIEVAL_AVAILABLE or retrieval_method == "tfidf":
+        print("Building TF-IDF index over skill corpus content...")
+        vectorizer, tfidf_matrix = build_tfidf_index(corpus_df)
 
     # Optional: limit number of plan rows for testing
     MAX_PLANS = 30
     plans_to_process = plans_df.head(MAX_PLANS).copy()
 
     all_questions: List[Dict] = []
+    all_retrieval_results: List[Dict] = []
 
     for idx, row in plans_to_process.iterrows():
         student_id = row["StudentID"]
@@ -379,8 +415,21 @@ def main():
             corpus_df=corpus_df,
             vectorizer=vectorizer,
             tfidf_matrix=tfidf_matrix,
+            retrieval_method=retrieval_method,
         )
         all_questions.extend(q_records)
+        
+        # Store retrieval results if using new method
+        if RAG_RETRIEVAL_AVAILABLE and q_records:
+            # Extract retrieval info from first question (they should all have same retrieval)
+            first_record = q_records[0]
+            if first_record.get("retrieved_chunk_ids"):
+                all_retrieval_results.append({
+                    "skill": skill,
+                    "retrieved_chunk_ids": first_record["retrieved_chunk_ids"],
+                    "retrieval_query": first_record.get("retrieval_query", skill),
+                    "method": retrieval_method
+                })
 
     if not all_questions:
         print("No questions generated. Check inputs and corpus.")
@@ -397,6 +446,12 @@ def main():
     out_df.to_csv(output_path, index=False)
 
     print(f"\nSaved {len(out_df)} questions to {output_path}")
+    
+    # Save retrieval results if available
+    if all_retrieval_results:
+        from src.rag_retrieval import save_retrieval_results
+        save_retrieval_results(all_retrieval_results, "output/retrieval_results.csv")
+    
     print("\nSample questions:")
     print(out_df.head(5))
 

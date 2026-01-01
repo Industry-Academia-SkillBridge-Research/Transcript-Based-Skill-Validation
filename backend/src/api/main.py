@@ -3,6 +3,8 @@
 import os
 import json
 import re
+import uuid
+from datetime import datetime
 from typing import Any, Dict, Optional, List, Tuple
 
 import pandas as pd
@@ -58,6 +60,7 @@ class QuizResponseItem(BaseModel):
 
 class SubmitQuizRequest(BaseModel):
     responses: List[QuizResponseItem]
+    quiz_id: Optional[str] = None  # Optional quiz_id for quiz-based submission
 
 
 # -----------------------------
@@ -871,22 +874,56 @@ def prepare_quiz(student_id: str, payload: PrepareQuizRequest):
         try:
             context = load_skill_context(mapped_skill, kb_dir="knowledge_base", max_chars=5500)
             if context and context.strip():
+                # Get retrieved chunk IDs if using RAG retrieval
+                retrieved_chunk_ids = []
+                try:
+                    from src.rag_retrieval import retrieve_skill_context
+                    import pandas as pd
+                    # Try to load corpus and get chunk IDs
+                    corpus_path = os.path.join("content", "skill_corpus.csv")
+                    if os.path.exists(corpus_path):
+                        corpus_df = pd.read_csv(corpus_path)
+                        retrieval_result = retrieve_skill_context(
+                            skill=mapped_skill,
+                            corpus_df=corpus_df,
+                            method="tfidf",
+                            top_k=5
+                        )
+                        retrieved_chunk_ids = retrieval_result.get("retrieved_chunk_ids", [])
+                except Exception:
+                    # If RAG retrieval fails, continue without chunk IDs
+                    retrieved_chunk_ids = []
+                
                 gen = generate_mcqs_from_context(
                     skill_key=mapped_skill,
                     context=context,
                     n=int(payload.num_questions_per_skill or 3),
-                    difficulty=(payload.difficulty or "mixed").strip().lower()
+                    difficulty=(payload.difficulty or "mixed").strip().lower(),
+                    retrieved_chunk_ids=retrieved_chunk_ids if retrieved_chunk_ids else None
                 )
 
+                # Use validated questions (validation already done in generate_mcqs_from_context)
                 gen_questions = gen.get("questions", []) if isinstance(gen, dict) else []
+                
+                # Log validation warnings if present (optional)
+                if gen.get("warnings"):
+                    # Could log to console or file
+                    pass
+                
                 for q in gen_questions:
                     opts = q.get("options", {}) or {}
                     ans = str(q.get("answer", "")).strip().upper()
 
+                    # Additional safety checks (redundant after validation but safe)
                     if ans not in ["A", "B", "C", "D"]:
                         continue
                     if not all(k in opts for k in ["A", "B", "C", "D"]):
                         continue
+                    
+                    # Check for duplicate options (additional safety)
+                    opt_values = [str(opts.get(k, "")).strip().lower() for k in ["A", "B", "C", "D"]]
+                    if len(opt_values) != len(set(opt_values)):
+                        continue  # Skip if duplicates found
 
                     qid = next_qid
                     next_qid += 1
@@ -903,6 +940,7 @@ def prepare_quiz(student_id: str, payload: PrepareQuizRequest):
                             "OptionB": str(opts.get("B", "")).strip(),
                             "OptionC": str(opts.get("C", "")).strip(),
                             "OptionD": str(opts.get("D", "")).strip(),
+                            "Explanation": str(q.get("explanation", "")).strip(),
                             "Source": "gemini",
                         }
                     )
@@ -955,26 +993,189 @@ def prepare_quiz(student_id: str, payload: PrepareQuizRequest):
             detail=f"No questions could be generated for selected origins: {sorted(set(missing_origins))}. Add knowledge_base files or expand question_bank.csv.",
         )
 
-    save_quiz_answer_key(student_id, answer_key)
+    if not questions:
+        raise HTTPException(
+            status_code=400,
+            detail="No questions were generated. Please try different skills or check the knowledge base.",
+        )
+    
+    # Final duplicate check across all questions (across all skills)
+    try:
+        from src.question_diversity import check_duplicate_questions
+        is_diverse, duplicate_warnings, unique_questions = check_duplicate_questions(
+            questions,
+            similarity_threshold=0.85
+        )
+        if not is_diverse:
+            # Use unique questions and log warnings (could be logged to file)
+            questions = unique_questions
+            # Note: warnings could be logged but not returned to user for simplicity
+    except Exception:
+        # If duplicate check fails, continue with original questions
+        pass
 
-    return {
+    # Generate unique quiz_id
+    quiz_id = str(uuid.uuid4())
+    
+    # Calculate time limit (default: 2 minutes per question, minimum 10 minutes)
+    time_limit_minutes = max(10, len(questions) * 2)
+    time_limit_seconds = time_limit_minutes * 60
+    
+    # Prepare questions for storage (with answers) and for frontend (without answers)
+    questions_with_answers = []
+    questions_for_frontend = []
+    
+    for q in questions:
+        # Store full question with answer for backend
+        questions_with_answers.append({
+            "QuestionID": q["QuestionID"],
+            "SelectedSkill": q.get("SelectedSkill", ""),
+            "Skill": q.get("Skill", ""),
+            "Difficulty": q.get("Difficulty", ""),
+            "QuestionText": q.get("QuestionText", ""),
+            "OptionA": q.get("OptionA", ""),
+            "OptionB": q.get("OptionB", ""),
+            "OptionC": q.get("OptionC", ""),
+            "OptionD": q.get("OptionD", ""),
+            "CorrectOption": answer_key.get(str(q["QuestionID"]), ""),
+            "Explanation": q.get("Explanation", ""),
+            "Source": q.get("Source", ""),
+        })
+        
+        # Frontend version (no answer)
+        questions_for_frontend.append({
+            "QuestionID": q["QuestionID"],
+            "SelectedSkill": q.get("SelectedSkill", ""),
+            "Skill": q.get("Skill", ""),
+            "Difficulty": q.get("Difficulty", ""),
+            "QuestionText": q.get("QuestionText", ""),
+            "OptionA": q.get("OptionA", ""),
+            "OptionB": q.get("OptionB", ""),
+            "OptionC": q.get("OptionC", ""),
+            "OptionD": q.get("OptionD", ""),
+            "Explanation": q.get("Explanation", ""),
+            "Source": q.get("Source", ""),
+        })
+    
+    # Save quiz metadata
+    quiz_meta = {
+        "quiz_id": quiz_id,
         "student_id": student_id,
         "selected_skills": selected,
         "expanded_skills": expanded_skills,
         "num_questions": len(questions),
-        "questions": questions,
+        "num_questions_per_skill": payload.num_questions_per_skill,
+        "difficulty": payload.difficulty,
+        "time_limit_minutes": time_limit_minutes,
+        "time_limit_seconds": time_limit_seconds,
+        "created_time": datetime.now().isoformat(),
+        "answer_key": answer_key,  # Store answer key in metadata
+    }
+    
+    # Save quiz files
+    quiz_dir = os.path.join("output", "quizzes")
+    os.makedirs(quiz_dir, exist_ok=True)
+    
+    questions_file = os.path.join(quiz_dir, f"{quiz_id}_questions.json")
+    meta_file = os.path.join(quiz_dir, f"{quiz_id}_meta.json")
+    
+    with open(questions_file, "w", encoding="utf-8") as f:
+        json.dump(questions_with_answers, f, indent=2, ensure_ascii=False)
+    
+    with open(meta_file, "w", encoding="utf-8") as f:
+        json.dump(quiz_meta, f, indent=2, ensure_ascii=False)
+    
+    # Also save answer key with student_id for backward compatibility
+    save_quiz_answer_key(student_id, answer_key)
+    
+    # Return to frontend (without answers)
+    return {
+        "quiz_id": quiz_id,
+        "student_id": student_id,
+        "selected_skills": selected,
+        "num_questions": len(questions),
+        "time_limit_minutes": time_limit_minutes,
+        "time_limit_seconds": time_limit_seconds,
+        "questions": questions_for_frontend,  # No answers!
     }
 
 
 
+@app.get("/quizzes/{quiz_id}")
+def get_quiz(quiz_id: str):
+    """
+    Retrieve a quiz by quiz_id (for frontend to load quiz).
+    Returns questions without answers.
+    """
+    meta_file = os.path.join("output", "quizzes", f"{quiz_id}_meta.json")
+    questions_file = os.path.join("output", "quizzes", f"{quiz_id}_questions.json")
+    
+    if not os.path.exists(meta_file) or not os.path.exists(questions_file):
+        raise HTTPException(status_code=404, detail=f"Quiz not found: {quiz_id}")
+    
+    # Load metadata
+    with open(meta_file, "r", encoding="utf-8") as f:
+        meta = json.load(f)
+    
+    # Load questions (with answers)
+    with open(questions_file, "r", encoding="utf-8") as f:
+        questions_with_answers = json.load(f)
+    
+    # Remove answers for frontend
+    questions_for_frontend = []
+    for q in questions_with_answers:
+        questions_for_frontend.append({
+            "QuestionID": q["QuestionID"],
+            "SelectedSkill": q.get("SelectedSkill", ""),
+            "Skill": q.get("Skill", ""),
+            "Difficulty": q.get("Difficulty", ""),
+            "QuestionText": q.get("QuestionText", ""),
+            "OptionA": q.get("OptionA", ""),
+            "OptionB": q.get("OptionB", ""),
+            "OptionC": q.get("OptionC", ""),
+            "OptionD": q.get("OptionD", ""),
+            "Explanation": q.get("Explanation", ""),
+            "Source": q.get("Source", ""),
+        })
+    
+    return {
+        "quiz_id": quiz_id,
+        "student_id": meta["student_id"],
+        "selected_skills": meta["selected_skills"],
+        "num_questions": meta["num_questions"],
+        "time_limit_minutes": meta["time_limit_minutes"],
+        "time_limit_seconds": meta["time_limit_seconds"],
+        "created_time": meta["created_time"],
+        "questions": questions_for_frontend,
+    }
+
+
 @app.post("/students/{student_id}/submit-quiz")
 def submit_quiz(student_id: str, payload: SubmitQuizRequest):
-    key_path = os.path.join("output", f"quiz_answer_key_{student_id}.json")
-    if not os.path.exists(key_path):
-        raise HTTPException(status_code=404, detail="Answer key not found. Generate a quiz first.")
-
-    with open(key_path, "r", encoding="utf-8") as f:
-        answer_key = json.load(f)
+    """
+    Submit quiz responses.
+    
+    If quiz_id is provided, uses that quiz's answer key.
+    Otherwise, falls back to student_id-based answer key (backward compatibility).
+    """
+    answer_key = {}
+    
+    # Try to load from quiz_id first (if provided in payload)
+    if payload.quiz_id:
+        meta_file = os.path.join("output", "quizzes", f"{payload.quiz_id}_meta.json")
+        if os.path.exists(meta_file):
+            with open(meta_file, "r", encoding="utf-8") as f:
+                meta = json.load(f)
+                answer_key = meta.get("answer_key", {})
+    
+    # Fallback to student_id-based answer key (backward compatibility)
+    if not answer_key:
+        key_path = os.path.join("output", f"quiz_answer_key_{student_id}.json")
+        if not os.path.exists(key_path):
+            raise HTTPException(status_code=404, detail="Answer key not found. Generate a quiz first.")
+        
+        with open(key_path, "r", encoding="utf-8") as f:
+            answer_key = json.load(f)
 
     total = len(payload.responses)
     correct = 0
