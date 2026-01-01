@@ -90,7 +90,8 @@ function QuizPage({ studentId, selectedSkills, onBack, onQuizCompleted }) {
       setQuizResult(data);
 
       if (onQuizCompleted) {
-        onQuizCompleted(data);
+        // Pass quiz result and questions to navigate to result page
+        onQuizCompleted(data, questions);
       }
     } catch (err) {
       setError(err.message || "Failed to submit quiz");
@@ -332,93 +333,19 @@ function QuizPage({ studentId, selectedSkills, onBack, onQuizCompleted }) {
         </div>
       )}
 
-      {/* Quiz Results Summary */}
-      {quizResult && !showReview && (
-        <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-xl border-2 border-green-200 shadow-lg p-8">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 mb-4 shadow-lg">
-              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h2 className="text-3xl font-bold text-slate-900 mb-2">Quiz Completed!</h2>
-            <p className="text-slate-600 text-lg">Here's how you performed</p>
+      {/* Loading state after submission - navigating to result page */}
+      {loading && quizResult && (
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-8 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 mb-4 shadow-lg">
+            <svg className="w-8 h-8 text-white animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white rounded-xl p-6 border-2 border-green-200 shadow-md text-center">
-              <div className="text-sm text-slate-600 mb-2 font-medium">Questions Answered</div>
-              <div className="text-4xl font-bold text-green-600 mb-1">
-                {quizResult.total_answered ?? quizResult.num_answered ?? 0}
-              </div>
-              <div className="text-xs text-slate-500">out of {questions.length}</div>
-            </div>
-            <div className="bg-white rounded-xl p-6 border-2 border-green-200 shadow-md text-center">
-              <div className="text-sm text-slate-600 mb-2 font-medium">Correct Answers</div>
-              <div className="text-4xl font-bold text-green-600 mb-1">
-                {quizResult.correct ?? quizResult.num_correct ?? 0}
-              </div>
-              <div className="text-xs text-slate-500">answers</div>
-            </div>
-            <div className="bg-white rounded-xl p-6 border-2 border-green-200 shadow-md text-center">
-              <div className="text-sm text-slate-600 mb-2 font-medium">Overall Accuracy</div>
-              <div className="text-4xl font-bold text-green-600 mb-1">
-                {((quizResult.accuracy ?? quizResult.overall_accuracy ?? 0) * 100).toFixed(1)}%
-              </div>
-              <div className="text-xs text-slate-500">score</div>
-            </div>
-          </div>
-
-          {quizResult.per_skill && quizResult.per_skill.length > 0 && (
-            <div className="mb-8">
-              <h3 className="text-xl font-bold text-slate-900 mb-4">Performance by Skill</h3>
-              <div className="space-y-3">
-                {quizResult.per_skill.map((skill, idx) => {
-                  const accuracy = (skill.accuracy ?? 0) * 100;
-                  const getColor = (acc) => {
-                    if (acc >= 70) return "from-green-500 to-emerald-600";
-                    if (acc >= 40) return "from-yellow-500 to-orange-500";
-                    return "from-red-500 to-pink-600";
-                  };
-
-                  return (
-                    <div key={idx} className="bg-white rounded-lg p-4 border border-slate-200">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="font-semibold text-slate-900">{skill.skill}</span>
-                        <span className="text-sm text-slate-600">
-                          {skill.num_correct}/{skill.num_questions} correct
-                        </span>
-                      </div>
-                      <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
-                        <div
-                          className={`h-full bg-gradient-to-r ${getColor(accuracy)} transition-all duration-500`}
-                          style={{ width: `${accuracy}%` }}
-                        />
-                      </div>
-                      <div className="text-right mt-1">
-                        <span className="text-sm font-semibold text-slate-700">
-                          {accuracy.toFixed(1)}%
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          <div className="text-center">
-            <button
-              onClick={() => setShowReview(true)}
-              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl"
-            >
-              Review Answers with Explanations
-            </button>
-          </div>
+          <p className="text-slate-600">Loading results...</p>
         </div>
       )}
 
-      {/* Review Mode */}
+      {/* Review Mode - removed as it's now in QuizResultPage */}
       {showReview && quizResult && currentReviewQuestion && (
         <div className="space-y-6">
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">

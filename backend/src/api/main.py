@@ -756,32 +756,7 @@ def prepare_quiz(student_id: str, payload: PrepareQuizRequest):
     if len(selected) > 5:
         raise HTTPException(status_code=400, detail="You can select a maximum of 5 skills.")
 
-    # If per-student skill profile exists, normalize user-selected skill names
-    per_student_path = os.path.join("output", f"skill_profile_{student_id}.csv")
-    if os.path.exists(per_student_path):
-        try:
-            skills_df_check = pd.read_csv(per_student_path)
-            if "Skill" in skills_df_check.columns:
-                # build canonical mapping from lowercased trimmed -> canonical value
-                canon_map = {str(x).strip().lower(): str(x).strip() for x in skills_df_check["Skill"].astype(str).tolist()}
-                normalized_selected = []
-                invalid = []
-                for s in selected:
-                    key = s.strip().lower()
-                    if key in canon_map:
-                        normalized_selected.append(canon_map[key])
-                    else:
-                        invalid.append(s)
-                if invalid:
-                    raise HTTPException(status_code=400, detail=f"Invalid skills selected (not found in student's skill profile): {invalid}")
-                selected = normalized_selected  # use canonical names going forward
-        except HTTPException:
-            raise
-        except Exception:
-            # fallback to original flow if anything goes wrong reading the file
-            pass
-
-    # Load question bank early (used for related-skill expansion and fallback)
+    # Load question bank early (used for validation fallback and related-skill expansion)
     try:
         qdf = load_question_bank()
         # Ensure numeric QuestionID
@@ -790,6 +765,45 @@ def prepare_quiz(student_id: str, payload: PrepareQuizRequest):
         qdf["QuestionID"] = qdf["QuestionID"].astype(int)
     except Exception:
         qdf = pd.DataFrame()
+
+    # If per-student skill profile exists, normalize user-selected skill names
+    # If a skill is not in the profile, check if it exists in the question bank as a fallback
+    per_student_path = os.path.join("output", f"skill_profile_{student_id}.csv")
+    profile_skills_map = {}
+    if os.path.exists(per_student_path):
+        try:
+            skills_df_check = pd.read_csv(per_student_path)
+            if "Skill" in skills_df_check.columns:
+                # build canonical mapping from lowercased trimmed -> canonical value
+                profile_skills_map = {str(x).strip().lower(): str(x).strip() for x in skills_df_check["Skill"].astype(str).tolist()}
+        except Exception:
+            # fallback to original flow if anything goes wrong reading the file
+            pass
+
+    # Build question bank skills map for fallback validation
+    question_bank_skills_map = {}
+    if not qdf.empty and "Skill" in qdf.columns:
+        question_bank_skills_map = {str(x).strip().lower(): str(x).strip() for x in qdf["Skill"].astype(str).unique().tolist()}
+
+    # Normalize selected skills: prefer profile canonical names, fallback to question bank canonical names
+    normalized_selected = []
+    invalid = []
+    for s in selected:
+        key = s.strip().lower()
+        # First try to match against student's skill profile
+        if profile_skills_map and key in profile_skills_map:
+            normalized_selected.append(profile_skills_map[key])
+        # Fallback to question bank if not in profile
+        elif question_bank_skills_map and key in question_bank_skills_map:
+            normalized_selected.append(question_bank_skills_map[key])
+        else:
+            invalid.append(s)
+
+    if invalid:
+        error_msg = f"Invalid skills selected (not found in student's skill profile or question bank): {invalid}"
+        raise HTTPException(status_code=400, detail=error_msg)
+
+    selected = normalized_selected  # use canonical names going forward
 
     # Expand selected skills with related skills if requested
     include_related = bool(payload.include_related)
