@@ -1,8 +1,8 @@
-import { useState, useMemo } from "react";
-import { prepareQuiz, submitQuiz } from "../api";
+import { useState, useMemo, useEffect } from "react";
+import { prepareQuiz, submitQuiz, getQuiz } from "../api";
 import { shuffleArray, shuffleQuestionOptions } from "../utils/shuffle";
 
-function QuizPage({ studentId, selectedSkills, quizId, onBack, onQuizCompleted }) {
+function QuizPage({ studentId, selectedSkills, quizId, timeLimitMinutes, sessionToken, sessionStartTime, onBack, onQuizCompleted }) {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const [quizResult, setQuizResult] = useState(null);
@@ -15,6 +15,51 @@ function QuizPage({ studentId, selectedSkills, quizId, onBack, onQuizCompleted }
   
   // Store option mappings for each question (shuffled letter -> original letter)
   const [optionMappings, setOptionMappings] = useState({});
+
+  // Load quiz if quizId is provided
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadQuizData = async () => {
+      if (quizId) {
+        try {
+          setLoading(true);
+          setError(null);
+          const data = await getQuiz(quizId);
+          
+          // Only update state if component is still mounted
+          if (isMounted) {
+            setQuestions(data.questions || []);
+            setQuizGenerated(true);
+          }
+        } catch (err) {
+          if (isMounted) {
+            setError(err.message || "Failed to load quiz");
+            console.error("Failed to load quiz:", err);
+          }
+        } finally {
+          if (isMounted) {
+            setLoading(false);
+          }
+        }
+      } else {
+        // Reset if quizId is cleared
+        if (isMounted) {
+          setQuestions([]);
+          setQuizGenerated(false);
+          setAnswers({});
+          setCurrentQuestionIndex(0);
+        }
+      }
+    };
+
+    loadQuizData();
+
+    // Cleanup function
+    return () => {
+      isMounted = false;
+    };
+  }, [quizId]);
   
   // Shuffled questions and processed questions with shuffled options
   const processedQuestions = useMemo(() => {
@@ -86,7 +131,7 @@ function QuizPage({ studentId, selectedSkills, quizId, onBack, onQuizCompleted }
   };
 
   const handleNext = () => {
-    if (currentQuestionIndex < questions.length - 1) {
+    if (currentQuestionIndex < processedQuestions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
@@ -128,8 +173,8 @@ function QuizPage({ studentId, selectedSkills, quizId, onBack, onQuizCompleted }
       setLoading(true);
       setError(null);
 
-      // Include quiz_id if available
-      const data = await submitQuiz(studentId, responses, quizId || null);
+      // Include quiz_id and session_token if available
+      const data = await submitQuiz(studentId, responses, quizId || null, sessionToken || null);
       setQuizResult(data);
 
       if (onQuizCompleted) {

@@ -161,6 +161,10 @@ export default function App() {
 
   const [quiz, setQuiz] = useState(null);
   const [quizResult, setQuizResult] = useState(null);
+  const [currentQuizId, setCurrentQuizId] = useState(null);
+  const [quizTimeLimit, setQuizTimeLimit] = useState(null);
+  const [quizSessionToken, setQuizSessionToken] = useState(null);
+  const [quizSessionStartTime, setQuizSessionStartTime] = useState(null);
 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -281,11 +285,19 @@ export default function App() {
       };
 
       const q = await prepareQuiz(studentId.trim(), payload);
-      // Store quiz_id for later submission
-      // Note: Questions will be shuffled on the QuizPage component (frontend)
+      
+      // Store quiz data
       setCurrentQuizId(q.quiz_id);
+      setQuizTimeLimit(q.time_limit_minutes);
+      setQuizSessionToken(q.session_token);
+      setQuizSessionStartTime(q.session_start_time);
       setQuiz({ ...q, quiz_id: q.quiz_id });
       setQuizResult(null);
+      
+      // Navigate to quiz page
+      setSelectedQuizSkills(selectedSkills);
+      setShowSkillsPage(false);
+      setShowQuizPage(true);
     });
   };
 
@@ -480,6 +492,9 @@ export default function App() {
             studentId={studentId}
             selectedSkills={selectedQuizSkills}
             quizId={currentQuizId || quiz?.quiz_id}
+            timeLimitMinutes={quizTimeLimit}
+            sessionToken={quizSessionToken}
+            sessionStartTime={quizSessionStartTime}
             onBack={() => {
               setShowQuizPage(false);
               setShowSkillsPage(true);
