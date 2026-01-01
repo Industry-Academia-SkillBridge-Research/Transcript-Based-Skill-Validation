@@ -67,28 +67,61 @@ def load_skill_corpus(path: str) -> pd.DataFrame:
     """
     Load the knowledge corpus used for retrieval.
 
-    Expected columns:
+    Expected columns (new chunked format):
         - Skill: skill name (e.g. 'Hypothesis Testing')
-        - SourceType: e.g. 'ModuleOutline', 'Textbook', 'Website'
-        - SourceName: e.g. 'IT2110 - Probability & Statistics'
-        - Content: short paragraph explaining the concept
+        - ChunkID: unique identifier for each chunk (e.g. 'sql_chunk_001')
+        - Text: chunk content (150-300 words per chunk)
+        - Source: optional source (module name, lecture note, textbook section)
+
+    Also supports legacy format:
+        - Skill, SourceType, SourceName, Content
     """
     if not os.path.exists(path):
         raise FileNotFoundError(
             f"Skill corpus file not found: {path}. "
             f"Create content/skill_corpus.csv with columns: "
-            f"Skill,SourceType,SourceName,Content"
+            f"Skill, ChunkID, Text, Source"
         )
 
     df = pd.read_csv(path)
-    expected_cols = {"Skill", "SourceType", "SourceName", "Content"}
-    missing = expected_cols - set(df.columns)
-    if missing:
-        raise ValueError(f"skill_corpus file is missing columns: {missing}")
-
-    # Drop rows with empty content
-    df = df.dropna(subset=["Content"])
-    return df
+    
+    # Check for new chunked format
+    if "ChunkID" in df.columns and "Text" in df.columns:
+        # New chunked format
+        expected_cols = {"Skill", "ChunkID", "Text"}
+        missing = expected_cols - set(df.columns)
+        if missing:
+            raise ValueError(f"skill_corpus file is missing required columns: {missing}")
+        
+        # Drop rows with empty text
+        df = df.dropna(subset=["Text"])
+        # Rename Text to Content for backward compatibility with rest of code
+        df = df.rename(columns={"Text": "Content"})
+        return df
+    
+    # Legacy format support
+    elif "Content" in df.columns:
+        expected_cols = {"Skill", "Content"}
+        missing = expected_cols - set(df.columns)
+        if missing:
+            raise ValueError(f"skill_corpus file is missing required columns: {missing}")
+        
+        # Drop rows with empty content
+        df = df.dropna(subset=["Content"])
+        # Create ChunkID for legacy format (one chunk per row)
+        if "ChunkID" not in df.columns:
+            df["ChunkID"] = df.apply(
+                lambda row: f"{str(row['Skill']).lower().replace(' ', '_')}_chunk_{row.name+1:03d}",
+                axis=1
+            )
+        return df
+    
+    else:
+        raise ValueError(
+            f"skill_corpus file must have either:\n"
+            f"  - New format: Skill, ChunkID, Text, Source\n"
+            f"  - Legacy format: Skill, Content (and optionally SourceType, SourceName)"
+        )
 
 
 # -----------------------------
@@ -97,10 +130,11 @@ def load_skill_corpus(path: str) -> pd.DataFrame:
 
 def build_tfidf_index(corpus_df: pd.DataFrame):
     """
-    Build a TF-IDF index over the Content field.
+    Build a TF-IDF index over the Content field (which contains chunked Text).
     Returns:
         vectorizer, tfidf_matrix
     """
+    # Use Content column (which is Text in new format, or Content in legacy format)
     contents = corpus_df["Content"].astype(str).tolist()
     vectorizer = TfidfVectorizer(
         stop_words="english",
@@ -117,25 +151,36 @@ def retrieve_context_for_skill(
     corpus_df: pd.DataFrame,
     vectorizer: TfidfVectorizer,
     tfidf_matrix,
-    max_paragraphs: int = 5,
+    max_chunks: int = 5,
 ) -> str:
     """
-    Given a skill name, retrieve the most relevant paragraphs from the corpus.
+    Given a skill name, retrieve the most relevant chunks from the corpus.
 
     Steps:
-        1. Optionally filter corpus by Skill column.
+        1. Filter corpus by Skill column (exact or partial match).
         2. Use TF-IDF + cosine similarity between the skill text
-           and each Content paragraph.
-        3. Take top-k paragraphs and join as context.
+           and each chunk (Content/Text field).
+        3. Take top-k chunks and join as context.
 
-    This is the "R" in RAG.
+    This is the "R" in RAG. Now works with chunked corpus format.
+
+    Args:
+        skill: Skill name to retrieve context for
+        corpus_df: DataFrame with Skill, ChunkID, Content columns
+        vectorizer: Fitted TF-IDF vectorizer
+        tfidf_matrix: TF-IDF matrix for all corpus content
+        max_chunks: Maximum number of chunks to retrieve (default 5)
+    
+    Returns:
+        Combined context string from top chunks
     """
     if corpus_df.empty:
         return ""
 
-    # First, try to filter by exact or partial skill name
+    # First, try to filter by exact or partial skill name match
     mask = corpus_df["Skill"].fillna("").str.contains(skill, case=False, na=False)
     filtered = corpus_df[mask]
+    
     if filtered.empty:
         # Fallback: use entire corpus
         filtered = corpus_df.copy()
@@ -153,7 +198,7 @@ def retrieve_context_for_skill(
     # Represent the skill text as a query vector
     skill_query = vectorizer.transform([skill])
 
-    # Compute cosine similarity between skill and each paragraph
+    # Compute cosine similarity between skill and each chunk
     sims = cosine_similarity(skill_query, sub_matrix).flatten()
 
     # Rank indices by similarity
@@ -163,12 +208,21 @@ def retrieve_context_for_skill(
         reverse=True,
     )
 
-    top_indices = [idx for idx, _ in ranked[:max_paragraphs]]
+    top_indices = [idx for idx, _ in ranked[:max_chunks]]
 
-    # Join selected paragraphs into a single context string
-    paragraphs: List[str] = corpus_df.loc[top_indices, "Content"].astype(str).tolist()
+    # Join selected chunks into a single context string
+    # Include ChunkID in context for traceability (optional)
+    chunks: List[str] = []
+    for idx in top_indices:
+        chunk_text = str(corpus_df.loc[idx, "Content"]).strip()
+        chunk_id = corpus_df.loc[idx, "ChunkID"] if "ChunkID" in corpus_df.columns else ""
+        if chunk_text:
+            if chunk_id:
+                chunks.append(f"[Chunk: {chunk_id}]\n{chunk_text}")
+            else:
+                chunks.append(chunk_text)
 
-    context = "\n\n".join(paragraphs)
+    context = "\n\n---\n\n".join(chunks)
     return context
 
 
