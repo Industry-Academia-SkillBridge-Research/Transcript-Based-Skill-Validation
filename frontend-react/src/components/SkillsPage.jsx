@@ -138,7 +138,7 @@ function SkillLevelBadge({ level }) {
   );
 }
 
-function SkillCard({ skill, index }) {
+function SkillCard({ skill, index, isSelected, onToggle }) {
   const score = Number(skill.ScoreNormalized ?? skill.FinalScore ?? skill.score ?? 0);
   const scorePercent = Math.min((score * 100), 100);
   const level = skill.FinalSkillLevel ?? skill.SkillLevel ?? skill.level ?? "Unknown";
@@ -153,14 +153,28 @@ function SkillCard({ skill, index }) {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all p-6">
+    <div 
+      className={`bg-white rounded-xl border-2 shadow-sm hover:shadow-md transition-all p-6 cursor-pointer ${
+        isSelected ? "border-blue-500 bg-blue-50" : "border-slate-200 hover:border-blue-300"
+      }`}
+      onClick={onToggle}
+    >
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
-            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-bold text-lg shadow-md">
-              {index + 1}
+            <div className={`flex items-center justify-center w-10 h-10 rounded-lg font-bold text-lg shadow-md ${
+              isSelected 
+                ? "bg-gradient-to-br from-green-500 to-emerald-600 text-white" 
+                : "bg-gradient-to-br from-blue-500 to-indigo-600 text-white"
+            }`}>
+              {isSelected ? "✓" : index + 1}
             </div>
             <h3 className="text-lg font-bold text-slate-900">{skill.Skill || skill.skill || "Unknown Skill"}</h3>
+            {isSelected && (
+              <span className="ml-auto px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
+                Selected
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-3 mt-3">
             <SkillLevelBadge level={level} />
@@ -216,8 +230,9 @@ function SkillCard({ skill, index }) {
   );
 }
 
-export default function SkillsPage({ skills, studentName, studentId, onContinue, onBack }) {
+export default function SkillsPage({ skills, studentName, studentId, onContinue, onBack, onGenerateQuiz }) {
   const [activeCategory, setActiveCategory] = useState("All");
+  const [selectedSkills, setSelectedSkills] = useState([]);
 
   // Merge similar skills and categorize
   const processedSkills = useMemo(() => {
@@ -257,6 +272,32 @@ export default function SkillsPage({ skills, studentName, studentId, onContinue,
       Other: categorizedSkills.Other.length,
     };
   }, [categorizedSkills]);
+
+  // Handle skill selection
+  const handleToggleSkill = (skill) => {
+    const skillName = skill.Skill || skill.skill || "";
+    setSelectedSkills((prev) => {
+      if (prev.includes(skillName)) {
+        return prev.filter((s) => s !== skillName);
+      } else {
+        if (prev.length >= 5) {
+          alert("You can select a maximum of 5 skills for the quiz.");
+          return prev;
+        }
+        return [...prev, skillName];
+      }
+    });
+  };
+
+  const handleGenerateQuiz = () => {
+    if (selectedSkills.length === 0) {
+      alert("Please select at least 1 skill to generate a quiz.");
+      return;
+    }
+    if (onGenerateQuiz) {
+      onGenerateQuiz(selectedSkills);
+    }
+  };
 
   // Calculate statistics
   const stats = useMemo(() => {
@@ -306,12 +347,22 @@ export default function SkillsPage({ skills, studentName, studentId, onContinue,
           </svg>
           <span>Back</span>
         </button>
-        <button
-          onClick={onContinue}
-          className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl"
-        >
-          Continue to Dashboard
-        </button>
+        <div className="flex gap-3">
+          {selectedSkills.length > 0 && (
+            <button
+              onClick={handleGenerateQuiz}
+              className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg hover:shadow-xl"
+            >
+              Generate Quiz ({selectedSkills.length}/5)
+            </button>
+          )}
+          <button
+            onClick={onContinue}
+            className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl"
+          >
+            Continue to Dashboard
+          </button>
+        </div>
       </div>
 
       {/* Title Section */}
@@ -349,6 +400,33 @@ export default function SkillsPage({ skills, studentName, studentId, onContinue,
           <div className="text-3xl font-bold text-green-600">{stats.avgScore.toFixed(1)}%</div>
         </div>
       </div>
+
+      {/* Selection Info */}
+      {selectedSkills.length > 0 && (
+        <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-200 p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div>
+                <p className="font-semibold text-purple-900">
+                  {selectedSkills.length} skill{selectedSkills.length !== 1 ? 's' : ''} selected
+                </p>
+                <p className="text-sm text-purple-700">
+                  {selectedSkills.join(", ")}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setSelectedSkills([])}
+              className="text-sm text-purple-600 hover:text-purple-800 underline"
+            >
+              Clear Selection
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Category Tabs */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-2">
@@ -394,9 +472,18 @@ export default function SkillsPage({ skills, studentName, studentId, onContinue,
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {sortedSkills.map((skill, index) => (
-              <SkillCard key={index} skill={skill} index={index} />
-            ))}
+            {sortedSkills.map((skill, index) => {
+              const skillName = skill.Skill || skill.skill || "";
+              return (
+                <SkillCard 
+                  key={index} 
+                  skill={skill} 
+                  index={index}
+                  isSelected={selectedSkills.includes(skillName)}
+                  onToggle={() => handleToggleSkill(skill)}
+                />
+              );
+            })}
           </div>
         )}
       </div>

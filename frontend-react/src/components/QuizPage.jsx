@@ -1,0 +1,561 @@
+import { useState } from "react";
+import { prepareQuiz, submitQuiz } from "../api";
+
+function QuizPage({ studentId, selectedSkills, onBack, onQuizCompleted }) {
+  const [questions, setQuestions] = useState([]);
+  const [answers, setAnswers] = useState({});
+  const [quizResult, setQuizResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [quizGenerated, setQuizGenerated] = useState(false);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [showReview, setShowReview] = useState(false);
+  const [reviewIndex, setReviewIndex] = useState(0);
+
+  const handleGenerateQuiz = async () => {
+    if (!selectedSkills || selectedSkills.length === 0) {
+      setError("Please select at least one skill.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      setQuizResult(null);
+      setAnswers({});
+      setCurrentQuestionIndex(0);
+      setShowReview(false);
+
+      const payload = {
+        selected_skills: selectedSkills,
+        num_questions_per_skill: 3,
+        difficulty: "mixed",
+      };
+
+      const data = await prepareQuiz(studentId, payload);
+      setQuestions(data.questions || []);
+      setQuizGenerated(true);
+    } catch (err) {
+      setError(err.message || "Failed to generate quiz");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAnswerChange = (questionId, option) => {
+    setAnswers((prev) => ({
+      ...prev,
+      [questionId]: option,
+    }));
+  };
+
+  const handleNext = () => {
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+    }
+  };
+
+  const handleSubmitQuiz = async () => {
+    if (questions.length === 0) {
+      setError("No quiz questions available.");
+      return;
+    }
+
+    const responses = questions.map((q) => {
+      const qId = q.QuestionID ?? q.question_id;
+      const selected = answers[qId];
+      return {
+        question_id: Number(qId),
+        selected_option: selected || "",
+        response_time_seconds: 30,
+      };
+    });
+
+    if (responses.filter((r) => r.selected_option).length === 0) {
+      setError("Please answer at least one question.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const data = await submitQuiz(studentId, responses);
+      setQuizResult(data);
+
+      if (onQuizCompleted) {
+        onQuizCompleted(data);
+      }
+    } catch (err) {
+      setError(err.message || "Failed to submit quiz");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Get current question
+  const currentQuestion = questions[currentQuestionIndex];
+  const currentReviewQuestion = showReview && quizResult ? questions[reviewIndex] : null;
+
+  // Calculate progress
+  const progress = questions.length > 0 ? ((currentQuestionIndex + 1) / questions.length) * 100 : 0;
+  const answeredCount = Object.keys(answers).length;
+
+  // Check if all questions are answered
+  const allAnswered = questions.length > 0 && Object.keys(answers).length === questions.length;
+
+  return (
+    <div className="max-w-4xl mx-auto space-y-6 min-h-screen pb-12">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <button
+          onClick={onBack}
+          className="flex items-center space-x-2 px-4 py-2 text-slate-600 hover:text-slate-900 hover:bg-white rounded-lg transition-colors"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          <span>Back</span>
+        </button>
+        {quizGenerated && !showReview && (
+          <div className="text-sm text-slate-600">
+            Question {currentQuestionIndex + 1} of {questions.length}
+          </div>
+        )}
+      </div>
+
+      {/* Title Section */}
+      {!quizGenerated && (
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 mb-4 shadow-lg">
+            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <h1 className="text-4xl font-bold text-slate-900 mb-2">Skill Validation Quiz</h1>
+          <p className="text-slate-600 text-lg">
+            Test your knowledge in the selected skills
+          </p>
+          {selectedSkills && selectedSkills.length > 0 && (
+            <div className="mt-4 flex flex-wrap justify-center gap-2">
+              {selectedSkills.map((skill, idx) => (
+                <span
+                  key={idx}
+                  className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium"
+                >
+                  {skill}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-800">
+          {error}
+        </div>
+      )}
+
+      {/* Generate Quiz Button */}
+      {!quizGenerated && (
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-8 text-center">
+          <p className="text-slate-600 mb-6">
+            Click the button below to generate a quiz based on your selected skills.
+          </p>
+          <button
+            onClick={handleGenerateQuiz}
+            disabled={loading}
+            className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {loading ? "Generating Quiz..." : "Generate Quiz"}
+          </button>
+        </div>
+      )}
+
+      {/* Quiz Progress Bar */}
+      {quizGenerated && !showReview && questions.length > 0 && (
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-slate-700">Progress</span>
+            <span className="text-sm font-medium text-slate-700">
+              {answeredCount} / {questions.length} answered
+            </span>
+          </div>
+          <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300 ease-out rounded-full"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Single Question Display */}
+      {quizGenerated && !showReview && currentQuestion && (
+        <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-8">
+          <div className="mb-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 text-white font-bold text-xl shadow-md">
+                {currentQuestionIndex + 1}
+              </div>
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-slate-900 mb-2">
+                  {currentQuestion.QuestionText ?? currentQuestion.question_text}
+                </h2>
+                {currentQuestion.Skill && (
+                  <div className="flex items-center gap-2">
+                    <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">
+                      {currentQuestion.Skill}
+                    </span>
+                    {currentQuestion.Difficulty && (
+                      <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">
+                        {currentQuestion.Difficulty}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3 mb-8">
+            {["A", "B", "C", "D"].map((letter) => {
+              const optionText = currentQuestion[`Option${letter}`] ?? currentQuestion[`option_${letter.toLowerCase()}`];
+              if (!optionText) return null;
+              
+              const qId = currentQuestion.QuestionID ?? currentQuestion.question_id;
+              const isSelected = answers[qId] === letter;
+
+              return (
+                <label
+                  key={letter}
+                  className={`flex items-center gap-4 p-4 rounded-xl cursor-pointer transition-all border-2 ${
+                    isSelected
+                      ? "bg-gradient-to-r from-purple-50 to-pink-50 border-purple-500 shadow-md"
+                      : "bg-slate-50 border-slate-200 hover:bg-slate-100 hover:border-purple-300"
+                  }`}
+                >
+                  <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-lg ${
+                    isSelected
+                      ? "bg-gradient-to-br from-purple-500 to-pink-600 text-white"
+                      : "bg-white border-2 border-slate-300 text-slate-600"
+                  }`}>
+                    {letter}
+                  </div>
+                  <input
+                    type="radio"
+                    name={`question_${qId}`}
+                    value={letter}
+                    checked={isSelected}
+                    onChange={() => handleAnswerChange(qId, letter)}
+                    className="w-5 h-5 text-purple-600 focus:ring-purple-500"
+                  />
+                  <span className="flex-1 text-slate-800 text-lg">{optionText}</span>
+                  {isSelected && (
+                    <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </label>
+              );
+            })}
+          </div>
+
+          {/* Navigation Buttons */}
+          <div className="flex items-center justify-between pt-6 border-t border-slate-200">
+            <button
+              onClick={handlePrevious}
+              disabled={currentQuestionIndex === 0}
+              className="flex items-center gap-2 px-6 py-3 bg-slate-100 text-slate-700 rounded-lg font-semibold hover:bg-slate-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Previous
+            </button>
+
+            <div className="flex gap-2">
+              {questions.map((_, idx) => {
+                const qId = questions[idx].QuestionID ?? questions[idx].question_id;
+                const isAnswered = answers[qId];
+                const isCurrent = idx === currentQuestionIndex;
+                
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentQuestionIndex(idx)}
+                    className={`w-10 h-10 rounded-lg font-semibold transition-all ${
+                      isCurrent
+                        ? "bg-gradient-to-br from-purple-500 to-pink-600 text-white shadow-md scale-110"
+                        : isAnswered
+                        ? "bg-green-100 text-green-700 hover:bg-green-200"
+                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    }`}
+                  >
+                    {idx + 1}
+                  </button>
+                );
+              })}
+            </div>
+
+            {currentQuestionIndex === questions.length - 1 ? (
+              <button
+                onClick={handleSubmitQuiz}
+                disabled={loading || !allAnswered}
+                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-semibold hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {loading ? "Submitting..." : "Submit Quiz"}
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </button>
+            ) : (
+              <button
+                onClick={handleNext}
+                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg hover:shadow-xl"
+              >
+                Next
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Quiz Results Summary */}
+      {quizResult && !showReview && (
+        <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-xl border-2 border-green-200 shadow-lg p-8">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 mb-4 shadow-lg">
+              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h2 className="text-3xl font-bold text-slate-900 mb-2">Quiz Completed!</h2>
+            <p className="text-slate-600 text-lg">Here's how you performed</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white rounded-xl p-6 border-2 border-green-200 shadow-md text-center">
+              <div className="text-sm text-slate-600 mb-2 font-medium">Questions Answered</div>
+              <div className="text-4xl font-bold text-green-600 mb-1">
+                {quizResult.total_answered ?? quizResult.num_answered ?? 0}
+              </div>
+              <div className="text-xs text-slate-500">out of {questions.length}</div>
+            </div>
+            <div className="bg-white rounded-xl p-6 border-2 border-green-200 shadow-md text-center">
+              <div className="text-sm text-slate-600 mb-2 font-medium">Correct Answers</div>
+              <div className="text-4xl font-bold text-green-600 mb-1">
+                {quizResult.correct ?? quizResult.num_correct ?? 0}
+              </div>
+              <div className="text-xs text-slate-500">answers</div>
+            </div>
+            <div className="bg-white rounded-xl p-6 border-2 border-green-200 shadow-md text-center">
+              <div className="text-sm text-slate-600 mb-2 font-medium">Overall Accuracy</div>
+              <div className="text-4xl font-bold text-green-600 mb-1">
+                {((quizResult.accuracy ?? quizResult.overall_accuracy ?? 0) * 100).toFixed(1)}%
+              </div>
+              <div className="text-xs text-slate-500">score</div>
+            </div>
+          </div>
+
+          {quizResult.per_skill && quizResult.per_skill.length > 0 && (
+            <div className="mb-8">
+              <h3 className="text-xl font-bold text-slate-900 mb-4">Performance by Skill</h3>
+              <div className="space-y-3">
+                {quizResult.per_skill.map((skill, idx) => {
+                  const accuracy = (skill.accuracy ?? 0) * 100;
+                  const getColor = (acc) => {
+                    if (acc >= 70) return "from-green-500 to-emerald-600";
+                    if (acc >= 40) return "from-yellow-500 to-orange-500";
+                    return "from-red-500 to-pink-600";
+                  };
+
+                  return (
+                    <div key={idx} className="bg-white rounded-lg p-4 border border-slate-200">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-semibold text-slate-900">{skill.skill}</span>
+                        <span className="text-sm text-slate-600">
+                          {skill.num_correct}/{skill.num_questions} correct
+                        </span>
+                      </div>
+                      <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                        <div
+                          className={`h-full bg-gradient-to-r ${getColor(accuracy)} transition-all duration-500`}
+                          style={{ width: `${accuracy}%` }}
+                        />
+                      </div>
+                      <div className="text-right mt-1">
+                        <span className="text-sm font-semibold text-slate-700">
+                          {accuracy.toFixed(1)}%
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          <div className="text-center">
+            <button
+              onClick={() => setShowReview(true)}
+              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl"
+            >
+              Review Answers with Explanations
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Review Mode */}
+      {showReview && quizResult && currentReviewQuestion && (
+        <div className="space-y-6">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-slate-900">Review Answers</h2>
+              <button
+                onClick={() => setShowReview(false)}
+                className="px-4 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+              >
+                Close Review
+              </button>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-8">
+            <div className="mb-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-bold text-xl shadow-md">
+                  {reviewIndex + 1}
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold text-slate-900 mb-2">
+                    {currentReviewQuestion.QuestionText ?? currentReviewQuestion.question_text}
+                  </h2>
+                  {currentReviewQuestion.Skill && (
+                    <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">
+                      {currentReviewQuestion.Skill}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3 mb-6">
+              {["A", "B", "C", "D"].map((letter) => {
+                const optionText = currentReviewQuestion[`Option${letter}`] ?? currentReviewQuestion[`option_${letter.toLowerCase()}`];
+                if (!optionText) return null;
+                
+                const qId = currentReviewQuestion.QuestionID ?? currentReviewQuestion.question_id;
+                const resultItem = quizResult.per_question?.find(
+                  (item) => item.question_id === qId
+                );
+                const isSelected = resultItem?.selected_option?.toUpperCase() === letter;
+                const isCorrect = resultItem?.correct_option?.toUpperCase() === letter;
+
+                return (
+                  <div
+                    key={letter}
+                    className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all ${
+                      isCorrect
+                        ? "bg-green-50 border-green-500"
+                        : isSelected
+                        ? "bg-red-50 border-red-500"
+                        : "bg-slate-50 border-slate-200"
+                    }`}
+                  >
+                    <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-lg ${
+                      isCorrect
+                        ? "bg-green-500 text-white"
+                        : isSelected
+                        ? "bg-red-500 text-white"
+                        : "bg-slate-300 text-slate-600"
+                    }`}>
+                      {letter}
+                    </div>
+                    <span className="flex-1 text-slate-800 text-lg">{optionText}</span>
+                    {isCorrect && (
+                      <div className="flex items-center gap-2 text-green-700 font-semibold">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        Correct Answer
+                      </div>
+                    )}
+                    {isSelected && !isCorrect && (
+                      <div className="flex items-center gap-2 text-red-700 font-semibold">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        Your Answer
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Explanation Section */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <div className="flex items-start gap-3">
+                <svg className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                  <h3 className="font-semibold text-blue-900 mb-1">Explanation</h3>
+                  <p className="text-blue-800 text-sm">
+                    {currentReviewQuestion.Explanation ?? 
+                     currentReviewQuestion.explanation ?? 
+                     "The correct answer is highlighted in green. Review the question and options to understand the concept better."}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Navigation */}
+            <div className="flex items-center justify-between pt-6 border-t border-slate-200">
+              <button
+                onClick={() => setReviewIndex(Math.max(0, reviewIndex - 1))}
+                disabled={reviewIndex === 0}
+                className="flex items-center gap-2 px-6 py-3 bg-slate-100 text-slate-700 rounded-lg font-semibold hover:bg-slate-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                Previous
+              </button>
+
+              <div className="text-sm text-slate-600">
+                Question {reviewIndex + 1} of {questions.length}
+              </div>
+
+              <button
+                onClick={() => setReviewIndex(Math.min(questions.length - 1, reviewIndex + 1))}
+                disabled={reviewIndex === questions.length - 1}
+                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Next
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default QuizPage;

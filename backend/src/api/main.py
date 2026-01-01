@@ -756,6 +756,31 @@ def prepare_quiz(student_id: str, payload: PrepareQuizRequest):
     if len(selected) > 5:
         raise HTTPException(status_code=400, detail="You can select a maximum of 5 skills.")
 
+    # If per-student skill profile exists, normalize user-selected skill names
+    per_student_path = os.path.join("output", f"skill_profile_{student_id}.csv")
+    if os.path.exists(per_student_path):
+        try:
+            skills_df_check = pd.read_csv(per_student_path)
+            if "Skill" in skills_df_check.columns:
+                # build canonical mapping from lowercased trimmed -> canonical value
+                canon_map = {str(x).strip().lower(): str(x).strip() for x in skills_df_check["Skill"].astype(str).tolist()}
+                normalized_selected = []
+                invalid = []
+                for s in selected:
+                    key = s.strip().lower()
+                    if key in canon_map:
+                        normalized_selected.append(canon_map[key])
+                    else:
+                        invalid.append(s)
+                if invalid:
+                    raise HTTPException(status_code=400, detail=f"Invalid skills selected (not found in student's skill profile): {invalid}")
+                selected = normalized_selected  # use canonical names going forward
+        except HTTPException:
+            raise
+        except Exception:
+            # fallback to original flow if anything goes wrong reading the file
+            pass
+
     # Load question bank early (used for related-skill expansion and fallback)
     try:
         qdf = load_question_bank()
@@ -968,3 +993,155 @@ def submit_quiz(student_id: str, payload: SubmitQuizRequest):
         "accuracy": accuracy,
         "per_question": per_question,
     }
+
+
+# New endpoint: provide skills a UI can use to let user choose up to max_selectable skills.
+@app.get("/students/{student_id}/selectable-skills")
+def selectable_skills(student_id: str, top_n: int = 15, only_weak: bool = False):
+    """
+    Return a list of skills for the student suitable for selection in the quiz UI.
+
+    - top_n: how many skills to return (default 15)
+    - only_weak: if True, return only skills marked weak/missing or below score threshold
+    """
+    per_student_path = os.path.join("output", f"skill_profile_{student_id}.csv")
+    path_primary = os.path.join("output", "skill_profiles_with_quiz.csv")
+    path_fallback = os.path.join("output", "skill_profiles_explainable.csv")
+
+    if os.path.exists(per_student_path):
+        df = pd.read_csv(per_student_path)
+        source = os.path.basename(per_student_path)
+    else:
+        path = path_primary if os.path.exists(path_primary) else path_fallback
+        if not os.path.exists(path):
+            raise HTTPException(status_code=404, detail="Skill profile CSV not found in output/")
+        df = pd.read_csv(path)
+        source = os.path.basename(path)
+
+    # determine score column
+    score_col = None
+    for sc in ["ScoreNormalized", "FinalScore", "Score"]:
+        if sc in df.columns:
+            score_col = sc
+            break
+
+    # sort by score if available
+    if score_col:
+        df_sorted = df.sort_values(score_col, ascending=False).head(int(top_n))
+    else:
+        df_sorted = df.head(int(top_n))
+
+    # determine weak flag using explainability column if present or a simple threshold
+    has_weak_col = "IsWeakOrMissing" in df_sorted.columns
+    out = []
+    for _, r in df_sorted.iterrows():
+        skill_name = str(r.get("Skill", r.get("skill", "")))
+        # compute numeric score if possible
+        score_val = None
+        if score_col and pd.notna(r.get(score_col)):
+            try:
+                score_val = float(r.get(score_col))
+                # normalize percentage-like FinalScore (> 1) to fraction if needed
+                if score_col == "FinalScore" and score_val > 1:
+                    # assume FinalScore is in 0-100, convert to 0-1 for threshold check but keep original number
+                    pass
+            except Exception:
+                score_val = None
+
+        is_weak = False
+        if has_weak_col and pd.notna(r.get("IsWeakOrMissing")):
+            try:
+                is_weak = bool(r.get("IsWeakOrMissing"))
+            except Exception:
+                is_weak = str(r.get("IsWeakOrMissing")).strip().lower() in ("true", "1", "yes")
+        else:
+            # threshold-based weak detection
+            if score_col and score_val is not None:
+                if score_col == "FinalScore":
+                    # treat FinalScore < 60 as weak (if FinalScore looks like percent)
+                    is_weak = score_val < 60
+                else:
+                    # ScoreNormalized or other fractional scores: < 0.6 is weak
+                    is_weak = score_val < 0.6
+
+        if only_weak and not is_weak:
+            continue
+
+        out.append(
+            {
+                "skill": skill_name,
+                "score": float(score_val) if score_val is not None else None,
+                "level": str(r.get("FinalSkillLevel", r.get("SkillLevel", ""))),
+                "is_weak": bool(is_weak),
+                "selectable": True,
+            }
+        )
+
+    return {
+        "student_id": student_id,
+        "source_file": source,
+        "count": len(out),
+        "max_selectable": 5,
+        "skills": out,
+    }
+
+
+# New endpoint: return plain list of canonical skill values (easy for simple UI consumption)
+@app.get("/students/{student_id}/available-skills")
+def available_skills(student_id: str, only_weak: bool = False, limit: int = 100):
+    """
+    Return a simple list of canonical skill values for the student.
+    - only_weak: if True, only return skills considered weak/missing
+    - limit: maximum number of skills to return
+    """
+    per_student_path = os.path.join("output", f"skill_profile_{student_id}.csv")
+    path_primary = os.path.join("output", "skill_profiles_with_quiz.csv")
+    path_fallback = os.path.join("output", "skill_profiles_explainable.csv")
+
+    if os.path.exists(per_student_path):
+        df = pd.read_csv(per_student_path)
+    else:
+        path = path_primary if os.path.exists(path_primary) else path_fallback
+        if not os.path.exists(path):
+            raise HTTPException(status_code=404, detail="Skill profile CSV not found in output/")
+        df = pd.read_csv(path)
+
+    if "Skill" not in df.columns:
+        raise HTTPException(status_code=500, detail="Skill column missing from skill profile file.")
+
+    # compute weak flag similar to selectable_skills
+    score_col = next((c for c in ["ScoreNormalized", "FinalScore", "Score"] if c in df.columns), None)
+    has_weak_col = "IsWeakOrMissing" in df.columns
+
+    out = []
+    seen = set()
+    for _, r in df.iterrows():
+        val = str(r["Skill"]).strip()
+        if not val or val in seen:
+            continue
+
+        is_weak = False
+        if has_weak_col and pd.notna(r.get("IsWeakOrMissing")):
+            try:
+                is_weak = bool(r.get("IsWeakOrMissing"))
+            except Exception:
+                is_weak = str(r.get("IsWeakOrMissing")).strip().lower() in ("true", "1", "yes")
+        elif score_col and pd.notna(r.get(score_col)):
+            try:
+                score_val = float(r.get(score_col))
+                if score_col == "FinalScore":
+                    is_weak = score_val < 60
+                else:
+                    is_weak = score_val < 0.6
+            except Exception:
+                is_weak = False
+
+        if only_weak and not is_weak:
+            continue
+
+        out.append(val)
+        seen.add(val)
+        if len(out) >= int(limit):
+            break
+
+    return {"student_id": student_id, "count": len(out), "skills": out}

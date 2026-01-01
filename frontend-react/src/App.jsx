@@ -12,6 +12,7 @@ import {
 import FileUpload from "./components/FileUpload";
 import TranscriptDetailsPage from "./components/TranscriptDetailsPage";
 import SkillsPage from "./components/SkillsPage";
+import QuizPage from "./components/QuizPage";
 
 function classNames(...xs) {
   return xs.filter(Boolean).join(" ");
@@ -143,6 +144,8 @@ export default function App() {
   const [transcriptUploaded, setTranscriptUploaded] = useState(false);
   const [showTranscriptDetails, setShowTranscriptDetails] = useState(false);
   const [showSkillsPage, setShowSkillsPage] = useState(false);
+  const [showQuizPage, setShowQuizPage] = useState(false);
+  const [selectedQuizSkills, setSelectedQuizSkills] = useState([]);
 
   const [transcriptDetails, setTranscriptDetails] = useState(null);
   const [transcriptCourses, setTranscriptCourses] = useState([]);
@@ -379,8 +382,22 @@ export default function App() {
           </div>
         ) : null}
 
-        {/* Show skills page */}
-        {showSkillsPage && uploadedSkills.length > 0 ? (
+        {/* Show quiz page */}
+        {showQuizPage && selectedQuizSkills.length > 0 ? (
+          <QuizPage
+            studentId={studentId}
+            selectedSkills={selectedQuizSkills}
+            onBack={() => {
+              setShowQuizPage(false);
+              setShowSkillsPage(true);
+            }}
+            onQuizCompleted={(result) => {
+              setQuiz(result);
+              // Optionally navigate back or show results
+            }}
+          />
+        ) : showSkillsPage && uploadedSkills.length > 0 ? (
+          /* Show skills page */
           <SkillsPage
             skills={uploadedSkills}
             studentName={transcriptDetails?.candidate_name || transcriptDetails?.name}
@@ -388,6 +405,11 @@ export default function App() {
             onContinue={() => {
               setShowSkillsPage(false);
               setTranscriptUploaded(true);
+            }}
+            onGenerateQuiz={(skills) => {
+              setSelectedQuizSkills(skills);
+              setShowSkillsPage(false);
+              setShowQuizPage(true);
             }}
             onBack={() => {
               setShowSkillsPage(false);
