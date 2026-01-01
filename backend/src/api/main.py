@@ -61,6 +61,8 @@ class QuizResponseItem(BaseModel):
 class SubmitQuizRequest(BaseModel):
     responses: List[QuizResponseItem]
     quiz_id: Optional[str] = None  # Optional quiz_id for quiz-based submission
+    session_token: Optional[str] = None  # Quiz session token for time validation
+    violations: Optional[List[Dict[str, Any]]] = []  # Security violations logged on frontend
 
 
 # -----------------------------
@@ -371,7 +373,14 @@ async def upload_transcript_auto(file: UploadFile = File(...), student_id: Optio
         if not details.get("registration_number"):
             details["registration_number"] = final_student_id
 
-        # Save file with proper student ID
+        # Create uploads directory and save original file
+        uploads_dir = os.path.join("output", "uploads")
+        os.makedirs(uploads_dir, exist_ok=True)
+        saved_file_path = os.path.join(uploads_dir, f"{final_student_id}.pdf" if is_pdf else f"{final_student_id}.{filename_lower.split('.')[-1]}")
+        with open(saved_file_path, "wb") as f:
+            f.write(contents)
+        
+        # Also save temp file for processing (cleaned up later)
         final_tmp_path = os.path.join("output", f"_tmp_{final_student_id}_{file.filename}")
         with open(final_tmp_path, "wb") as f:
             f.write(contents)
@@ -392,6 +401,29 @@ async def upload_transcript_auto(file: UploadFile = File(...), student_id: Optio
 
         if "Year" not in courses_df.columns:
             courses_df["Year"] = courses_df["CourseCode"].apply(infer_year_from_code)
+        
+        # Add StudentID column for saving parsed transcript
+        courses_df["StudentID"] = final_student_id
+        
+        # Save parsed transcript to transcript_parsed_single.csv
+        parsed_transcript_path = os.path.join("output", "transcript_parsed_single.csv")
+        # Select columns in order: StudentID, CourseCode, CourseTitle, Grade, Year
+        columns_to_save = ["StudentID", "CourseCode", "CourseTitle", "Grade"]
+        if "Year" in courses_df.columns:
+            columns_to_save.append("Year")
+        
+        # Save to CSV (append if file exists, otherwise create new)
+        if os.path.exists(parsed_transcript_path):
+            # Read existing file and append
+            existing_df = pd.read_csv(parsed_transcript_path)
+            # Remove old entries for this student (if any)
+            existing_df = existing_df[existing_df["StudentID"] != final_student_id]
+            # Combine with new data
+            combined_df = pd.concat([existing_df, courses_df[columns_to_save]], ignore_index=True)
+            combined_df.to_csv(parsed_transcript_path, index=False)
+        else:
+            # Create new file
+            courses_df[columns_to_save].to_csv(parsed_transcript_path, index=False)
 
         # Calculate statistics
         GRADE_POINTS = {
@@ -428,6 +460,10 @@ async def upload_transcript_auto(file: UploadFile = File(...), student_id: Optio
             skills_df.to_csv(per_student_path, index=False)
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed to write {per_student_path}: {e}")
+        
+        # Also save to skill_profile_parsed_single.csv (single student format)
+        parsed_single_path = os.path.join("output", "skill_profile_parsed_single.csv")
+        skills_df.to_csv(parsed_single_path, index=False)
 
         # Clean up temporary file
         try:
@@ -485,6 +521,13 @@ async def upload_transcript(student_id: str, file: UploadFile = File(...)):
                 status_code=422,
                 detail="No course lines detected. Transcript format may not match parser regex.",
             )
+        
+        # Save original file to uploads directory
+        uploads_dir = os.path.join("output", "uploads")
+        os.makedirs(uploads_dir, exist_ok=True)
+        saved_file_path = os.path.join(uploads_dir, f"{student_id}.pdf")
+        with open(saved_file_path, "wb") as f:
+            f.write(contents)
 
         # Infer year from course code (IT1xxx = Year 1, IT2xxx = Year 2, etc.)
         def infer_year_from_code(code: str) -> Optional[int]:
@@ -502,6 +545,36 @@ async def upload_transcript(student_id: str, file: UploadFile = File(...)):
 
         if "Year" not in courses_df.columns:
             courses_df["Year"] = courses_df["CourseCode"].apply(infer_year_from_code)
+        
+        # Save original file to uploads directory
+        uploads_dir = os.path.join("output", "uploads")
+        os.makedirs(uploads_dir, exist_ok=True)
+        saved_file_path = os.path.join(uploads_dir, f"{student_id}.pdf")
+        with open(saved_file_path, "wb") as f:
+            f.write(contents)
+        
+        # Add StudentID column for saving parsed transcript
+        courses_df["StudentID"] = student_id
+        
+        # Save parsed transcript to transcript_parsed_single.csv
+        parsed_transcript_path = os.path.join("output", "transcript_parsed_single.csv")
+        # Select columns in order: StudentID, CourseCode, CourseTitle, Grade, Year
+        columns_to_save = ["StudentID", "CourseCode", "CourseTitle", "Grade"]
+        if "Year" in courses_df.columns:
+            columns_to_save.append("Year")
+        
+        # Save to CSV (append if file exists, otherwise create new)
+        if os.path.exists(parsed_transcript_path):
+            # Read existing file and append
+            existing_df = pd.read_csv(parsed_transcript_path)
+            # Remove old entries for this student (if any)
+            existing_df = existing_df[existing_df["StudentID"] != student_id]
+            # Combine with new data
+            combined_df = pd.concat([existing_df, courses_df[columns_to_save]], ignore_index=True)
+            combined_df.to_csv(parsed_transcript_path, index=False)
+        else:
+            # Create new file
+            courses_df[columns_to_save].to_csv(parsed_transcript_path, index=False)
 
         # Calculate statistics
         GRADE_POINTS = {
@@ -538,6 +611,10 @@ async def upload_transcript(student_id: str, file: UploadFile = File(...)):
             skills_df.to_csv(per_student_path, index=False)
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed to write {per_student_path}: {e}")
+        
+        # Also save to skill_profile_parsed_single.csv (single student format)
+        parsed_single_path = os.path.join("output", "skill_profile_parsed_single.csv")
+        skills_df.to_csv(parsed_single_path, index=False)
 
         return {
             "student_id": student_id,
@@ -850,6 +927,63 @@ def prepare_quiz(student_id: str, payload: PrepareQuizRequest):
             origin = selected[0]
         pairs.append((origin, e))
         used_set.add(e)
+    
+    # Create and save quiz plan records (one per selected skill)
+    quiz_plan_records = []
+    for skill in selected:
+        # Try to get student's skill level from profile
+        skill_level = "Unknown"
+        if os.path.exists(per_student_path):
+            try:
+                skills_df_check = pd.read_csv(per_student_path)
+                if "Skill" in skills_df_check.columns and "SkillLevel" in skills_df_check.columns:
+                    skill_row = skills_df_check[skills_df_check["Skill"].astype(str).str.strip().str.lower() == skill.lower()]
+                    if not skill_row.empty:
+                        skill_level = str(skill_row.iloc[0]["SkillLevel"]).strip()
+            except Exception:
+                pass
+        
+        # Infer target difficulty from skill level (or use user-selected difficulty if "mixed")
+        target_difficulty = payload.difficulty
+        if target_difficulty == "mixed" or not target_difficulty:
+            # Auto-infer based on skill level
+            if skill_level in ["Beginner"]:
+                target_difficulty = "Easy"
+            elif skill_level in ["Developing"]:
+                target_difficulty = "Medium"
+            elif skill_level in ["Proficient", "Advanced"]:
+                target_difficulty = "Hard"
+            else:
+                target_difficulty = "Medium"  # Default
+        
+        quiz_plan_records.append({
+            "StudentID": student_id,
+            "Skill": skill,
+            "TargetDifficulty": target_difficulty,
+            "NumQuestions": payload.num_questions_per_skill,
+            "StudentSkillLevel": skill_level,
+            "CreatedTime": datetime.now().isoformat(),
+        })
+    
+    # Save quiz plan to CSV
+    if quiz_plan_records:
+        quiz_plan_df = pd.DataFrame(quiz_plan_records)
+        quiz_plan_path = os.path.join("output", "quiz_plans_direct.csv")
+        
+        # Append to file if it exists, otherwise create new
+        if os.path.exists(quiz_plan_path):
+            try:
+                existing_df = pd.read_csv(quiz_plan_path)
+                # Optionally remove old plans for this student (keep only latest)
+                existing_df = existing_df[existing_df["StudentID"] != student_id]
+                combined_df = pd.concat([existing_df, quiz_plan_df], ignore_index=True)
+                combined_df.to_csv(quiz_plan_path, index=False)
+            except Exception:
+                # If append fails, just overwrite
+                quiz_plan_df.to_csv(quiz_plan_path, index=False)
+        else:
+            os.makedirs("output", exist_ok=True)
+            quiz_plan_df.to_csv(quiz_plan_path, index=False)
 
     bank_skills = set(qdf["Skill"].astype(str).unique()) if not qdf.empty else set()
     aliases = load_skill_aliases() if "load_skill_aliases" in globals() else []
@@ -1057,6 +1191,10 @@ def prepare_quiz(student_id: str, payload: PrepareQuizRequest):
             "Source": q.get("Source", ""),
         })
     
+    # Generate quiz session token
+    session_token = str(uuid.uuid4())
+    start_time = datetime.now()
+    
     # Save quiz metadata
     quiz_meta = {
         "quiz_id": quiz_id,
@@ -1068,8 +1206,10 @@ def prepare_quiz(student_id: str, payload: PrepareQuizRequest):
         "difficulty": payload.difficulty,
         "time_limit_minutes": time_limit_minutes,
         "time_limit_seconds": time_limit_seconds,
-        "created_time": datetime.now().isoformat(),
+        "created_time": start_time.isoformat(),
         "answer_key": answer_key,  # Store answer key in metadata
+        "session_token": session_token,  # Session token for this quiz attempt
+        "session_start_time": start_time.isoformat(),  # When quiz was started
     }
     
     # Save quiz files
@@ -1096,6 +1236,8 @@ def prepare_quiz(student_id: str, payload: PrepareQuizRequest):
         "num_questions": len(questions),
         "time_limit_minutes": time_limit_minutes,
         "time_limit_seconds": time_limit_seconds,
+        "session_token": session_token,  # Return session token
+        "session_start_time": start_time.isoformat(),  # Return start time
         "questions": questions_for_frontend,  # No answers!
     }
 
@@ -1153,12 +1295,17 @@ def get_quiz(quiz_id: str):
 @app.post("/students/{student_id}/submit-quiz")
 def submit_quiz(student_id: str, payload: SubmitQuizRequest):
     """
-    Submit quiz responses.
+    Submit quiz responses with time limit enforcement.
     
     If quiz_id is provided, uses that quiz's answer key.
     Otherwise, falls back to student_id-based answer key (backward compatibility).
+    
+    Validates session token and time limit.
     """
     answer_key = {}
+    meta = {}
+    time_limit_seconds = None
+    session_start_time = None
     
     # Try to load from quiz_id first (if provided in payload)
     if payload.quiz_id:
@@ -1167,6 +1314,65 @@ def submit_quiz(student_id: str, payload: SubmitQuizRequest):
             with open(meta_file, "r", encoding="utf-8") as f:
                 meta = json.load(f)
                 answer_key = meta.get("answer_key", {})
+                time_limit_seconds = meta.get("time_limit_seconds")
+                session_start_time_str = meta.get("session_start_time")
+                
+                # Validate session token if provided
+                if payload.session_token:
+                    expected_token = meta.get("session_token")
+                    if payload.session_token != expected_token:
+                        raise HTTPException(
+                            status_code=403,
+                            detail="Invalid session token. Quiz session may have expired or been invalidated."
+                        )
+                
+                # Validate time limit if session start time is available
+                if session_start_time_str and time_limit_seconds:
+                    try:
+                        from datetime import datetime, timezone
+                        session_start_time = datetime.fromisoformat(session_start_time_str)
+                        current_time = datetime.now(timezone.utc) if session_start_time.tzinfo else datetime.now()
+                        if session_start_time.tzinfo:
+                            current_time = datetime.now(timezone.utc)
+                        else:
+                            current_time = datetime.now()
+                        
+                        elapsed_seconds = (current_time - session_start_time).total_seconds()
+                        
+                        if elapsed_seconds > time_limit_seconds:
+                            # Time expired - reject submission
+                            raise HTTPException(
+                                status_code=400,
+                                detail=f"Quiz time limit exceeded. Time limit: {time_limit_seconds}s, Elapsed: {elapsed_seconds:.1f}s"
+                            )
+                    except Exception as e:
+                        if isinstance(e, HTTPException):
+                            raise
+                        # If time parsing fails, log but don't block (graceful degradation)
+                        pass
+                
+                # Log violations if provided
+                if payload.violations:
+                    violations_file = os.path.join("output", "quizzes", f"{payload.quiz_id}_violations.json")
+                    violations_data = {
+                        "quiz_id": payload.quiz_id,
+                        "student_id": student_id,
+                        "violations": payload.violations,
+                        "timestamp": datetime.now().isoformat(),
+                    }
+                    try:
+                        if os.path.exists(violations_file):
+                            with open(violations_file, "r", encoding="utf-8") as f:
+                                existing = json.load(f)
+                                if "violation_logs" not in existing:
+                                    existing["violation_logs"] = []
+                                existing["violation_logs"].append(violations_data)
+                                violations_data = existing
+                        with open(violations_file, "w", encoding="utf-8") as f:
+                            json.dump(violations_data, f, indent=2, ensure_ascii=False)
+                    except Exception:
+                        # Log violations but don't fail submission
+                        pass
     
     # Fallback to student_id-based answer key (backward compatibility)
     if not answer_key:
@@ -1180,33 +1386,193 @@ def submit_quiz(student_id: str, payload: SubmitQuizRequest):
     total = len(payload.responses)
     correct = 0
     per_question = []
+    
+    # Load questions to get skill information
+    questions_file = None
+    if payload.quiz_id:
+        questions_file = os.path.join("output", "quizzes", f"{payload.quiz_id}_questions.json")
+    
+    questions_data = []
+    if questions_file and os.path.exists(questions_file):
+        with open(questions_file, "r", encoding="utf-8") as f:
+            questions_data = json.load(f)
+    
+    # Create question lookup dict
+    question_lookup = {str(q.get("QuestionID", "")): q for q in questions_data}
 
+    # Score each response
+    skill_stats = {}  # Track per-skill statistics
+    
     for r in payload.responses:
         qid = str(r.question_id)
         gold = str(answer_key.get(qid, "")).upper()
         picked = str(r.selected_option).upper()
+        response_time = r.get("response_time_seconds", 0.0)
 
         is_correct = picked == gold and gold in ["A", "B", "C", "D"]
         if is_correct:
             correct += 1
 
+        # Get question details
+        question_info = question_lookup.get(qid, {})
+        skill = question_info.get("Skill") or question_info.get("SelectedSkill") or "Unknown"
+        question_text = question_info.get("QuestionText", "")
+        difficulty = question_info.get("Difficulty", "")
+        
+        # Initialize skill stats if needed
+        if skill not in skill_stats:
+            skill_stats[skill] = {
+                "total": 0,
+                "correct": 0,
+                "total_time": 0.0,
+            }
+        
+        skill_stats[skill]["total"] += 1
+        if is_correct:
+            skill_stats[skill]["correct"] += 1
+        skill_stats[skill]["total_time"] += response_time
+
         per_question.append(
             {
                 "question_id": r.question_id,
+                "question_text": question_text,
+                "skill": skill,
+                "difficulty": difficulty,
                 "selected_option": picked,
                 "correct_option": gold,
                 "is_correct": is_correct,
+                "response_time_seconds": response_time,
             }
         )
-
+    
+    # Calculate overall accuracy
     accuracy = (correct / total) if total else 0.0
+    
+    # Calculate per-skill accuracy
+    per_skill_results = []
+    for skill, stats in skill_stats.items():
+        skill_accuracy = (stats["correct"] / stats["total"]) if stats["total"] > 0 else 0.0
+        avg_time = (stats["total_time"] / stats["total"]) if stats["total"] > 0 else 0.0
+        
+        per_skill_results.append({
+            "skill": skill,
+            "total_questions": stats["total"],
+            "correct_answers": stats["correct"],
+            "accuracy": skill_accuracy,
+            "avg_response_time_seconds": avg_time,
+        })
+    
+    # Save detailed results to CSV
+    results_dir = os.path.join("output", "quizzes")
+    os.makedirs(results_dir, exist_ok=True)
+    
+    # Save quiz_results_scored.csv (detailed results per question)
+    detailed_results = []
+    for pq in per_question:
+        detailed_results.append({
+            "StudentID": student_id,
+            "QuizID": payload.quiz_id or "unknown",
+            "QuestionID": pq["question_id"],
+            "QuestionText": pq.get("question_text", ""),
+            "Skill": pq.get("skill", ""),
+            "Difficulty": pq.get("difficulty", ""),
+            "SelectedOption": pq["selected_option"],
+            "CorrectOption": pq["correct_option"],
+            "IsCorrect": pq["is_correct"],
+            "ResponseTimeSeconds": pq.get("response_time_seconds", 0.0),
+        })
+    
+    if detailed_results:
+        detailed_df = pd.DataFrame(detailed_results)
+        results_scored_path = os.path.join("output", "quiz_results_scored.csv")
+        
+        # Append to file if exists, otherwise create new
+        if os.path.exists(results_scored_path):
+            try:
+                existing_df = pd.read_csv(results_scored_path)
+                combined_df = pd.concat([existing_df, detailed_df], ignore_index=True)
+                combined_df.to_csv(results_scored_path, index=False)
+            except Exception:
+                detailed_df.to_csv(results_scored_path, index=False)
+        else:
+            detailed_df.to_csv(results_scored_path, index=False)
+    
+    # Save skill_quiz_updates.csv (per-skill aggregated results)
+    if per_skill_results:
+        skill_updates = []
+        for skill_result in per_skill_results:
+            skill_updates.append({
+                "StudentID": student_id,
+                "QuizID": payload.quiz_id or "unknown",
+                "Skill": skill_result["skill"],
+                "NumQuestions": skill_result["total_questions"],
+                "NumCorrect": skill_result["correct_answers"],
+                "QuizProficiency": skill_result["accuracy"],  # Proficiency = accuracy
+                "AvgResponseTimeSeconds": skill_result["avg_response_time_seconds"],
+            })
+        
+        skill_updates_df = pd.DataFrame(skill_updates)
+        skill_updates_path = os.path.join("output", "skill_quiz_updates.csv")
+        
+        # Append to file if exists, otherwise create new
+        if os.path.exists(skill_updates_path):
+            try:
+                existing_df = pd.read_csv(skill_updates_path)
+                # Remove old entries for this student+quiz combination
+                existing_df = existing_df[
+                    ~((existing_df["StudentID"] == student_id) & 
+                      (existing_df["QuizID"] == (payload.quiz_id or "unknown")))
+                ]
+                combined_df = pd.concat([existing_df, skill_updates_df], ignore_index=True)
+                combined_df.to_csv(skill_updates_path, index=False)
+            except Exception:
+                skill_updates_df.to_csv(skill_updates_path, index=False)
+        else:
+            skill_updates_df.to_csv(skill_updates_path, index=False)
+    
+    # Trigger skill profile fusion after quiz scoring
+    try:
+        from src.skill_profile_fusion import fuse_profiles, load_skill_profiles, load_quiz_updates
+        
+        # Try to load skill profile (prefer parsed_single, fallback to explainable)
+        parsed_single_path = os.path.join("output", "skill_profile_parsed_single.csv")
+        explainable_path = os.path.join("output", "skill_profiles_explainable.csv")
+        
+        base_path = None
+        if os.path.exists(parsed_single_path):
+            base_path = parsed_single_path
+        elif os.path.exists(explainable_path):
+            base_path = explainable_path
+        
+        if base_path:
+            try:
+                base_df = load_skill_profiles(base_path)
+                quiz_df = load_quiz_updates(skill_updates_path)
+                fused_df = fuse_profiles(base_df, quiz_df)
+                
+                # Save fused profile
+                fused_path = os.path.join("output", "skill_profiles_with_quiz.csv")
+                fused_df.to_csv(fused_path, index=False)
+            except Exception as e:
+                # Log but don't fail quiz submission if fusion fails
+                print(f"Warning: Skill fusion failed: {e}")
+        else:
+            print("Warning: No skill profile found for fusion. Skipping fusion step.")
+    except ImportError:
+        # If fusion module not available, skip silently
+        pass
+    except Exception as e:
+        # Log but don't fail quiz submission
+        print(f"Warning: Skill fusion error: {e}")
 
     return {
         "student_id": student_id,
+        "quiz_id": payload.quiz_id,
         "total_answered": total,
         "correct": correct,
         "accuracy": accuracy,
         "per_question": per_question,
+        "per_skill": per_skill_results,  # Add per-skill results
     }
 
 

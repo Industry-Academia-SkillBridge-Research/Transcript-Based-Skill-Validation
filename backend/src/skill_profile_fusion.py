@@ -13,15 +13,24 @@ def load_skill_profiles(path: str) -> pd.DataFrame:
     """
     Load baseline transcript-derived skill profile.
 
-    Expected columns (from skill_aggregation_explainable.py):
-      StudentID, Skill, EvidenceCount, TotalContribution,
-      ScoreNormalized, SkillLevel
+    Supports multiple formats:
+    - skill_profiles_explainable.csv (batch format)
+    - skill_profile_parsed_single.csv (single student format)
+    - skill_profile_{student_id}.csv (per-student format)
+
+    Expected columns:
+      StudentID, Skill, EvidenceCount (optional), ScoreNormalized, SkillLevel (optional)
     """
     df = pd.read_csv(path)
     required = {"StudentID", "Skill", "ScoreNormalized"}
     missing = required - set(df.columns)
     if missing:
         raise ValueError(f"Skill profile file missing columns: {missing}")
+    
+    # Ensure StudentID is string for consistent merging
+    df["StudentID"] = df["StudentID"].astype(str).str.strip()
+    df["Skill"] = df["Skill"].astype(str).str.strip()
+    
     return df
 
 
@@ -29,16 +38,17 @@ def load_quiz_updates(path: str) -> pd.DataFrame:
     """
     Load aggregated quiz proficiency per (StudentID, Skill).
 
-    Expected columns (from quiz_scoring.py):
+    Expected columns (from quiz_scoring.py or API submission):
       StudentID, Skill, NumQuestions, NumCorrect,
-      NumIncorrect, AvgEffectiveScore, QuizProficiency
+      QuizProficiency (required)
+    
+    Also supports optional: AvgResponseTimeSeconds, QuizID
     """
     if not os.path.exists(path):
         print(f"[WARN] Quiz updates file not found: {path}")
         return pd.DataFrame(columns=[
             "StudentID", "Skill", "NumQuestions",
-            "NumCorrect", "NumIncorrect",
-            "AvgEffectiveScore", "QuizProficiency",
+            "NumCorrect", "QuizProficiency",
         ])
 
     df = pd.read_csv(path)
@@ -50,6 +60,18 @@ def load_quiz_updates(path: str) -> pd.DataFrame:
     missing = required - set(df.columns)
     if missing:
         raise ValueError(f"Quiz updates file missing columns: {missing}")
+    
+    # Ensure StudentID and Skill are strings for consistent merging
+    df["StudentID"] = df["StudentID"].astype(str).str.strip()
+    df["Skill"] = df["Skill"].astype(str).str.strip()
+    
+    # Ensure NumQuestions exists (may be missing in old format)
+    if "NumQuestions" not in df.columns:
+        # Try to infer from NumCorrect + NumIncorrect or use default
+        if "NumCorrect" in df.columns:
+            df["NumQuestions"] = df["NumCorrect"]  # Approximation
+        else:
+            df["NumQuestions"] = 3  # Default assumption
 
     return df
 

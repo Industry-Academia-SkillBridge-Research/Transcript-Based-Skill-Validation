@@ -154,8 +154,10 @@ function SkillCard({ skill, index, isSelected, onToggle }) {
 
   return (
     <div 
-      className={`bg-white rounded-xl border-2 shadow-sm hover:shadow-md transition-all p-6 cursor-pointer ${
-        isSelected ? "border-blue-500 bg-blue-50" : "border-slate-200 hover:border-blue-300"
+      className={`bg-white rounded-2xl border-2 shadow-lg hover:shadow-2xl transition-all duration-300 p-6 cursor-pointer transform hover:scale-[1.02] ${
+        isSelected 
+          ? "border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50 ring-4 ring-blue-200" 
+          : "border-slate-200 hover:border-blue-300 hover:bg-gradient-to-br hover:from-slate-50 hover:to-blue-50"
       }`}
       onClick={onToggle}
     >
@@ -335,12 +337,12 @@ export default function SkillsPage({ skills, studentName, studentId, onContinue,
   }, [categorizedSkills]);
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="max-w-7xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-8">
         <button
           onClick={onBack}
-          className="flex items-center space-x-2 px-4 py-2 text-slate-600 hover:text-slate-900 hover:bg-white rounded-lg transition-colors"
+          className="flex items-center space-x-2 px-5 py-2.5 text-slate-700 hover:text-slate-900 hover:bg-white rounded-xl transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 font-medium"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -351,9 +353,14 @@ export default function SkillsPage({ skills, studentName, studentId, onContinue,
           {selectedSkills.length > 0 && (
             <button
               onClick={handleGenerateQuiz}
-              className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg hover:shadow-xl"
+              className="px-8 py-3 bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 text-white rounded-xl font-bold hover:from-purple-700 hover:via-pink-700 hover:to-indigo-700 transition-all shadow-xl hover:shadow-2xl transform hover:-translate-y-1 hover:scale-105 text-lg"
             >
-              Generate Quiz ({selectedSkills.length}/5)
+              <span className="flex items-center gap-2">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Generate Quiz ({selectedSkills.length}/5)
+              </span>
             </button>
           )}
           <button

@@ -58,10 +58,16 @@ export function prepareQuiz(studentId, payload = {}) {
   });
 }
 
-export function submitQuiz(studentId, responses, quizId = null) {
+export function submitQuiz(studentId, responses, quizId = null, sessionToken = null, violations = []) {
   const payload = { responses };
   if (quizId) {
     payload.quiz_id = quizId;
+  }
+  if (sessionToken) {
+    payload.session_token = sessionToken;
+  }
+  if (violations && violations.length > 0) {
+    payload.violations = violations;
   }
   return apiFetch(`/students/${encodeURIComponent(studentId)}/submit-quiz`, {
     method: "POST",
