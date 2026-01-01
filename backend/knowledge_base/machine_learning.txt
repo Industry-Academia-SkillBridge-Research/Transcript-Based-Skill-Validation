@@ -1,0 +1,124 @@
+MACHINE LEARNING KNOWLEDGE BASE (FOR QUIZ GENERATION)
+
+1) What machine learning is
+Machine learning builds models that learn patterns from data to make predictions or decisions.
+
+Key terms:
+- feature: input variable (X)
+- label/target: output variable (y)
+- training data: used to fit the model
+- test data: used to evaluate performance on unseen data
+
+2) Types of machine learning
+Supervised learning:
+- training data includes labels
+- tasks: classification and regression
+
+Unsupervised learning:
+- no labels
+- tasks: clustering, dimensionality reduction
+
+Semi-supervised learning:
+- few labeled examples + many unlabeled examples
+
+Reinforcement learning:
+- agent learns through rewards in an environment
+
+3) Classification vs regression
+Classification predicts categories (spam or not spam).
+Regression predicts a numeric value (house price).
+
+4) Train/validation/test split
+A common approach:
+- Train set: fit the model
+- Validation set: tune hyperparameters
+- Test set: final unbiased evaluation
+
+Avoid using the test set to tune the model, to prevent overfitting the evaluation.
+
+5) Overfitting and underfitting
+Overfitting: model learns noise, performs well on training but poorly on test.
+Underfitting: model too simple, performs poorly on both training and test.
+
+Regularization helps reduce overfitting by penalizing complexity.
+
+6) Common models (high-level)
+Linear regression:
+- predicts continuous value using a weighted sum of features
+
+Logistic regression:
+- used for binary classification (outputs probability)
+
+Decision trees:
+- split data based on feature thresholds
+
+Random forest:
+- ensemble of decision trees, reduces variance
+
+K-nearest neighbors (KNN):
+- predicts using nearest data points in feature space
+
+Support vector machines (SVM):
+- finds a boundary with maximum margin (classification)
+
+Naive Bayes:
+- probabilistic model with independence assumption (often used in text classification)
+
+7) Model evaluation metrics
+Classification:
+- accuracy = correct / total
+- precision = TP / (TP + FP)
+- recall = TP / (TP + FN)
+- F1 = harmonic mean of precision and recall
+- confusion matrix: TP, FP, TN, FN
+
+Regression:
+- MAE: mean absolute error
+- MSE: mean squared error
+- RMSE: square root of MSE
+- R-squared: proportion of variance explained
+
+Metric choice depends on the problem. For imbalanced classes, accuracy may be misleading.
+
+8) Feature scaling
+Some algorithms benefit from scaling features (standardization or normalization), such as:
+- KNN
+- SVM
+- gradient-based methods
+
+Tree-based models usually do not require scaling.
+
+9) Cross-validation (concept-level)
+K-fold cross-validation splits data into K folds:
+- train on K-1 folds
+- validate on remaining fold
+Repeat K times and average performance.
+
+This gives a more stable performance estimate.
+
+10) Hyperparameters vs parameters
+Parameters are learned from data (weights in linear regression).
+Hyperparameters are set by the user (k in KNN, tree depth, learning rate).
+
+11) Data preprocessing (common steps)
+- handle missing values
+- encode categorical variables
+- scale numeric features if needed
+- remove duplicates and obvious errors
+- split into train/test properly
+
+12) Common mistakes and pitfalls
+- data leakage: using information from test set during training
+- evaluating on training data only
+- choosing accuracy for highly imbalanced classification
+- not checking baseline performance
+- not controlling randomness (seed)
+
+13) Short concept checks (good for quiz creation)
+- What is overfitting?
+- Difference between classification and regression
+- Why use a train/test split?
+- What is precision vs recall?
+- What is data leakage?
+
+END OF MACHINE LEARNING KNOWLEDGE BASE

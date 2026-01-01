@@ -1,0 +1,31 @@
+QuestionID,Skill,Difficulty,QuestionText,OptionA,OptionB,OptionC,OptionD,CorrectOption
+1,Python,easy,What does range(3) produce when converted to a list?,[1 2 3],[0 1 2],[0 1 2 3],[3],B
+2,Python,easy,Which keyword is used to define a function in Python?,func,def,function,lambda,B
+3,Python,medium,What is the main difference between a list and a tuple in Python?,Tuples are mutable and lists are immutable,Lists are immutable and tuples are mutable,Lists are mutable and tuples are immutable,They are the same type,C
+4,Python,medium,What does the 'is' operator check in Python?,Value equality,Object identity,String length,Type conversion,B
+5,Python,hard,What happens if you access a missing key in a dictionary using d['k']?,Returns None,Returns 0,Raises KeyError,Raises IndexError,C
+6,Python,hard,Which statement best describes list comprehensions?,They create dictionaries only,They provide a compact way to build lists,They are required for loops,They only work with strings,B
+7,SQL,easy,Which clause is used to filter rows in a SELECT query?,GROUP BY,WHERE,ORDER BY,HAVING,B
+8,SQL,easy,Which SQL keyword removes duplicate rows from a result set?,UNIQUE,ONLY,DISTINCT,CLEAN,C
+9,SQL,medium,What does GROUP BY do?,Sorts rows alphabetically,Groups rows to compute aggregates per group,Joins two tables,Deletes duplicate records,B
+10,SQL,medium,When should HAVING be used instead of WHERE?,When filtering columns,When filtering groups after aggregation,When sorting results,When selecting distinct rows,B
+11,SQL,hard,Which JOIN returns all rows from the left table and matching rows from the right table?,INNER JOIN,LEFT JOIN,RIGHT JOIN,FULL JOIN,B
+12,SQL,hard,How should you check for missing values in SQL?,= NULL,!= NULL,IS NULL,NULL(),C
+13,Statistics,easy,Which measure of center is most affected by extreme outliers?,Mean,Median,Mode,Range,A
+14,Statistics,easy,What does a probability of 0 mean?,The event is certain,The event is impossible,The event is likely,The event has equal chance,B
+15,Statistics,medium,Which statement about correlation is correct?,Correlation always implies causation,Correlation measures a relationship but does not imply causation,Correlation only applies to categorical data,Correlation is always positive,B
+16,Statistics,medium,In hypothesis testing what is a Type I error?,Failing to reject a false null hypothesis,Rejecting a true null hypothesis,Accepting a true alternative hypothesis,Using the wrong sample size,B
+17,Statistics,hard,Which description best matches a 95 percent confidence interval method?,There is a 95 percent chance the computed interval contains the true value,Over repeated sampling about 95 percent of intervals computed this way contain the true parameter,The interval always contains the true parameter,It is the same as a p-value,B
+18,Statistics,hard,If A and B are independent events what is P(A and B)?,P(A)+P(B),P(A)-P(B),P(A)*P(B),P(A)/P(B),C
+19,Machine Learning,easy,Which task is an example of classification?,Predicting house price,Predicting whether an email is spam,Predicting temperature tomorrow,Predicting monthly revenue,B
+20,Machine Learning,easy,What is overfitting?,Model performs poorly on training and test,Model performs well on training but poorly on test,Model performs well on test but poorly on training,Model cannot be trained,B
+21,Machine Learning,medium,Why do we split data into train and test sets?,To make the dataset smaller,To evaluate performance on unseen data,To remove outliers,To increase the number of features,B
+22,Machine Learning,medium,Which metric is often misleading for highly imbalanced classes?,Precision,Recall,Accuracy,F1-score,C
+23,Machine Learning,hard,What is data leakage?,Using too many features,Using information from test data during training or preprocessing,Using a small dataset,Using cross-validation,B
+24,Machine Learning,hard,Which models typically do not require feature scaling?,KNN,SVM,Logistic Regression,Decision Trees,D
+25,Data Visualization,easy,Which chart is usually best for showing a trend over time?,Bar chart,Line chart,Pie chart,Box plot,B
+26,Data Visualization,easy,Which chart is best for showing the distribution of a numeric variable?,Histogram,Pie chart,Stacked bar chart,Map,A
+27,Data Visualization,medium,Why can truncated y-axes be misleading in bar charts?,They make bars too colorful,They can exaggerate differences in bar heights,They remove categories,They always hide outliers,B
+28,Data Visualization,medium,Which chart is best for showing the relationship between two numeric variables?,Scatter plot,Histogram,Line chart,Pie chart,A
+29,Data Visualization,hard,Which visual encoding is generally easiest for people to compare accurately?,Angle,Area,Position or length,Texture,C
+30,Data Visualization,hard,When is a heatmap commonly useful?,Showing a single average value,Showing intensity in a matrix like a correlation matrix,Showing only categorical counts,Replacing a table for printing,B
