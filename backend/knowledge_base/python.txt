@@ -1,0 +1,239 @@
+PYTHON KNOWLEDGE BASE (FOR QUIZ GENERATION)
+
+1) Python basics
+Python is a high-level programming language. Python code is organized using indentation rather than braces. A statement block is defined by consistent indentation (commonly 4 spaces).
+Python is dynamically typed, meaning a variable name can refer to values of different types at different times.
+
+Key terms:
+- variable: a name that refers to a value
+- expression: code that produces a value
+- statement: code that performs an action
+
+Example:
+x = 10
+x = "ten"   # allowed in Python (dynamic typing)
+
+2) Data types
+Common built-in types:
+- int: whole numbers (e.g., 3, -2)
+- float: decimal numbers (e.g., 3.14)
+- bool: True or False
+- str: text (e.g., "hello")
+- list: ordered, mutable collection (e.g., [1, 2, 3])
+- tuple: ordered, immutable collection (e.g., (1, 2, 3))
+- dict: key-value mapping (e.g., {"a": 1})
+- set: unordered collection of unique elements (e.g., {1, 2, 3})
+- NoneType: None represents “no value”
+
+Mutability:
+- mutable: list, dict, set
+- immutable: int, float, bool, str, tuple
+
+3) Operators
+Arithmetic:
++  addition
+-  subtraction
+*  multiplication
+/  division (returns float)
+/ / floor division (integer-like division)
+%  modulus (remainder)
+** exponentiation
+
+Comparison:
+== equal
+!= not equal
+<  less than
+<= less or equal
+>  greater than
+>= greater or equal
+
+Logical:
+and, or, not
+
+Membership:
+in, not in
+
+Identity:
+is, is not
+Use "is" for identity (same object), not for value equality.
+
+Example:
+a = [1, 2]
+b = [1, 2]
+a == b  # True (same values)
+a is b  # False (different objects)
+
+4) Control flow
+If statement:
+if condition:
+    ...
+elif other_condition:
+    ...
+else:
+    ...
+
+For loop iterates over an iterable:
+for item in iterable:
+    ...
+
+While loop repeats while condition is True:
+while condition:
+    ...
+
+Common loop tools:
+- range(n): generates 0..n-1
+- break: exit loop
+- continue: skip to next iteration
+
+Example:
+for i in range(3):
+    print(i)
+# outputs: 0 1 2
+
+5) Functions
+A function is defined using def.
+Parameters receive values when calling a function.
+A function can return a value using return.
+
+Example:
+def add(a, b):
+    return a + b
+
+Default parameters:
+def greet(name="User"):
+    return "Hello " + name
+
+6) Scope (LEGB rule)
+Python resolves names using:
+- Local
+- Enclosing
+- Global
+- Built-in
+
+A variable assigned inside a function is local unless declared global.
+
+Example:
+x = 5
+def f():
+    x = 10  # local x
+    return x
+
+7) Collections
+Lists:
+- ordered and mutable
+- indexing starts at 0
+- supports append, remove, slicing
+
+Example:
+nums = [10, 20, 30]
+nums.append(40)
+nums[0] = 99
+
+Tuples:
+- ordered and immutable
+- useful for fixed collections
+
+Dicts:
+- map keys to values
+- keys must be hashable (immutable types like str, int, tuple)
+
+Example:
+d = {"name": "Ana", "age": 20}
+d["age"] = 21
+
+Sets:
+- unique elements
+- useful for membership testing and removing duplicates
+
+8) Strings
+Strings are immutable.
+Common operations:
+- concatenation: "a" + "b"
+- repetition: "ha" * 3
+- indexing and slicing
+- methods: lower(), upper(), strip(), split(), replace()
+
+f-strings for formatting:
+name = "Sam"
+msg = f"Hello {name}"
+
+9) Exceptions
+Errors during runtime raise exceptions.
+Use try/except to handle them.
+
+Example:
+try:
+    x = int("abc")
+except ValueError:
+    x = 0
+
+Common exceptions:
+- ValueError: invalid value conversion
+- TypeError: invalid operation between types
+- KeyError: missing dict key
+- IndexError: list index out of range
+- ZeroDivisionError: divide by zero
+
+10) File handling
+Open files with open().
+Use "with" to ensure the file is closed.
+
+Example:
+with open("data.txt", "r", encoding="utf-8") as f:
+    text = f.read()
+
+Modes:
+- "r": read
+- "w": write (overwrite)
+- "a": append
+
+11) List comprehensions
+A compact way to build lists.
+
+Example:
+squares = [x*x for x in range(5)]
+# [0, 1, 4, 9, 16]
+
+With filtering:
+evens = [x for x in range(10) if x % 2 == 0]
+
+12) Modules and imports
+Code can be organized into modules.
+Import examples:
+import math
+from math import sqrt
+import pandas as pd
+
+When you import a module, Python searches paths listed in sys.path.
+
+13) Common data science libraries (concept-level)
+NumPy: numerical arrays and vectorized operations.
+Pandas: tables (DataFrames), CSV reading, data cleaning.
+Matplotlib: plotting.
+Scikit-learn: machine learning utilities (train/test split, models, metrics).
+
+Typical workflow:
+- read data
+- clean data
+- split into train/test
+- train model
+- evaluate model
+
+14) Common mistakes and pitfalls
+- Using "is" instead of "==" for value comparison
+- Forgetting indentation rules
+- Modifying a list while iterating over it
+- Confusing list and tuple mutability
+- KeyError when accessing missing dict keys: use d.get("key")
+
+Example:
+value = d.get("missing_key", 0)
+
+15) Short concept checks (good for quiz creation)
+- What does range(5) produce?
+- Difference between list and tuple
+- When to use try/except
+- Difference between == and is
+- What happens when dividing integers with / in Python
+
+END OF PYTHON KNOWLEDGE BASE

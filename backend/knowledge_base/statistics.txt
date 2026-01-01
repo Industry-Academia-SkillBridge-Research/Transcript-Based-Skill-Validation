@@ -1,0 +1,136 @@
+STATISTICS KNOWLEDGE BASE (FOR QUIZ GENERATION)
+
+1) What statistics is
+Statistics is the study of collecting, summarizing, analyzing, and interpreting data.
+Two broad branches:
+- Descriptive statistics: summarize data (mean, median, charts)
+- Inferential statistics: draw conclusions about a population based on a sample
+
+Key terms:
+- population: entire group of interest
+- sample: subset of the population
+- parameter: true population value (often unknown)
+- statistic: value computed from a sample
+
+2) Types of data
+- categorical (qualitative): labels or categories (gender, color)
+- numerical (quantitative): numbers
+
+Quantitative types:
+- discrete: countable (number of visits)
+- continuous: measurable (height, time)
+
+Measurement scales:
+- nominal: categories, no order
+- ordinal: order exists, gaps not meaningful
+- interval: equal gaps, no true zero (Celsius)
+- ratio: equal gaps, true zero (weight)
+
+3) Measures of center
+- mean: average (sum / count)
+- median: middle value when sorted
+- mode: most frequent value
+
+Mean is sensitive to outliers.
+Median is more robust for skewed data.
+
+4) Measures of spread
+- range: max - min
+- variance: average squared deviation from mean (sample variance uses n-1)
+- standard deviation: square root of variance
+- IQR: interquartile range = Q3 - Q1 (robust spread)
+
+Outlier rule (common):
+- values < Q1 - 1.5*IQR or > Q3 + 1.5*IQR may be considered outliers
+
+5) Probability basics
+Probability is between 0 and 1.
+If events are mutually exclusive:
+P(A or B) = P(A) + P(B)
+
+Complement:
+P(not A) = 1 - P(A)
+
+Independence:
+If A and B are independent:
+P(A and B) = P(A) * P(B)
+
+Conditional probability:
+P(A|B) = P(A and B) / P(B), when P(B) > 0
+
+6) Random variables and distributions
+A random variable maps outcomes to numbers.
+
+Common distributions:
+- Bernoulli: single trial, success/failure
+- Binomial: number of successes in n independent trials
+- Normal: symmetric, bell-shaped (mean and standard deviation define it)
+- Uniform: equal probability over an interval (continuous case)
+- Poisson: counts events in fixed interval with average rate
+
+Normal distribution facts:
+- Mean = median = mode (for perfect normal)
+- About 68% within 1 standard deviation of mean
+- About 95% within 2 standard deviations
+- About 99.7% within 3 standard deviations
+
+7) Sampling and bias
+Good sampling aims to represent the population.
+Common issues:
+- selection bias
+- non-response bias
+- convenience sampling
+
+Larger samples usually reduce random sampling error, but do not fix bias.
+
+8) Confidence intervals (concept-level)
+A confidence interval estimates a population parameter with uncertainty.
+Interpretation: Over many repeated samples, a 95% confidence interval method would capture the true parameter about 95% of the time.
+It does not mean a 95% probability the true value lies in a particular computed interval.
+
+9) Hypothesis testing (concept-level)
+Hypothesis testing compares two statements:
+- Null hypothesis (H0): no effect / no difference
+- Alternative hypothesis (H1): effect / difference exists
+
+Steps:
+1) Choose significance level alpha (often 0.05)
+2) Compute test statistic and p-value
+3) If p-value <= alpha, reject H0
+4) Otherwise, fail to reject H0
+
+Type I error: reject H0 when H0 is true (false positive)
+Type II error: fail to reject H0 when H0 is false (false negative)
+Power: probability of rejecting H0 when H0 is false (1 - Type II error)
+
+10) Correlation and covariance
+Covariance indicates whether two variables move together.
+Correlation is standardized covariance, ranges from -1 to +1.
+
+Correlation does not imply causation.
+
+11) Common statistical tests (high-level)
+- t-test: compare means (two groups)
+- chi-square test: association between categorical variables
+- ANOVA: compare means across more than two groups
+
+Choice depends on:
+- variable types
+- sample size
+- assumptions (normality, equal variance)
+
+12) Common mistakes and pitfalls
+- confusing correlation with causation
+- misinterpreting confidence intervals
+- p-value misuse (p-value is not the probability H0 is true)
+- ignoring outliers and skewness
+- using mean for heavily skewed distributions without caution
+
+13) Short concept checks (good for quiz creation)
+- Mean vs median: when is each preferred?
+- What does p-value represent?
+- What is Type I error?
+- What is a confidence interval?
+- What does correlation measure?
+
+END OF STATISTICS KNOWLEDGE BASE

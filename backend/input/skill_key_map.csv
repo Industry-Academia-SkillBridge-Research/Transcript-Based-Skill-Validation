@@ -1,0 +1,18 @@
+pattern,skill_key
+java,Java
+sql,SQL
+database,SQL
+jdbc,SQL
+odbc,SQL
+python,Python
+statistics,Statistics
+probability,Statistics
+hypothesis,Statistics
+machine learning,MachineLearning
+neural,MachineLearning
+classification,MachineLearning
+regression,MachineLearning
+visualization,DataVisualization
+visualisation,DataVisualization
+chart,DataVisualization
+plot,DataVisualization

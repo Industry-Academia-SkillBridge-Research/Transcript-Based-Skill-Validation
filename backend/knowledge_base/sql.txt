@@ -1,0 +1,161 @@
+SQL KNOWLEDGE BASE (FOR QUIZ GENERATION)
+
+1) What SQL is
+SQL (Structured Query Language) is used to manage and query data stored in relational databases. Data is organized into tables (relations) with rows (records) and columns (fields).
+
+Key ideas:
+- A table has columns (attributes) and rows (tuples).
+- A primary key uniquely identifies each row.
+- A foreign key references a primary key in another table.
+
+2) Basic SELECT queries
+SELECT chooses columns, FROM chooses table, WHERE filters rows.
+
+Example:
+SELECT name, age
+FROM Students
+WHERE age >= 21;
+
+Common clauses:
+- DISTINCT removes duplicates
+- ORDER BY sorts results (ASC default, or DESC)
+- LIMIT restricts number of rows returned (syntax depends on DB)
+
+Example:
+SELECT DISTINCT department
+FROM Employees
+ORDER BY department ASC;
+
+3) Filtering with WHERE
+Common operators:
+=, !=, <, <=, >, >=
+AND, OR, NOT
+IN, BETWEEN, LIKE
+IS NULL, IS NOT NULL
+
+LIKE patterns:
+- % matches any sequence of characters
+- _ matches exactly one character
+
+Example:
+SELECT *
+FROM Products
+WHERE name LIKE 'Pro%';
+
+NULL behavior:
+NULL means unknown or missing. Comparisons with NULL using = do not work.
+Use IS NULL / IS NOT NULL.
+
+4) Aggregation and GROUP BY
+Aggregate functions:
+- COUNT(*) counts rows
+- COUNT(col) counts non-NULL values in col
+- SUM(col), AVG(col), MIN(col), MAX(col)
+
+GROUP BY groups rows to compute aggregates per group.
+
+Example:
+SELECT department, COUNT(*) AS num_employees
+FROM Employees
+GROUP BY department;
+
+HAVING filters groups (after grouping), while WHERE filters rows (before grouping).
+
+Example:
+SELECT department, COUNT(*) AS num_employees
+FROM Employees
+GROUP BY department
+HAVING COUNT(*) >= 10;
+
+5) Joins
+A JOIN combines rows from two tables using a related column.
+
+Common join types:
+- INNER JOIN: only matching rows in both tables
+- LEFT JOIN: all rows from left table, matches from right (NULL if no match)
+- RIGHT JOIN: all rows from right table (not supported in all DBs)
+- FULL OUTER JOIN: all rows from both tables (NULL where no match)
+
+Example:
+SELECT o.order_id, c.customer_name
+FROM Orders o
+INNER JOIN Customers c
+ON o.customer_id = c.customer_id;
+
+6) Set operations
+These combine results of queries:
+- UNION: combines and removes duplicates
+- UNION ALL: combines and keeps duplicates
+- INTERSECT: rows common to both (not in all DBs)
+- EXCEPT/MINUS: rows in first but not second (name depends on DB)
+
+7) Subqueries
+A subquery is a query inside another query.
+
+Example:
+SELECT name
+FROM Students
+WHERE id IN (
+  SELECT student_id
+  FROM Enrollments
+  WHERE course_code = 'CS101'
+);
+
+Subqueries can appear in WHERE, FROM, or SELECT.
+
+8) Views
+A view is a saved query that behaves like a virtual table.
+
+Example:
+CREATE VIEW ActiveStudents AS
+SELECT *
+FROM Students
+WHERE status = 'active';
+
+9) Constraints (data integrity)
+Common constraints:
+- PRIMARY KEY: unique + not null
+- FOREIGN KEY: enforces relationship to another table
+- UNIQUE: values must be unique
+- NOT NULL: disallow NULL
+- CHECK: enforce a condition (DB support varies)
+
+10) Normalization (concept-level)
+Normalization reduces duplication and improves data integrity.
+Common forms:
+- 1NF: atomic values, no repeating groups
+- 2NF: no partial dependency on part of a composite key
+- 3NF: no transitive dependency (non-key depends only on key)
+
+11) Transactions (ACID concept-level)
+Transactions group operations into a single unit.
+ACID:
+- Atomicity: all or nothing
+- Consistency: rules preserved
+- Isolation: transactions do not interfere (as defined by isolation level)
+- Durability: committed changes persist
+
+Basic commands:
+BEGIN/START TRANSACTION
+COMMIT
+ROLLBACK
+
+12) Indexes (concept-level)
+An index speeds up lookups on columns, at the cost of extra storage and slower writes.
+Indexes are helpful for columns often used in WHERE and JOIN conditions.
+
+13) Common mistakes and pitfalls
+- Using WHERE with aggregates instead of HAVING
+- Forgetting JOIN condition (creates a Cartesian product)
+- Assuming NULL behaves like a normal value
+- COUNT(col) ignoring NULL values
+- Using INNER JOIN when LEFT JOIN is needed
+
+14) Short concept checks (good for quiz creation)
+- Difference between WHERE and HAVING
+- What does LEFT JOIN return when there is no match?
+- How to filter NULL values
+- What does GROUP BY do?
+- Difference between UNION and UNION ALL
+
+END OF SQL KNOWLEDGE BASE

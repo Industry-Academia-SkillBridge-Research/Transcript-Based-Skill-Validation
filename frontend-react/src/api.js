@@ -1,5 +1,6 @@
 // src/api.js
 const API_BASE = (import.meta.env.VITE_API_BASE || "http://127.0.0.1:8000").replace(/\/$/, "");
+console.log("API_BASE =", API_BASE);
 
 async function parseErrorResponse(res) {
   const text = await res.text();

@@ -1,0 +1,96 @@
+DATA VISUALIZATION KNOWLEDGE BASE (FOR QUIZ GENERATION)
+
+1) What data visualization is
+Data visualization uses charts and graphs to communicate patterns, trends, comparisons, and relationships in data.
+A good visualization is clear, accurate, and suited to the data type and question.
+
+2) Common chart types and when to use them
+Bar chart:
+- compare categories (counts or values)
+- good for discrete categories
+
+Line chart:
+- show trends over time (time series)
+- good for continuous time axis
+
+Scatter plot:
+- show relationship between two numeric variables
+- can reveal correlation, clusters, outliers
+
+Histogram:
+- show distribution of a numeric variable by bins
+- good for understanding shape (skewness, spread)
+
+Box plot:
+- show median, quartiles, and outliers
+- good for comparing distributions across groups
+
+Pie chart:
+- shows parts of a whole
+- often discouraged if many categories or small differences (hard to compare)
+
+Heatmap:
+- show intensity for matrix-like data (correlation matrix, confusion matrix)
+
+3) Choosing the right chart
+Match chart to question:
+- comparison: bar chart
+- trend: line chart
+- relationship: scatter plot
+- distribution: histogram/box plot
+- composition: stacked bar or carefully used pie chart
+
+4) Visual encodings
+Visual encodings include:
+- position (strongest for comparison)
+- length
+- angle
+- area
+- color intensity
+
+Position and length are usually easier to compare than area or angle.
+
+5) Scales and axes
+- Use appropriate axis scaling (linear vs logarithmic)
+- Be careful with truncated axes on bar charts (can mislead)
+- Label axes clearly with units
+- Use consistent scales when comparing charts
+
+6) Color usage
+Color can highlight groups or emphasize key points.
+Good practices:
+- use limited colors
+- ensure readability
+- consider color blindness (avoid relying only on red/green)
+- use legends when needed
+
+7) Good chart hygiene
+- clear title describing what is shown
+- axis labels and units
+- avoid clutter (too many gridlines, too many labels)
+- avoid 3D charts for basic comparisons (can distort perception)
+- annotate important points if needed
+
+8) Dashboards (concept-level)
+A dashboard combines multiple visualizations to give an overview.
+Good dashboards:
+- show key metrics first
+- keep consistent layout
+- allow filtering where appropriate
+- avoid information overload
+
+9) Common mistakes and pitfalls
+- using a pie chart for too many categories
+- using 3D effects that distort values
+- missing axis labels or units
+- choosing wrong chart type (line chart for categories)
+- misleading scales (truncated bars)
+
+10) Short concept checks (good for quiz creation)
+- Best chart for trend over time
+- Best chart for distribution
+- Why avoid truncated axes in bar charts?
+- What chart shows relationship between two numeric variables?
+- When is a heatmap useful?
+
+END OF DATA VISUALIZATION KNOWLEDGE BASE
