@@ -5,9 +5,13 @@ import {
   prepareQuiz,
   submitQuiz,
   uploadTranscript,
+  uploadTranscriptAuto,
   getSkillEvidence,
   getRoleEvidence,
 } from "./api";
+import FileUpload from "./components/FileUpload";
+import TranscriptDetailsPage from "./components/TranscriptDetailsPage";
+import SkillsPage from "./components/SkillsPage";
 
 function classNames(...xs) {
   return xs.filter(Boolean).join(" ");
@@ -136,9 +140,13 @@ export default function App() {
   const [studentId, setStudentId] = useState("IT21013928");
   const [regNo, setRegNo] = useState("");
   const [file, setFile] = useState(null);
+  const [transcriptUploaded, setTranscriptUploaded] = useState(false);
+  const [showTranscriptDetails, setShowTranscriptDetails] = useState(false);
+  const [showSkillsPage, setShowSkillsPage] = useState(false);
 
   const [transcriptDetails, setTranscriptDetails] = useState(null);
   const [transcriptCourses, setTranscriptCourses] = useState([]);
+  const [uploadedSkills, setUploadedSkills] = useState([]);
 
   const [skillsResp, setSkillsResp] = useState(null);
   const [rolesResp, setRolesResp] = useState(null);
@@ -202,19 +210,30 @@ export default function App() {
     }
 
     await safeRun(async () => {
-      const out = await uploadTranscript(studentId.trim(), file, regNo);
+      // Use auto-upload endpoint that extracts student ID from transcript
+      const out = await uploadTranscriptAuto(file, null);
+      
+      // Extract student ID from response and update state
+      const extractedStudentId = out.student_id || out.transcript_details?.student_id || "";
+      if (extractedStudentId) {
+        setStudentId(extractedStudentId);
+      }
 
       setTranscriptDetails(out.transcript_details || null);
       setTranscriptCourses(out.courses || []);
+      setUploadedSkills(out.skills || []);
 
-      const s = await getSkills(studentId.trim());
-      setSkillsResp(s);
+      const finalStudentId = extractedStudentId || studentId.trim();
+      if (finalStudentId) {
+        const s = await getSkills(finalStudentId);
+        setSkillsResp(s);
 
-      try {
-        const r = await getRoles(studentId.trim());
-        setRolesResp(r);
-      } catch {
-        setRolesResp(null);
+        try {
+          const r = await getRoles(finalStudentId);
+          setRolesResp(r);
+        } catch {
+          setRolesResp(null);
+        }
       }
 
       setQuiz(null);
@@ -222,6 +241,9 @@ export default function App() {
 
       // NEW: clear selection after a new upload
       setSelectedSkills([]);
+      
+      // Show transcript details page first
+      setShowTranscriptDetails(true);
     });
   };
 
@@ -319,35 +341,37 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
-          <div>
-            <div className="text-2xl font-bold text-slate-900">Transcript-Based Skill Validation</div>
-            <div className="text-slate-600 mt-1">
-              Upload transcript → View modules → Select skills → Quiz validation → Role recommendations
+        {transcriptUploaded && (
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+            <div>
+              <div className="text-2xl font-bold text-slate-900">Transcript-Based Skill Validation</div>
+              <div className="text-slate-600 mt-1">
+                Upload transcript → View modules → Select skills → Quiz validation → Role recommendations
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                className="px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-60"
+                onClick={onOpenXai}
+                disabled={busy}
+                title="Show explainability panel"
+              >
+                Explain (XAI)
+              </button>
+              <a
+                className="px-4 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50"
+                href="http://127.0.0.1:8000/docs"
+                target="_blank"
+                rel="noreferrer"
+              >
+                API Docs
+              </a>
             </div>
           </div>
-
-          <div className="flex gap-2">
-            <button
-              className="px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-60"
-              onClick={onOpenXai}
-              disabled={busy}
-              title="Show explainability panel"
-            >
-              Explain (XAI)
-            </button>
-            <a
-              className="px-4 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50"
-              href="http://127.0.0.1:8000/docs"
-              target="_blank"
-              rel="noreferrer"
-            >
-              API Docs
-            </a>
-          </div>
-        </div>
+        )}
 
         {error ? (
           <div className="mb-6 p-3 rounded-lg border border-red-200 bg-red-50 text-red-800 text-sm">
@@ -355,52 +379,123 @@ export default function App() {
           </div>
         ) : null}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-1 space-y-6">
+        {/* Show skills page */}
+        {showSkillsPage && uploadedSkills.length > 0 ? (
+          <SkillsPage
+            skills={uploadedSkills}
+            studentName={transcriptDetails?.candidate_name || transcriptDetails?.name}
+            studentId={studentId}
+            onContinue={() => {
+              setShowSkillsPage(false);
+              setTranscriptUploaded(true);
+            }}
+            onBack={() => {
+              setShowSkillsPage(false);
+              setShowTranscriptDetails(true);
+            }}
+          />
+        ) : showTranscriptDetails && transcriptDetails ? (
+          /* Show transcript details page after upload */
+          <TranscriptDetailsPage
+            details={transcriptDetails}
+            courses={transcriptCourses}
+            studentId={studentId}
+            onContinue={() => {
+              setShowTranscriptDetails(false);
+              setTranscriptUploaded(true);
+            }}
+            onViewSkills={() => {
+              setShowTranscriptDetails(false);
+              setShowSkillsPage(true);
+            }}
+            onBack={() => {
+              setShowTranscriptDetails(false);
+              setFile(null);
+              setTranscriptDetails(null);
+              setTranscriptCourses([]);
+              setUploadedSkills([]);
+            }}
+          />
+        ) : !transcriptUploaded ? (
+          /* Show only upload form if transcript not uploaded yet */
+          <div className="max-w-3xl mx-auto">
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+                Transcript-Based Skill Validation
+              </h1>
+              <p className="text-slate-600 text-lg">
+                Upload your academic transcript to analyze your skills and discover career opportunities
+              </p>
+            </div>
             <Card
-              title="1) Upload transcript"
-              subtitle="Upload PDF to extract details and build skill profile"
-              right={busy ? <Badge tone="amber">Working</Badge> : <Badge tone="green">Ready</Badge>}
+              title=""
+              subtitle=""
+              right={busy ? <Badge tone="amber">Processing...</Badge> : <Badge tone="green">Ready</Badge>}
             >
-              <div className="space-y-3">
-                <div>
-                  <label className="text-sm font-medium text-slate-700">Student ID</label>
-                  <input
-                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                    value={studentId}
-                    onChange={(e) => setStudentId(e.target.value)}
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-slate-700">Reg No (optional)</label>
-                  <input
-                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                    value={regNo}
-                    onChange={(e) => setRegNo(e.target.value)}
-                    placeholder="Defaults to Student ID"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-slate-700">Transcript file</label>
-                  <input
-                    type="file"
-                    className="mt-1 w-full text-sm"
-                    accept=".pdf,image/*"
-                    onChange={(e) => setFile(e.target.files?.[0] || null)}
-                  />
-                </div>
+              <div className="space-y-6">
+                <FileUpload
+                  onFileSelect={setFile}
+                  loading={busy}
+                  accept=".pdf,image/*"
+                />
 
                 <button
-                  className="w-full px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
+                  className="w-full px-6 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02] text-lg"
                   onClick={onUpload}
-                  disabled={busy}
+                  disabled={busy || !file}
                 >
-                  Upload and Extract
+                  {busy ? (
+                    <span className="flex items-center justify-center space-x-2">
+                      <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span>Uploading and Processing...</span>
+                    </span>
+                  ) : (
+                    "Upload and Extract"
+                  )}
                 </button>
+                
+                <div className="flex items-center justify-center space-x-2 text-sm text-slate-500 pt-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>Student ID will be automatically extracted from your transcript</span>
+                </div>
               </div>
             </Card>
+          </div>
+        ) : (
+          /* Show all sections after transcript is uploaded */
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-1 space-y-6">
+              <Card
+                title="1) Upload transcript"
+                subtitle="Upload PDF to extract details and build skill profile"
+                right={busy ? <Badge tone="amber">Working</Badge> : <Badge tone="green">Ready</Badge>}
+              >
+                <div className="space-y-3">
+                  {/* Student ID and Reg No fields hidden - will be extracted from transcript automatically */}
+                  <div>
+                    <label className="text-sm font-medium text-slate-700">Transcript file</label>
+                    <input
+                      type="file"
+                      className="mt-1 w-full text-sm"
+                      accept=".pdf,image/*"
+                      onChange={(e) => setFile(e.target.files?.[0] || null)}
+                    />
+                  </div>
+
+                  <button
+                    className="w-full px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
+                    onClick={onUpload}
+                    disabled={busy}
+                  >
+                    Upload and Extract
+                  </button>
+                </div>
+              </Card>
 
             <Card title="2) Build view panels" subtitle="Load computed skills and roles">
               <div className="flex flex-wrap gap-2">
@@ -702,6 +797,7 @@ export default function App() {
             </Card>
           </div>
         </div>
+        )}
       </div>
 
       <XaiDrawer

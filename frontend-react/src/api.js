@@ -77,6 +77,21 @@ export function uploadTranscript(studentId, file, regNo = "") {
   });
 }
 
+// Upload transcript without requiring student ID (will be extracted from transcript)
+export function uploadTranscriptAuto(file, studentId = null) {
+  const form = new FormData();
+  form.append("file", file);
+  // Only append student_id if provided (Form(None) handles empty string as None)
+  if (studentId && studentId.trim()) {
+    form.append("student_id", studentId.trim());
+  }
+
+  return apiFetch("/upload-transcript", {
+    method: "POST",
+    body: form,
+  });
+}
+
 // XAI (optional)
 export function getSkillEvidence(studentId) {
   return apiFetch(`/students/${encodeURIComponent(studentId)}/xai/skills`);

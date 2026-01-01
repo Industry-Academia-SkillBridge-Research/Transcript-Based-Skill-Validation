@@ -1,0 +1,96 @@
+StudentID,Skill,EvidenceCount,ScoreNormalized,SkillLevel
+IT22471543,Academic Listening & Note-taking,3,0.75,Advanced
+IT22471543,Academic Writing & Grammar,3,0.75,Advanced
+IT22471543,Agile Development & SCRUM,3,0.75,Advanced
+IT22471543,Agile Software Development & Scrum Practices,3,0.75,Advanced
+IT22471543,Algorithm Analysis & Asymptotic Notations,3,0.75,Advanced
+IT22471543,Algorithm Design Techniques,3,0.75,Advanced
+IT22471543,Android OS & Application Components,3,0.75,Advanced
+IT22471543,Application Testing & Security,3,0.75,Advanced
+IT22471543,"Arrays, Structures & File Handling",3,0.75,Advanced
+IT22471543,Boolean Algebra & Logic,3,0.75,Advanced
+IT22471543,C++ Programming Implementation,3,0.75,Advanced
+IT22471543,Calculus & Differentiation,3,0.75,Advanced
+IT22471543,"Classes, Objects & Properties",3,0.75,Advanced
+IT22471543,"Collections, Generics & Threads",3,0.75,Advanced
+IT22471543,Combinational & Sequential Logic Circuits,3,0.75,Advanced
+IT22471543,Control Structures & Loops,3,0.75,Advanced
+IT22471543,Data Handling & Media Integration,3,0.75,Advanced
+IT22471543,Data Modeling & ER Diagrams,3,0.75,Advanced
+IT22471543,Data Representation & Computer Architecture,3,0.75,Advanced
+IT22471543,Database Connectivity (ODBC/JDBC),3,0.75,Advanced
+IT22471543,Database Design & Conceptual Modeling,3,0.75,Advanced
+IT22471543,Database Security & Performance Optimization,3,0.75,Advanced
+IT22471543,Descriptive & Inferential Statistics,3,0.75,Advanced
+IT22471543,Design Patterns & Web-based Project,3,0.75,Advanced
+IT22471543,"Design Patterns (Creational, Structural, Behavioral)",3,0.75,Advanced
+IT22471543,Diversity & Inclusion Awareness,3,0.75,Advanced
+IT22471543,Documentation & Presentation Skills,3,0.75,Advanced
+IT22471543,"Encapsulation, Abstraction & Interfaces",3,0.75,Advanced
+IT22471543,Ethics & Professional Conduct,6,0.75,Advanced
+IT22471543,Exception Handling & Debugging,3,0.75,Advanced
+IT22471543,File System & I/O Management,3,0.75,Advanced
+IT22471543,Functional & Object-Oriented Analysis & Design,3,0.75,Advanced
+IT22471543,Functions & Recursion,3,0.75,Advanced
+IT22471543,Graph Theory & Matrices,3,0.75,Advanced
+IT22471543,HTML/CSS & UI Design,3,0.75,Advanced
+IT22471543,Hypothesis Testing & Chi-Squared Tests,3,0.75,Advanced
+IT22471543,IP Addressing & Network Design,3,0.75,Advanced
+IT22471543,IP Addressing & Subnetting,3,0.75,Advanced
+IT22471543,Industrial Tools & Technologies,6,0.75,Advanced
+IT22471543,Industry Expectations & Workplace Adaptation,6,0.75,Advanced
+IT22471543,Information Systems Analysis,3,0.75,Advanced
+IT22471543,Inheritance & Polymorphism,3,0.75,Advanced
+IT22471543,Integration & Applications,3,0.75,Advanced
+IT22471543,Intellectual Property & Entrepreneurship,3,0.75,Advanced
+IT22471543,Internet & Web Protocols,3,0.75,Advanced
+IT22471543,Java Programming Fundamentals,3,0.75,Advanced
+IT22471543,JavaScript/PHP Web Development,3,0.75,Advanced
+IT22471543,Job Role Awareness,6,0.75,Advanced
+IT22471543,Legal & Professional Responsibilities,3,0.75,Advanced
+IT22471543,Logical Database Design & Schema Refinement,3,0.75,Advanced
+IT22471543,Memory & Virtual Memory Management,3,0.75,Advanced
+IT22471543,Mobile App Development Fundamentals,3,0.75,Advanced
+IT22471543,Network Device Configuration (Routers/Switches),3,0.75,Advanced
+IT22471543,Network Security & ACLs,3,0.75,Advanced
+IT22471543,Networking Fundamentals & ISO/OSI Layers,3,0.75,Advanced
+IT22471543,Number Systems & Computer Arithmetic,3,0.75,Advanced
+IT22471543,OS Concepts & Architecture,3,0.75,Advanced
+IT22471543,Object-Oriented Concepts & Recap,3,0.75,Advanced
+IT22471543,Object-Oriented Programming Fundamentals,3,0.75,Advanced
+IT22471543,Operating Systems Basics,3,0.75,Advanced
+IT22471543,"Paraphrasing, Summarizing & Referencing",3,0.75,Advanced
+IT22471543,Personal Development & Work Ethics,3,0.75,Advanced
+IT22471543,Pointers & Memory Management,3,0.75,Advanced
+IT22471543,Probability Distributions & Random Variables,3,0.75,Advanced
+IT22471543,Procedural Programming Concepts,3,0.75,Advanced
+IT22471543,Process & Thread Management,3,0.75,Advanced
+IT22471543,Project Planning & Requirement Gathering,3,0.75,Advanced
+IT22471543,Reading Comprehension,3,0.75,Advanced
+IT22471543,Regression & Time Series Analysis,3,0.75,Advanced
+IT22471543,Requirements Engineering & UML,3,0.75,Advanced
+IT22471543,Routing & TCP/UDP Protocols,3,0.75,Advanced
+IT22471543,SQL Database Management (DDL/DML),3,0.75,Advanced
+IT22471543,SQL Querying & Database Programming,3,0.75,Advanced
+IT22471543,Sampling & Probability Theory,3,0.75,Advanced
+IT22471543,Schema Refinement & Normalization,3,0.75,Advanced
+IT22471543,Searching & Sorting Algorithms,3,0.75,Advanced
+IT22471543,Social Media & Digital Content,3,0.75,Advanced
+IT22471543,Soft Skills & Professionalism,6,0.75,Advanced
+IT22471543,Software Design & Testing,3,0.75,Advanced
+IT22471543,Software Engineering Fundamentals,3,0.75,Advanced
+IT22471543,Software Life Cycle Modeling,3,0.75,Advanced
+IT22471543,Software Testing & Unit Testing,3,0.75,Advanced
+IT22471543,Software Testing & User Acceptance,3,0.75,Advanced
+IT22471543,Speaking & Presentations,3,0.75,Advanced
+IT22471543,"Stack, Queue & Linked List Implementation",3,0.75,Advanced
+IT22471543,Strategic IS & Decision Support,3,0.75,Advanced
+IT22471543,"Supportive Software Processes (Configuration, Version, Release Management)",3,0.75,Advanced
+IT22471543,System Security & Administration Scripting,3,0.75,Advanced
+IT22471543,Team Organization & Collaboration,3,0.75,Advanced
+IT22471543,Teamwork & Collaboration,3,0.75,Advanced
+IT22471543,Tree & Graph Data Structures,3,0.75,Advanced
+IT22471543,UI/UX Design & Mobile Interface Concepts,3,0.75,Advanced
+IT22471543,UML Modeling & Behavioral Modeling,3,0.75,Advanced
+IT22471543,"VLAN, Spanning Tree & Trunking",3,0.75,Advanced
+IT22471543,e-Commerce & Web Security,3,0.75,Advanced

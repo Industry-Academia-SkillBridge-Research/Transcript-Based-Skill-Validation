@@ -7,7 +7,9 @@ from typing import Any, Dict, Optional, List, Tuple
 
 import pandas as pd
 import pdfplumber
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from PIL import Image
+import pytesseract
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -44,6 +46,8 @@ class PrepareQuizRequest(BaseModel):
     selected_skills: List[str] = []
     num_questions_per_skill: int = 3
     difficulty: str = "mixed"  # "easy" | "medium" | "hard" | "mixed"
+    include_related: bool = True
+    max_total_skills: int = 5
 
 
 class QuizResponseItem(BaseModel):
@@ -186,9 +190,265 @@ def map_to_bank_skill(selected_skill: str, bank_skills: set, aliases: List[Tuple
     return None
 
 
+def find_related_skills(selected: List[str], qdf: pd.DataFrame, max_total: int = 5) -> Tuple[List[str], Dict[str, List[str]]]:
+    """
+    Expand selected skills with related skills found in the question bank (qdf).
+    Returns (expanded_list, map_of_origin_to_added_related_skills).
+    Simple heuristic: token overlap and substring match (case-insensitive).
+    """
+    if qdf is None or qdf.empty:
+        return selected[:max_total], {s: [] for s in selected}
+
+    # Unique bank skills
+    bank_skills = sorted(set(qdf["Skill"].astype(str)))
+    selected_clean = [s.strip() for s in selected if s and s.strip()]
+
+    # Tokenize helper
+    def tokens(s: str):
+        return {t for t in re.split(r"\W+", s.lower()) if len(t) > 2}
+
+    expanded = []
+    added_set = set()
+    related_map: Dict[str, List[str]] = {}
+
+    # Start by adding the original selected skills (if they exist in bank, prefer bank naming)
+    for s in selected_clean:
+        # Try to find exact bank skill name first
+        bank_match = None
+        for b in bank_skills:
+            if s == b or s.lower() == b.lower():
+                bank_match = b
+                break
+        entry = bank_match if bank_match else s
+        if entry not in added_set:
+            expanded.append(entry)
+            added_set.add(entry)
+        related_map[s] = []
+
+        if len(added_set) >= max_total:
+            break
+
+    if len(added_set) < max_total:
+        # Find candidates for each selected
+        candidates_scores: Dict[str, float] = {}
+        for s in selected_clean:
+            s_toks = tokens(s)
+            for b in bank_skills:
+                if b in added_set:
+                    continue
+                b_toks = tokens(b)
+                score = len(s_toks & b_toks)
+                # substring boost
+                if s.lower() in b.lower() or b.lower() in s.lower():
+                    score += 1
+                if score > 0:
+                    candidates_scores.setdefault(b, 0.0)
+                    candidates_scores[b] = max(candidates_scores[b], score)
+
+        # Sort candidates by score desc, then by name
+        sorted_cands = sorted(candidates_scores.items(), key=lambda x: (-x[1], x[0]))
+
+        # Greedily add highest scoring candidates, but also assign to one of the origins (closest token overlap)
+        for cand, _ in sorted_cands:
+            if len(added_set) >= max_total:
+                break
+            # Find best origin to attach this candidate to
+            best_origin = None
+            best_score = -1
+            cand_toks = tokens(cand)
+            for s in selected_clean:
+                score = len(tokens(s) & cand_toks)
+                if s.lower() in cand.lower() or cand.lower() in s.lower():
+                    score += 1
+                if score > best_score:
+                    best_score = score
+                    best_origin = s
+            if cand not in added_set and best_score > 0:
+                expanded.append(cand)
+                added_set.add(cand)
+                if best_origin:
+                    related_map.setdefault(best_origin, []).append(cand)
+
+    # Ensure we return at most max_total and preserve order (originals first)
+    expanded = expanded[:max_total]
+    return expanded, related_map
+
+
 # -----------------------------
 # Endpoints
 # -----------------------------
+@app.post("/upload-transcript")
+async def upload_transcript_auto(file: UploadFile = File(...), student_id: Optional[str] = Form(None)):
+    """
+    Upload transcript without requiring student ID in the path.
+    Student ID will be extracted from the transcript if not provided.
+    """
+    try:
+        os.makedirs("output", exist_ok=True)
+
+        contents = await file.read()
+        
+        # Determine file type
+        filename_lower = file.filename.lower()
+        is_pdf = filename_lower.endswith(".pdf")
+        is_image = any(filename_lower.endswith(ext) for ext in [".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp"])
+        
+        if not (is_pdf or is_image):
+            raise HTTPException(
+                status_code=400,
+                detail="Only PDF and image files (JPG, PNG, GIF, WEBP, BMP) are supported."
+            )
+
+        # Extract text from file
+        import tempfile
+        import io
+        
+        text_parts = []
+        
+        if is_pdf:
+            # Handle PDF files
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
+                tmp_file.write(contents)
+                tmp_path = tmp_file.name
+            
+            with pdfplumber.open(tmp_path) as pdf:
+                for page in pdf.pages:
+                    text_parts.append(page.extract_text() or "")
+            
+            # Clean up temp PDF file
+            try:
+                os.unlink(tmp_path)
+            except:
+                pass
+        else:
+            # Handle image files using OCR
+            try:
+                image = Image.open(io.BytesIO(contents))
+                # Convert to RGB if necessary (for formats like PNG with transparency)
+                if image.mode != 'RGB':
+                    image = image.convert('RGB')
+                
+                # Use pytesseract to extract text
+                text = pytesseract.image_to_string(image, lang='eng')
+                text_parts.append(text)
+            except Exception as e:
+                raise HTTPException(
+                    status_code=422,
+                    detail=f"Failed to process image with OCR: {str(e)}"
+                )
+        
+        text = "\n".join(text_parts)
+
+        details, courses_df = parse_transcript_text(text)
+
+        if courses_df.empty:
+            raise HTTPException(
+                status_code=422,
+                detail="No course lines detected. Transcript format may not match parser regex.",
+            )
+
+        # Use provided student_id, or extract from transcript, or generate one
+        extracted_student_id = details.get("student_id") or details.get("registration_number") or ""
+        # Clean up student_id from form (could be None, empty string, or whitespace)
+        provided_student_id = (student_id or "").strip() if student_id else ""
+        final_student_id = (provided_student_id or extracted_student_id).strip()
+        
+        if not final_student_id:
+            # Generate a temporary ID based on filename and timestamp
+            import hashlib
+            import time
+            filename_hash = hashlib.md5(file.filename.encode()).hexdigest()[:8]
+            timestamp = str(int(time.time()))[-6:]
+            final_student_id = f"TEMP_{filename_hash}_{timestamp}"
+            details["student_id"] = final_student_id
+            details["is_temporary_id"] = True
+
+        # Update details with final student ID
+        details["student_id"] = final_student_id
+        if not details.get("registration_number"):
+            details["registration_number"] = final_student_id
+
+        # Save file with proper student ID
+        final_tmp_path = os.path.join("output", f"_tmp_{final_student_id}_{file.filename}")
+        with open(final_tmp_path, "wb") as f:
+            f.write(contents)
+
+        # Infer year from course code (IT1xxx = Year 1, IT2xxx = Year 2, etc.)
+        def infer_year_from_code(code: str) -> Optional[int]:
+            if not code or len(code) < 4:
+                return None
+            try:
+                # Extract first digit after "IT"
+                if code.upper().startswith("IT") and code[2].isdigit():
+                    year = int(code[2])
+                    if 1 <= year <= 4:
+                        return year
+            except (ValueError, IndexError):
+                pass
+            return None
+
+        if "Year" not in courses_df.columns:
+            courses_df["Year"] = courses_df["CourseCode"].apply(infer_year_from_code)
+
+        # Calculate statistics
+        GRADE_POINTS = {
+            "A+": 4.0, "A": 4.0, "A-": 3.7,
+            "B+": 3.3, "B": 3.0, "B-": 2.7,
+            "C+": 2.3, "C": 2.0, "C-": 1.7,
+            "D+": 1.3, "D": 1.0, "D-": 0.7,
+            "E": 0.0, "F": 0.0,
+        }
+        
+        courses_df["GradePoint"] = courses_df["Grade"].str.upper().map(GRADE_POINTS).fillna(0.0)
+        valid_grades = courses_df[courses_df["GradePoint"] > 0]
+        
+        # Calculate grade distribution
+        grade_dist = courses_df["Grade"].astype(str).str.upper().str.replace(r"[+-]", "", regex=True)
+        grade_distribution = grade_dist.value_counts().to_dict()
+        # Convert numpy types to native Python types
+        grade_distribution = {str(k): int(v) for k, v in grade_distribution.items()}
+        
+        stats = {
+            "total_courses": int(len(courses_df)),
+            "average_gpa": float(valid_grades["GradePoint"].mean()) if len(valid_grades) > 0 else None,
+            "grade_distribution": grade_distribution,
+        }
+
+        skills_df = build_skill_profile_from_parsed(
+            student_id=final_student_id,
+            parsed_courses_df=courses_df,
+            mapping_path="input/course_skill_mapping.csv",
+        )
+
+        per_student_path = os.path.join("output", f"skill_profile_{final_student_id}.csv")
+        try:
+            skills_df.to_csv(per_student_path, index=False)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to write {per_student_path}: {e}")
+
+        # Clean up temporary file
+        try:
+            os.unlink(tmp_path)
+        except:
+            pass
+
+        return {
+            "student_id": final_student_id,
+            "transcript_details": details,
+            "num_courses_detected": int(len(courses_df)),
+            "courses": courses_df.to_dict(orient="records"),
+            "statistics": stats,
+            "num_skills_mapped": int(len(skills_df)),
+            "skills": skills_df.sort_values("ScoreNormalized", ascending=False).to_dict(orient="records"),
+            "saved_skill_profile": os.path.basename(per_student_path),
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing transcript: {e}")
+
+
 @app.post("/students/{student_id}/upload-transcript")
 async def upload_transcript(student_id: str, file: UploadFile = File(...)):
     try:
@@ -199,8 +459,15 @@ async def upload_transcript(student_id: str, file: UploadFile = File(...)):
         with open(tmp_path, "wb") as f:
             f.write(contents)
 
-        if not file.filename.lower().endswith(".pdf"):
-            raise HTTPException(status_code=400, detail="Only PDF supported for now.")
+        filename_lower = file.filename.lower()
+        is_pdf = filename_lower.endswith(".pdf")
+        is_image = any(filename_lower.endswith(ext) for ext in [".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp"])
+        
+        if not (is_pdf or is_image):
+            raise HTTPException(
+                status_code=400,
+                detail="Only PDF and image files (JPG, PNG, GIF, WEBP, BMP) are supported."
+            )
 
         text_parts = []
         with pdfplumber.open(tmp_path) as pdf:
@@ -215,6 +482,47 @@ async def upload_transcript(student_id: str, file: UploadFile = File(...)):
                 status_code=422,
                 detail="No course lines detected. Transcript format may not match parser regex.",
             )
+
+        # Infer year from course code (IT1xxx = Year 1, IT2xxx = Year 2, etc.)
+        def infer_year_from_code(code: str) -> Optional[int]:
+            if not code or len(code) < 4:
+                return None
+            try:
+                # Extract first digit after "IT"
+                if code.upper().startswith("IT") and code[2].isdigit():
+                    year = int(code[2])
+                    if 1 <= year <= 4:
+                        return year
+            except (ValueError, IndexError):
+                pass
+            return None
+
+        if "Year" not in courses_df.columns:
+            courses_df["Year"] = courses_df["CourseCode"].apply(infer_year_from_code)
+
+        # Calculate statistics
+        GRADE_POINTS = {
+            "A+": 4.0, "A": 4.0, "A-": 3.7,
+            "B+": 3.3, "B": 3.0, "B-": 2.7,
+            "C+": 2.3, "C": 2.0, "C-": 1.7,
+            "D+": 1.3, "D": 1.0, "D-": 0.7,
+            "E": 0.0, "F": 0.0,
+        }
+        
+        courses_df["GradePoint"] = courses_df["Grade"].str.upper().map(GRADE_POINTS).fillna(0.0)
+        valid_grades = courses_df[courses_df["GradePoint"] > 0]
+        
+        # Calculate grade distribution
+        grade_dist = courses_df["Grade"].astype(str).str.upper().str.replace(r"[+-]", "", regex=True)
+        grade_distribution = grade_dist.value_counts().to_dict()
+        # Convert numpy types to native Python types
+        grade_distribution = {str(k): int(v) for k, v in grade_distribution.items()}
+        
+        stats = {
+            "total_courses": int(len(courses_df)),
+            "average_gpa": float(valid_grades["GradePoint"].mean()) if len(valid_grades) > 0 else None,
+            "grade_distribution": grade_distribution,
+        }
 
         skills_df = build_skill_profile_from_parsed(
             student_id=student_id,
@@ -233,6 +541,7 @@ async def upload_transcript(student_id: str, file: UploadFile = File(...)):
             "transcript_details": details,
             "num_courses_detected": int(len(courses_df)),
             "courses": courses_df.to_dict(orient="records"),
+            "statistics": stats,
             "num_skills_mapped": int(len(skills_df)),
             "skills": skills_df.sort_values("ScoreNormalized", ascending=False).to_dict(orient="records"),
             "saved_skill_profile": os.path.basename(per_student_path),
@@ -447,23 +756,7 @@ def prepare_quiz(student_id: str, payload: PrepareQuizRequest):
     if len(selected) > 5:
         raise HTTPException(status_code=400, detail="You can select a maximum of 5 skills.")
 
-    per_student_path = os.path.join("output", f"skill_profile_{student_id}.csv")
-    if not os.path.exists(per_student_path):
-        raise HTTPException(status_code=404, detail="Upload transcript first (skill profile not found).")
-
-    skills_df = pd.read_csv(per_student_path)
-    if "Skill" not in skills_df.columns:
-        raise HTTPException(status_code=500, detail="Skill profile missing 'Skill' column.")
-
-    available = set(skills_df["Skill"].astype(str))
-    invalid = [s for s in selected if s not in available]
-    if invalid:
-        raise HTTPException(status_code=400, detail=f"Invalid skills selected: {invalid}")
-
-    difficulty = (payload.difficulty or "mixed").strip().lower()
-    per_skill = int(payload.num_questions_per_skill or 3)
-
-    # Load question bank for fallback
+    # Load question bank early (used for related-skill expansion and fallback)
     try:
         qdf = load_question_bank()
         # Ensure numeric QuestionID
@@ -473,27 +766,68 @@ def prepare_quiz(student_id: str, payload: PrepareQuizRequest):
     except Exception:
         qdf = pd.DataFrame()
 
+    # Expand selected skills with related skills if requested
+    include_related = bool(payload.include_related)
+    max_total = int(payload.max_total_skills or 5)
+    if max_total <= 0:
+        max_total = 5
+    if max_total > 10:
+        # sanity cap
+        max_total = 10
+
+    if include_related and not qdf.empty:
+        expanded_skills, related_map = find_related_skills(selected, qdf, max_total=max_total)
+    else:
+        expanded_skills = selected[:max_total]
+        related_map = {s: [] for s in selected}
+
+    # Build pairs of (origin_selected_skill, skill_to_use)
+    # origin is the skill the user selected; skill_to_use is the bank skill used to fetch/generate questions
+    pairs: List[Tuple[str, str]] = []
+    used_set = set()
+    # First, add the original selected skills (if present in expanded)
+    for s in selected:
+        for e in expanded_skills:
+            if e.lower() == s.lower() and e not in used_set:
+                pairs.append((s, e))
+                used_set.add(e)
+                break
+
+    # Then add remaining expanded skills and assign them to an origin (from related_map where possible)
+    for e in expanded_skills:
+        if e in used_set:
+            continue
+        # find origin that lists e
+        origin = None
+        for s, rels in related_map.items():
+            if e in rels:
+                origin = s
+                break
+        if origin is None:
+            # fallback to first selected
+            origin = selected[0]
+        pairs.append((origin, e))
+        used_set.add(e)
+
     bank_skills = set(qdf["Skill"].astype(str).unique()) if not qdf.empty else set()
     aliases = load_skill_aliases() if "load_skill_aliases" in globals() else []
 
     questions = []
     answer_key = {}
-    missing_skills = []
+    missing_origins = []
 
     next_qid = 100000  # ids for Gemini-generated questions
 
-    for selected_skill in selected:
-        # Map long skill -> bank skill key (SQL/Java/etc.) to decide which KB file to use
+    # Iterate over pairs so we know the origin (user-selected) skill for each generated question
+    for origin_skill, skill_to_use in pairs:
         mapped_skill = None
         if bank_skills:
-            mapped_skill = map_to_bank_skill(selected_skill, bank_skills, aliases)
+            mapped_skill = map_to_bank_skill(skill_to_use, bank_skills, aliases)
 
-        # If bank is empty or mapping fails, use a simple default key:
-        # take first word (e.g., "Java Programming..." -> "Java")
         if not mapped_skill:
-            mapped_skill = selected_skill.split()[0].strip() if selected_skill.split() else selected_skill
+            mapped_skill = skill_to_use.split()[0].strip() if skill_to_use.split() else skill_to_use
 
-        # --- 1) Try Gemini + RAG ---
+        # --- Gemini + RAG ---
         gemini_ok = False
         try:
             context = load_skill_context(mapped_skill, kb_dir="knowledge_base", max_chars=5500)
@@ -501,16 +835,15 @@ def prepare_quiz(student_id: str, payload: PrepareQuizRequest):
                 gen = generate_mcqs_from_context(
                     skill_key=mapped_skill,
                     context=context,
-                    n=per_skill,
-                    difficulty=difficulty
+                    n=int(payload.num_questions_per_skill or 3),
+                    difficulty=(payload.difficulty or "mixed").strip().lower()
                 )
 
-                gen_questions = gen.get("questions", [])
+                gen_questions = gen.get("questions", []) if isinstance(gen, dict) else []
                 for q in gen_questions:
                     opts = q.get("options", {}) or {}
                     ans = str(q.get("answer", "")).strip().upper()
 
-                    # Validate minimal structure
                     if ans not in ["A", "B", "C", "D"]:
                         continue
                     if not all(k in opts for k in ["A", "B", "C", "D"]):
@@ -518,15 +851,14 @@ def prepare_quiz(student_id: str, payload: PrepareQuizRequest):
 
                     qid = next_qid
                     next_qid += 1
-
                     answer_key[str(qid)] = ans
 
                     questions.append(
                         {
                             "QuestionID": qid,
-                            "SelectedSkill": selected_skill,
+                            "SelectedSkill": origin_skill,
                             "Skill": mapped_skill,
-                            "Difficulty": difficulty,
+                            "Difficulty": (payload.difficulty or "mixed").strip().lower(),
                             "QuestionText": str(q.get("question", "")).strip(),
                             "OptionA": str(opts.get("A", "")).strip(),
                             "OptionB": str(opts.get("B", "")).strip(),
@@ -536,26 +868,27 @@ def prepare_quiz(student_id: str, payload: PrepareQuizRequest):
                         }
                     )
 
-                if len([x for x in questions if x["SelectedSkill"] == selected_skill]) > 0:
+                if len([x for x in questions if x["SelectedSkill"] == origin_skill]) > 0:
                     gemini_ok = True
         except Exception:
             gemini_ok = False
 
-        # --- 2) Fallback to Question Bank if Gemini failed ---
+        # --- Fallback to Question Bank if Gemini failed ---
         if not gemini_ok:
             if qdf.empty:
-                missing_skills.append(selected_skill)
+                missing_origins.append(origin_skill)
                 continue
 
-            # Use mapped_skill to pull from bank (SQL/Java/etc.)
             subset = qdf[qdf["Skill"].astype(str) == str(mapped_skill)].copy()
+            difficulty = (payload.difficulty or "mixed").strip().lower()
             if difficulty != "mixed":
                 subset = subset[subset["Difficulty"].astype(str).str.lower() == difficulty]
 
             if subset.empty:
-                missing_skills.append(selected_skill)
+                missing_origins.append(origin_skill)
                 continue
 
+            per_skill = int(payload.num_questions_per_skill or 3)
             subset = subset.sample(n=min(per_skill, len(subset)), random_state=42)
 
             for _, row in subset.iterrows():
@@ -565,7 +898,7 @@ def prepare_quiz(student_id: str, payload: PrepareQuizRequest):
                 questions.append(
                     {
                         "QuestionID": qid,
-                        "SelectedSkill": selected_skill,
+                        "SelectedSkill": origin_skill,
                         "Skill": str(row["Skill"]),
                         "Difficulty": str(row["Difficulty"]),
                         "QuestionText": str(row["QuestionText"]),
@@ -577,10 +910,10 @@ def prepare_quiz(student_id: str, payload: PrepareQuizRequest):
                     }
                 )
 
-    if missing_skills:
+    if missing_origins:
         raise HTTPException(
             status_code=404,
-            detail=f"No questions could be generated for: {missing_skills}. Add knowledge_base files or expand question_bank.csv.",
+            detail=f"No questions could be generated for selected origins: {sorted(set(missing_origins))}. Add knowledge_base files or expand question_bank.csv.",
         )
 
     save_quiz_answer_key(student_id, answer_key)
@@ -588,6 +921,7 @@ def prepare_quiz(student_id: str, payload: PrepareQuizRequest):
     return {
         "student_id": student_id,
         "selected_skills": selected,
+        "expanded_skills": expanded_skills,
         "num_questions": len(questions),
         "questions": questions,
     }
