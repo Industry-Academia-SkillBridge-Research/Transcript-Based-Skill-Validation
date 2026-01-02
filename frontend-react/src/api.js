@@ -116,3 +116,11 @@ export function getRoleEvidence(studentId, roleName) {
   const q = roleName ? `?role=${encodeURIComponent(roleName)}` : "";
   return apiFetch(`/students/${encodeURIComponent(studentId)}/xai/roles${q}`);
 }
+
+// Process jobs from Job_data.json and create job roles
+export function processJobs() {
+  return apiFetch("/admin/process-jobs", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+  });
+}

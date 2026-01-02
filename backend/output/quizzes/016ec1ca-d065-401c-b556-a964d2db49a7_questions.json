@@ -1,0 +1,44 @@
+[
+  {
+    "QuestionID": 100000,
+    "SelectedSkill": "SQL",
+    "Skill": "SQL",
+    "Difficulty": "mixed",
+    "QuestionText": "What does NULL signify in SQL, and how are comparisons with NULL typically handled?",
+    "OptionA": "NULL means an unknown or missing value, and comparisons require IS NULL or IS NOT NULL.",
+    "OptionB": "NULL means an empty string, and NULL = NULL evaluates to true.",
+    "OptionC": "NULL is equivalent to zero, and can be compared directly using = or !=.",
+    "OptionD": "NULL indicates an error, and comparisons using = always return false.",
+    "CorrectOption": "A",
+    "Explanation": "According to the context, NULL means unknown or missing. Standard comparison operators like '=' do not work with NULL; instead, IS NULL or IS NOT NULL must be used.",
+    "Source": "gemini"
+  },
+  {
+    "QuestionID": 100001,
+    "SelectedSkill": "SQL",
+    "Skill": "SQL",
+    "Difficulty": "mixed",
+    "QuestionText": "You need to retrieve the names of departments that have at least 10 employees. Which SQL clauses would you primarily use to achieve this, and in what logical order?",
+    "OptionA": "GROUP BY and HAVING, with HAVING filtering groups after grouping.",
+    "OptionB": "WHERE and GROUP BY, with WHERE filtering rows before grouping.",
+    "OptionC": "ORDER BY and LIMIT, to sort and then restrict results.",
+    "OptionD": "SELECT DISTINCT and WHERE, to get unique departments after initial filtering.",
+    "CorrectOption": "A",
+    "Explanation": "To count employees per department (group) and then filter those groups based on the count, you must use GROUP BY to aggregate and HAVING to filter the aggregated results. WHERE filters individual rows before grouping.",
+    "Source": "gemini"
+  },
+  {
+    "QuestionID": 100002,
+    "SelectedSkill": "SQL",
+    "Skill": "SQL",
+    "Difficulty": "mixed",
+    "QuestionText": "What is the primary difference between the UNION and UNION ALL set operations in SQL?",
+    "OptionA": "UNION combines result sets and removes duplicate rows, while UNION ALL combines results but keeps all duplicate rows.",
+    "OptionB": "UNION requires both queries to have the same number of columns, while UNION ALL does not.",
+    "OptionC": "UNION combines results vertically, whereas UNION ALL combines results horizontally.",
+    "OptionD": "UNION only works with SELECT statements, but UNION ALL can combine any DML operations.",
+    "CorrectOption": "A",
+    "Explanation": "The context explicitly states that UNION combines results and removes duplicates, while UNION ALL combines results and keeps all duplicates, making this the key distinction.",
+    "Source": "gemini"
+  }
+]

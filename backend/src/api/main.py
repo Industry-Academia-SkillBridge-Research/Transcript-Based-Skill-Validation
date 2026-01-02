@@ -1670,6 +1670,52 @@ def selectable_skills(student_id: str, top_n: int = 15, only_weak: bool = False)
 
 
 # New endpoint: return plain list of canonical skill values (easy for simple UI consumption)
+@app.post("/admin/process-jobs")
+def process_jobs():
+    """
+    Process Job_data.json and create job roles.
+    This endpoint:
+    1. Converts Job_data.json to CSV (if needed)
+    2. Processes job postings and extracts skills
+    3. Creates role skill templates
+    4. Computes role readiness for all students
+    """
+    try:
+        # Step 1: Convert JSON to CSV if needed
+        from src.convert_job_json_to_csv import main as convert_main
+        try:
+            convert_main()
+            print("[INFO] Job JSON converted to CSV")
+        except FileNotFoundError:
+            print("[INFO] Job_data.json not found, using existing CSV if available")
+        except Exception as e:
+            print(f"[WARN] JSON conversion failed: {e}")
+
+        # Step 2: Process job postings and extract skills
+        from src.job_postings_ingestion import main as ingest_main
+        ingest_main()
+        print("[INFO] Job postings processed and role templates created")
+
+        # Step 3: Compute role readiness
+        from src.job_role_model_dynamic import main as role_model_main
+        role_model_main()
+        print("[INFO] Role readiness computed for all students")
+
+        return {
+            "status": "success",
+            "message": "Jobs processed successfully. Job roles created and matched with student skills.",
+            "files_created": [
+                "output/job_postings_sample.csv",
+                "output/job_skill_matches.csv",
+                "output/job_role_skill_templates_dynamic.csv",
+                "output/role_readiness_dynamic.csv",
+                "output/role_readiness_explainable.csv",
+            ],
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing jobs: {str(e)}")
+
+
 @app.get("/students/{student_id}/available-skills")
 def available_skills(student_id: str, only_weak: bool = False, limit: int = 100):
     """

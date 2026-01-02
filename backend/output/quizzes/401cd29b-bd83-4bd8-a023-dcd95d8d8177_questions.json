@@ -1,0 +1,44 @@
+[
+  {
+    "QuestionID": 100000,
+    "SelectedSkill": "SQL",
+    "Skill": "SQL",
+    "Difficulty": "mixed",
+    "QuestionText": "What is the primary purpose of SQL (Structured Query Language)?",
+    "OptionA": "To design graphical user interfaces for database applications.",
+    "OptionB": "To manage and query data stored in relational databases.",
+    "OptionC": "To create and maintain operating systems for database servers.",
+    "OptionD": "To develop front-end web applications that connect to databases.",
+    "CorrectOption": "B",
+    "Explanation": "SQL is specifically designed as a language for managing and querying data within relational databases, enabling operations like data retrieval, insertion, update, and deletion.",
+    "Source": "gemini"
+  },
+  {
+    "QuestionID": 100001,
+    "SelectedSkill": "SQL",
+    "Skill": "SQL",
+    "Difficulty": "mixed",
+    "QuestionText": "In a scenario where you need to retrieve departments that have a total count of 10 or more employees, which SQL clause should be used to filter the results *after* grouping by department and calculating the employee count?",
+    "OptionA": "WHERE",
+    "OptionB": "SELECT",
+    "OptionC": "ORDER BY",
+    "OptionD": "HAVING",
+    "CorrectOption": "D",
+    "Explanation": "The HAVING clause is used to filter groups based on conditions involving aggregate functions after the GROUP BY clause has been applied, distinguishing it from WHERE which filters individual rows before grouping.",
+    "Source": "gemini"
+  },
+  {
+    "QuestionID": 100002,
+    "SelectedSkill": "SQL",
+    "Skill": "SQL",
+    "Difficulty": "mixed",
+    "QuestionText": "When executing a LEFT JOIN between Table A (left) and Table B (right), what is the outcome for columns from Table B if a row from Table A has no matching row in Table B?",
+    "OptionA": "The row from Table A will be excluded from the final result set.",
+    "OptionB": "The corresponding columns from Table B will contain NULL values.",
+    "OptionC": "An error will be generated due to the absence of a match.",
+    "OptionD": "The query will automatically convert to an INNER JOIN for that specific row.",
+    "CorrectOption": "B",
+    "Explanation": "A LEFT JOIN returns all rows from the left table (Table A) and the matching rows from the right table (Table B). If there is no match for a left table row, the columns from the right table will have NULL values.",
+    "Source": "gemini"
+  }
+]

@@ -173,8 +173,18 @@ function QuizPage({ studentId, selectedSkills, quizId, timeLimitMinutes, session
       setLoading(true);
       setError(null);
 
-      // Include quiz_id and session_token if available
-      const data = await submitQuiz(studentId, responses, quizId || null, sessionToken || null);
+      // Collect violations if available from quiz security
+      let violations = [];
+      try {
+        const { getViolations } = await import("../utils/quizSecurity");
+        violations = getViolations();
+      } catch (err) {
+        // quizSecurity may not be available, that's okay
+        console.warn("Could not load violations:", err);
+      }
+
+      // Include quiz_id, session_token, and violations if available
+      const data = await submitQuiz(studentId, responses, quizId || null, sessionToken || null, violations);
       setQuizResult(data);
 
       if (onQuizCompleted) {

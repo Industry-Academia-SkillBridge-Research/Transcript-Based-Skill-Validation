@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   getSkills,
   getRoles,
@@ -14,6 +15,8 @@ import TranscriptDetailsPage from "./components/TranscriptDetailsPage";
 import SkillsPage from "./components/SkillsPage";
 import QuizPage from "./components/QuizPage";
 import QuizResultPage from "./components/QuizResultPage";
+import SkillProfileDashboard from "./components/SkillProfileDashboard";
+import JobRecommendations from "./components/JobRecommendations";
 
 function classNames(...xs) {
   return xs.filter(Boolean).join(" ");
@@ -141,6 +144,8 @@ function normalizeSkillRow(s) {
 }
 
 export default function App() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [studentId, setStudentId] = useState("IT21013928");
   const [regNo, setRegNo] = useState("");
   const [file, setFile] = useState(null);
@@ -149,6 +154,8 @@ export default function App() {
   const [showSkillsPage, setShowSkillsPage] = useState(false);
   const [showQuizPage, setShowQuizPage] = useState(false);
   const [showQuizResultPage, setShowQuizResultPage] = useState(false);
+  const [showSkillDashboard, setShowSkillDashboard] = useState(false);
+  const [showJobRecommendations, setShowJobRecommendations] = useState(false);
   const [selectedQuizSkills, setSelectedQuizSkills] = useState([]);
   const [quizQuestions, setQuizQuestions] = useState(null);
 
@@ -468,8 +475,29 @@ export default function App() {
           </div>
         ) : null}
 
-        {/* Show quiz result page */}
-        {showQuizResultPage && quizResult && quizQuestions ? (
+        {/* Show job recommendations */}
+        {showJobRecommendations ? (
+          <JobRecommendations
+            studentId={studentId}
+            onBack={() => {
+              setShowJobRecommendations(false);
+              setShowSkillDashboard(true);
+            }}
+          />
+        ) : showSkillDashboard ? (
+          <SkillProfileDashboard
+            studentId={studentId}
+            selectedSkills={selectedQuizSkills}
+            onBack={() => {
+              setShowSkillDashboard(false);
+              setShowQuizResultPage(true);
+            }}
+            onViewJobs={() => {
+              setShowSkillDashboard(false);
+              setShowJobRecommendations(true);
+            }}
+          />
+        ) : showQuizResultPage && quizResult && quizQuestions ? (
           <QuizResultPage
             studentId={studentId}
             quizResult={quizResult}
@@ -479,6 +507,10 @@ export default function App() {
               setShowQuizResultPage(false);
               setShowQuizPage(false);
               setShowSkillsPage(true);
+            }}
+            onViewDashboard={() => {
+              setShowQuizResultPage(false);
+              setShowSkillDashboard(true);
             }}
             onRetakeQuiz={() => {
               setQuizResult(null);

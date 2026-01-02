@@ -1,0 +1,44 @@
+[
+  {
+    "QuestionID": 100000,
+    "SelectedSkill": "SQL",
+    "Skill": "SQL",
+    "Difficulty": "mixed",
+    "QuestionText": "What is the primary purpose of SQL (Structured Query Language) as described in the provided context?",
+    "OptionA": "To create graphical user interfaces for databases.",
+    "OptionB": "To manage and query data stored in relational databases.",
+    "OptionC": "To develop operating systems for servers.",
+    "OptionD": "To design hardware components for data storage.",
+    "CorrectOption": "B",
+    "Explanation": "The context clearly states that 'SQL (Structured Query Language) is used to manage and query data stored in relational databases.' This defines its core functionality.",
+    "Source": "gemini"
+  },
+  {
+    "QuestionID": 100001,
+    "SelectedSkill": "SQL",
+    "Skill": "SQL",
+    "Difficulty": "mixed",
+    "QuestionText": "You need to retrieve the 'name' and 'age' for all students who are 21 years old or older from a table named 'Students'. Which SQL query correctly achieves this?",
+    "OptionA": "SELECT name, age FROM Students WHERE age =< 21;",
+    "OptionB": "SELECT name, age FROM Students WHERE age >= 21;",
+    "OptionC": "SELECT age, name FROM Students ORDER BY age;",
+    "OptionD": "SELECT name, age FROM Students LIMIT 21;",
+    "CorrectOption": "B",
+    "Explanation": "The context provides an example query: 'SELECT name, age FROM Students WHERE age >= 21;' which correctly uses the SELECT, FROM, and WHERE clauses to filter by age.",
+    "Source": "gemini"
+  },
+  {
+    "QuestionID": 100002,
+    "SelectedSkill": "SQL",
+    "Skill": "SQL",
+    "Difficulty": "mixed",
+    "QuestionText": "In a relational database, what is the role of a Primary Key, and which basic SQL clause is used to select specific columns from a table?",
+    "OptionA": "A Primary Key uniquely identifies each row; SELECT chooses columns.",
+    "OptionB": "A Primary Key sorts data within a table; FROM specifies the table.",
+    "OptionC": "A Primary Key aggregates data into groups; WHERE filters rows.",
+    "OptionD": "A Primary Key restricts the number of rows returned; DISTINCT removes duplicates.",
+    "CorrectOption": "A",
+    "Explanation": "The context defines a primary key as uniquely identifying each row (chunk_101) and states that SELECT is the clause used to choose columns (chunk_102).",
+    "Source": "gemini"
+  }
+]

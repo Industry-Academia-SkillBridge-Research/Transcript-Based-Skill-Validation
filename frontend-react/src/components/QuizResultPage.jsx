@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function QuizResultPage({ studentId, quizResult, questions, selectedSkills, onBack, onRetakeQuiz }) {
+function QuizResultPage({ studentId, quizResult, questions, selectedSkills, onBack, onRetakeQuiz, onViewDashboard }) {
   const [reviewIndex, setReviewIndex] = useState(0);
   const [showReview, setShowReview] = useState(false);
 
@@ -158,6 +158,14 @@ function QuizResultPage({ studentId, quizResult, questions, selectedSkills, onBa
             >
               Review Answers with Explanations
             </button>
+            {onViewDashboard && (
+              <button
+                onClick={onViewDashboard}
+                className="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl"
+              >
+                View Skill Profile Dashboard
+              </button>
+            )}
             {onRetakeQuiz && (
               <button
                 onClick={onRetakeQuiz}
