@@ -1,0 +1,44 @@
+[
+  {
+    "QuestionID": 100000,
+    "SelectedSkill": "SQL",
+    "Skill": "SQL",
+    "Difficulty": "mixed",
+    "QuestionText": "What is the primary role of a primary key in a relational database table?",
+    "OptionA": "To uniquely identify each row within the table.",
+    "OptionB": "To establish a link to a primary key in another table.",
+    "OptionC": "To enforce that a column cannot contain NULL values.",
+    "OptionD": "To sort the query results in a predefined order.",
+    "CorrectOption": "A",
+    "Explanation": "A primary key's fundamental purpose is to ensure that every single row in a table can be uniquely identified, preventing duplicate records based on that key.",
+    "Source": "gemini"
+  },
+  {
+    "QuestionID": 100001,
+    "SelectedSkill": "SQL",
+    "Skill": "SQL",
+    "Difficulty": "mixed",
+    "QuestionText": "A database administrator needs to retrieve all records from the 'Products' table where the 'description' column explicitly indicates that the value is unknown or missing. Which of the following SQL WHERE clause conditions is the correct way to filter for these records?",
+    "OptionA": "WHERE description = NULL",
+    "OptionB": "WHERE description != NULL",
+    "OptionC": "WHERE description IS NULL",
+    "OptionD": "WHERE description LIKE 'NULL'",
+    "CorrectOption": "C",
+    "Explanation": "NULL represents unknown or missing data, and standard comparison operators like '=' or '!=' do not work with it. The correct way to check for NULL values is by using the 'IS NULL' operator.",
+    "Source": "gemini"
+  },
+  {
+    "QuestionID": 100002,
+    "SelectedSkill": "SQL",
+    "Skill": "SQL",
+    "Difficulty": "mixed",
+    "QuestionText": "To significantly improve the performance of data retrieval operations, particularly for columns frequently utilized in `WHERE` clauses and `JOIN` conditions, which database object should be created?",
+    "OptionA": "A View",
+    "OptionB": "An Index",
+    "OptionC": "A Constraint",
+    "OptionD": "A Subquery",
+    "CorrectOption": "B",
+    "Explanation": "Indexes are specifically designed to speed up lookup operations on columns, which is beneficial when those columns are frequently used to filter rows or combine data between tables.",
+    "Source": "gemini"
+  }
+]

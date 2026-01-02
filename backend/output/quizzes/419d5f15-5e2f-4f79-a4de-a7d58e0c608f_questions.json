@@ -1,0 +1,44 @@
+[
+  {
+    "QuestionID": 100000,
+    "SelectedSkill": "SQL",
+    "Skill": "SQL",
+    "Difficulty": "mixed",
+    "QuestionText": "What is the primary difference in how the WHERE and HAVING clauses filter data in SQL?",
+    "OptionA": "WHERE filters individual rows before grouping, while HAVING filters groups of rows after grouping.",
+    "OptionB": "WHERE filters groups based on aggregate functions, while HAVING filters individual rows based on column values.",
+    "OptionC": "WHERE is used exclusively with JOIN operations, while HAVING is used with subqueries.",
+    "OptionD": "WHERE filters after data has been sorted, while HAVING filters before sorting occurs.",
+    "CorrectOption": "A",
+    "Explanation": "The WHERE clause filters individual rows before any grouping occurs. In contrast, the HAVING clause is used to filter groups of rows, and it applies its conditions after the GROUP BY clause has aggregated the data.",
+    "Source": "gemini"
+  },
+  {
+    "QuestionID": 100001,
+    "SelectedSkill": "SQL",
+    "Skill": "SQL",
+    "Difficulty": "mixed",
+    "QuestionText": "You need to retrieve a list of all unique department names from the 'Employees' table, sorted alphabetically in ascending order. Which of the following SQL queries will correctly achieve this?",
+    "OptionA": "SELECT DISTINCT department FROM Employees ORDER BY department ASC;",
+    "OptionB": "SELECT department FROM Employees WHERE department IS DISTINCT ORDER BY department ASC;",
+    "OptionC": "SELECT department FROM Employees GROUP BY department HAVING COUNT(*) > 0;",
+    "OptionD": "SELECT department FROM Employees ORDER BY department ASC UNIQUE;",
+    "CorrectOption": "A",
+    "Explanation": "The DISTINCT clause removes duplicate values from the result set, and the ORDER BY clause sorts the results. Combining these with ASC (ascending) will provide unique department names sorted alphabetically.",
+    "Source": "gemini"
+  },
+  {
+    "QuestionID": 100002,
+    "SelectedSkill": "SQL",
+    "Skill": "SQL",
+    "Difficulty": "mixed",
+    "QuestionText": "When using a LEFT JOIN in SQL, what values appear for columns from the right table if there is no matching row for a record from the left table?",
+    "OptionA": "NULL values.",
+    "OptionB": "An error is returned.",
+    "OptionC": "Empty strings.",
+    "OptionD": "The values from the corresponding row in the left table are duplicated.",
+    "CorrectOption": "A",
+    "Explanation": "A LEFT JOIN returns all rows from the left table, and the matching rows from the right table. If there is no match in the right table, NULL values are returned for the columns of the right table.",
+    "Source": "gemini"
+  }
+]

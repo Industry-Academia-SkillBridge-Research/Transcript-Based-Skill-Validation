@@ -1012,7 +1012,6 @@ def prepare_quiz(student_id: str, payload: PrepareQuizRequest):
                 retrieved_chunk_ids = []
                 try:
                     from src.rag_retrieval import retrieve_skill_context
-                    import pandas as pd
                     # Try to load corpus and get chunk IDs
                     corpus_path = os.path.join("content", "skill_corpus.csv")
                     if os.path.exists(corpus_path):
@@ -1407,7 +1406,10 @@ def submit_quiz(student_id: str, payload: SubmitQuizRequest):
         qid = str(r.question_id)
         gold = str(answer_key.get(qid, "")).upper()
         picked = str(r.selected_option).upper()
-        response_time = r.get("response_time_seconds", 0.0)
+        # `r` is a Pydantic `QuizResponseItem` (object) not a dict; use attribute access
+        response_time = getattr(r, "response_time_seconds", None)
+        if response_time is None:
+            response_time = 0.0
 
         is_correct = picked == gold and gold in ["A", "B", "C", "D"]
         if is_correct:

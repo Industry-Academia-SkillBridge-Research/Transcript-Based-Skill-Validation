@@ -1,0 +1,44 @@
+[
+  {
+    "QuestionID": 100000,
+    "SelectedSkill": "SQL",
+    "Skill": "SQL",
+    "Difficulty": "mixed",
+    "QuestionText": "Which of the following best describes a primary key in SQL?",
+    "OptionA": "A key that links two tables together by referencing a unique value in another table.",
+    "OptionB": "A key that uniquely identifies each row in a table.",
+    "OptionC": "A key used for sorting query results in ascending order.",
+    "OptionD": "A key that allows multiple duplicate values in a column.",
+    "CorrectOption": "B",
+    "Explanation": "A primary key is designed to uniquely identify each row within its table, ensuring data integrity and providing a unique reference point for foreign keys.",
+    "Source": "gemini"
+  },
+  {
+    "QuestionID": 100001,
+    "SelectedSkill": "SQL",
+    "Skill": "SQL",
+    "Difficulty": "mixed",
+    "QuestionText": "What is the primary difference in how the WHERE and HAVING clauses filter data in SQL?",
+    "OptionA": "WHERE filters rows after aggregation, while HAVING filters rows before aggregation.",
+    "OptionB": "WHERE filters individual rows before any grouping occurs, while HAVING filters groups of rows after aggregation.",
+    "OptionC": "WHERE is used for numerical comparisons, and HAVING is used for string comparisons.",
+    "OptionD": "WHERE can only be used with SELECT statements, while HAVING can be used with INSERT statements.",
+    "CorrectOption": "B",
+    "Explanation": "The WHERE clause is applied to filter individual rows before they are grouped, whereas the HAVING clause is used to filter groups of rows after the GROUP BY clause has aggregated them.",
+    "Source": "gemini"
+  },
+  {
+    "QuestionID": 100002,
+    "SelectedSkill": "SQL",
+    "Skill": "SQL",
+    "Difficulty": "mixed",
+    "QuestionText": "You need to retrieve all orders and their customer names, including orders that do not have a matching customer in the 'Customers' table. If there's no match, the customer name should appear as NULL. Which JOIN type should you use between the 'Orders' table (left) and 'Customers' table (right)?",
+    "OptionA": "INNER JOIN",
+    "OptionB": "LEFT JOIN",
+    "OptionC": "RIGHT JOIN",
+    "OptionD": "FULL OUTER JOIN",
+    "CorrectOption": "B",
+    "Explanation": "A LEFT JOIN returns all rows from the left table and the matching rows from the right table. If there is no match in the right table, NULL values are returned for columns from the right table, which aligns with the requirement.",
+    "Source": "gemini"
+  }
+]

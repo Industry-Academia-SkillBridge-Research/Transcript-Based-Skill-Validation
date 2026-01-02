@@ -1,0 +1,44 @@
+[
+  {
+    "QuestionID": 100000,
+    "SelectedSkill": "SQL",
+    "Skill": "SQL",
+    "Difficulty": "mixed",
+    "QuestionText": "What is the primary purpose of a primary key in a relational database table?",
+    "OptionA": "To uniquely identify each row within the table.",
+    "OptionB": "To filter rows based on specific conditions.",
+    "OptionC": "To reference a primary key in another table, establishing a link.",
+    "OptionD": "To sort the results of a query in ascending or descending order.",
+    "CorrectOption": "A",
+    "Explanation": "A primary key is a crucial constraint that ensures every row in a table can be uniquely identified, preventing duplicate records based on that key.",
+    "Source": "gemini"
+  },
+  {
+    "QuestionID": 100001,
+    "SelectedSkill": "SQL",
+    "Skill": "SQL",
+    "Difficulty": "mixed",
+    "QuestionText": "A SQL user wants to display the count of employees for each department, but only for departments with 10 or more employees. Which clause should be used to filter the results based on the aggregated count?",
+    "OptionA": "WHERE",
+    "OptionB": "ORDER BY",
+    "OptionC": "HAVING",
+    "OptionD": "GROUP BY",
+    "CorrectOption": "C",
+    "Explanation": "The HAVING clause is specifically designed to filter groups of rows after they have been aggregated by the GROUP BY clause, based on a condition applied to the aggregate function's result.",
+    "Source": "gemini"
+  },
+  {
+    "QuestionID": 100002,
+    "SelectedSkill": "SQL",
+    "Skill": "SQL",
+    "Difficulty": "mixed",
+    "QuestionText": "What is the main distinction between using UNION and UNION ALL in SQL when combining the results of two SELECT statements?",
+    "OptionA": "UNION combines results from tables, while UNION ALL combines results from views.",
+    "OptionB": "UNION removes duplicate rows from the final result set, while UNION ALL includes all duplicate rows.",
+    "OptionC": "UNION requires an explicit ORDER BY clause, whereas UNION ALL automatically sorts the results.",
+    "OptionD": "UNION is used for numerical data types, while UNION ALL supports all data types.",
+    "CorrectOption": "B",
+    "Explanation": "The UNION operator combines results and removes any duplicate rows from the combined output, whereas UNION ALL combines all rows from both result sets, including any duplicates.",
+    "Source": "gemini"
+  }
+]

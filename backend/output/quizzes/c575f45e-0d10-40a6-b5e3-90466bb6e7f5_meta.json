@@ -1,0 +1,23 @@
+{
+  "quiz_id": "c575f45e-0d10-40a6-b5e3-90466bb6e7f5",
+  "student_id": "IT21013928",
+  "selected_skills": [
+    "SQL"
+  ],
+  "expanded_skills": [
+    "SQL"
+  ],
+  "num_questions": 3,
+  "num_questions_per_skill": 3,
+  "difficulty": "mixed",
+  "time_limit_minutes": 10,
+  "time_limit_seconds": 600,
+  "created_time": "2026-01-02T09:01:42.602701",
+  "answer_key": {
+    "100000": "A",
+    "100001": "C",
+    "100002": "B"
+  },
+  "session_token": "cae38ec1-4c98-489f-b544-9f1d9971df2b",
+  "session_start_time": "2026-01-02T09:01:42.602701"
+}

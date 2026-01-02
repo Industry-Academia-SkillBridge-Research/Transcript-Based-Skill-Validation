@@ -1,0 +1,44 @@
+[
+  {
+    "QuestionID": 100000,
+    "SelectedSkill": "SQL",
+    "Skill": "SQL",
+    "Difficulty": "mixed",
+    "QuestionText": "In SQL, what is the primary function of a `PRIMARY KEY`?",
+    "OptionA": "To uniquely identify each row in a table.",
+    "OptionB": "To link two tables together based on a common column.",
+    "OptionC": "To filter rows based on specific conditions.",
+    "OptionD": "To sort the results of a query in ascending or descending order.",
+    "CorrectOption": "A",
+    "Explanation": "A primary key is essential for data integrity, as it guarantees that each row in a table can be uniquely identified, preventing duplicate records.",
+    "Source": "gemini"
+  },
+  {
+    "QuestionID": 100001,
+    "SelectedSkill": "SQL",
+    "Skill": "SQL",
+    "Difficulty": "mixed",
+    "QuestionText": "An analyst needs to count the number of employees in each department and display only those departments that have 10 or more employees. Which SQL query structure correctly achieves this, assuming a table named 'Employees' with a 'department' column?",
+    "OptionA": "SELECT department, COUNT(*) FROM Employees WHERE COUNT(*) >= 10 GROUP BY department;",
+    "OptionB": "SELECT department, COUNT(*) AS num_employees FROM Employees GROUP BY department HAVING COUNT(*) >= 10;",
+    "OptionC": "SELECT department, COUNT(*) FROM Employees GROUP BY department WHERE COUNT(*) >= 10;",
+    "OptionD": "SELECT department, COUNT(*) FROM Employees ORDER BY COUNT(*) DESC LIMIT 10;",
+    "CorrectOption": "B",
+    "Explanation": "The `GROUP BY` clause groups rows by department, and the `HAVING` clause is correctly used to filter these aggregated groups based on the condition `COUNT(*) >= 10`. The `WHERE` clause cannot filter aggregate functions directly.",
+    "Source": "gemini"
+  },
+  {
+    "QuestionID": 100002,
+    "SelectedSkill": "SQL",
+    "Skill": "SQL",
+    "Difficulty": "mixed",
+    "QuestionText": "What is the fundamental difference in how the `WHERE` and `HAVING` clauses filter data in SQL?",
+    "OptionA": "`WHERE` filters individual rows before grouping, while `HAVING` filters groups after aggregation.",
+    "OptionB": "`WHERE` is used exclusively with aggregate functions, whereas `HAVING` is used with individual column values.",
+    "OptionC": "`WHERE` can include aggregate functions like `COUNT()`, but `HAVING` cannot.",
+    "OptionD": "`WHERE` is an optional clause, but `HAVING` is always required when using `GROUP BY`.",
+    "CorrectOption": "A",
+    "Explanation": "The `WHERE` clause operates on individual rows *before* they are grouped and aggregates are computed. In contrast, the `HAVING` clause filters the results of `GROUP BY` after aggregation has occurred.",
+    "Source": "gemini"
+  }
+]
